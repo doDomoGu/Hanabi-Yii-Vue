@@ -2,7 +2,7 @@
 
 namespace frontend\modules\v1\controllers;
 
-use frontend\models\User;
+use common\models\User;
 use yii\rest\ActiveController;
 use yii\web\Response;
 use yii\filters\auth\QueryParamAuth;

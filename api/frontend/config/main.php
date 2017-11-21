@@ -44,13 +44,13 @@ return [
 
         'urlManager' => [
             'enablePrettyUrl' => true,
-            'showScriptName' => false,
             'enableStrictParsing' => true,
+            'showScriptName' => false,
             'rules' => [
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => ['v1/user'],
-                    'pluralize' => true
+                    'pluralize' => false
                 ],
             ],
         ],

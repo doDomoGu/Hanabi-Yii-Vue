@@ -16,7 +16,7 @@ use Yii;
  * @property int $status
  * @property int $verify
  */
-class User extends \yii\db\ActiveRecord
+class User_bk extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
