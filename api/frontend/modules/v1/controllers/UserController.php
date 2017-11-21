@@ -5,31 +5,32 @@ namespace frontend\modules\v1\controllers;
 use frontend\models\User;
 use yii\rest\ActiveController;
 use yii\web\Response;
+use yii\filters\auth\QueryParamAuth;
 
-
-class UsersController extends ActiveController
+class UserController extends ActiveController
 {
     public function init(){
         $this->modelClass = User::className();
         parent::init();
     }
 
-    public function behaviors()
+    public function behaviors222()
     {
         $behaviors = parent::behaviors();
-        $behaviors['contentNegotiator']['formats'] = ['application/json' => Response::FORMAT_JSON];
-        /*$behaviors['authenticator'] = [
+        //$behaviors['contentNegotiator']['formats'] = ['application/json' => Response::FORMAT_JSON];
+        $behaviors['authenticator'] = [
             'class' => QueryParamAuth::className(),
             // 设置token名称，默认是access-token
-            'tokenParam' => 'token',
-            'optional' => [
+            //'tokenParam' => 'access_token',
+            /*'optional' => [
                 'index',
                 'signup-test',
                 'view'
-            ],
-        ];*/
+            ],*/
+        ];
         return $behaviors;
     }
+
 
 
     public function actionIndex()
