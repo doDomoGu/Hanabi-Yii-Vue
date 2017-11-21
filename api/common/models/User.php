@@ -23,8 +23,9 @@ use yii\web\IdentityInterface;
  */
 class User extends ActiveRecord implements IdentityInterface
 {
-    const STATUS_DELETED = 0;
-    const STATUS_ACTIVE = 10;
+    const STATUS_DELETED = 2;
+    const STATUS_ACTIVE = 1;
+    const STATUS_BANNED = 0;
 
 
     /**
@@ -69,7 +70,20 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
+        $authFlag = false;
+        $auth = UserAuth::findOne(['token'=>$token]);
+        if($auth){
+            if($auth->expired_time >= date('Y-m-d H:i:s')){
+                $authFlag = static::findOne(['id'=>$auth->user_id,'status'=>self::STATUS_ACTIVE]);
+            }
+
+        }
+
+        return $authFlag;
+
+        //return static::findOne(['access_token' => $token, 'status' => self::STATUS_ACTIVE]);
+
+        //throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
     }
 
     /**

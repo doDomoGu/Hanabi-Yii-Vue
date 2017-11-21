@@ -14,7 +14,7 @@ class UserController extends ActiveController
         parent::init();
     }
 
-    public function behaviors222()
+    public function behaviors()
     {
         $behaviors = parent::behaviors();
         //$behaviors['contentNegotiator']['formats'] = ['application/json' => Response::FORMAT_JSON];
