@@ -41,7 +41,7 @@ const actions = {
         const password = formData.password.trim();
         return new Promise((resolve, reject) => {
             axios.post(
-                '/auths',
+                '/auth',
                 {
                     username: username,
                     password: password
@@ -65,7 +65,7 @@ const actions = {
 
         return new Promise((resolve, reject) => {
             axios.get(
-                '/auths',
+                '/auth',
                 {
                     params: {
                         token: token
