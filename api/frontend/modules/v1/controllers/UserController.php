@@ -2,6 +2,7 @@
 
 namespace frontend\modules\v1\controllers;
 
+use Yii;
 use common\models\User;
 use yii\rest\ActiveController;
 use yii\web\Response;
@@ -22,21 +23,28 @@ class UserController extends ActiveController
             'class' => QueryParamAuth::className(),
             // 设置token名称，默认是access-token
             //'tokenParam' => 'access_token',
-            /*'optional' => [
+            'optional' => [
                 'index',
-                'signup-test',
-                'view'
-            ],*/
+                'create',
+                //'signup-test',
+                //'view',
+                'login'
+            ],
         ];
         return $behaviors;
     }
 
 
 
-    public function actionIndex()
+    public function actionLogin()
     {
+        $username = Yii::$app->request->post('username');
+        $password = Yii::$app->request->post('password');
+
+        var_dump($username);
+        var_dump($password);exit;
+
         return $this->render('index');
     }
-
 
 }
