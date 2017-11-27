@@ -40,44 +40,6 @@ class UserController extends ActiveController
         return $behaviors;
     }
 
-
-
-    public function actionLogin()
-    {
-        /*$pwd1 = H_JWT::generatePassword('1231233');
-        $pwd2 = H_JWT::generatePassword('123123');
-
-        var_dump($pwd1);
-
-        echo '<br/>'.$pwd1;
-$pwd1 = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwYXNzd29yZCI6IjEyMzEyMzMifQ.ljI32JGTU5o2fWPPvhKqb2QraXN2_geUqiSBD0qdDAM';
-        echo '<br/>'.H_JWT::parse($pwd1);
-
-
-
-        echo '<br/>';
-
-
-
-        var_dump($pwd2);
-        echo '<br/>'.$pwd2;
-
-        exit;*/
-
-
-        $token = H_JWT::generateToken(1);
-        echo $token;
-        var_dump((string)$token);exit;
-        $username = Yii::$app->request->post('username');
-        $password = Yii::$app->request->post('password');
-
-        var_dump($username);
-        var_dump($password);exit;
-
-        return $this->render('index');
-    }
-
-
     //重写checkAccess 控制权限
     /*public function checkAccess($action, $model = null, $params = [])
     {
@@ -117,99 +79,52 @@ $pwd1 = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwYXNzd29yZCI6IjEyMzEyMzMifQ.ljI
         }else{
             $return['errormsg'] = '提交数据错误';
         }
-
-
         return $return;
+    }
 
+    public function actionAuthDelete(){
+        $return = [
+            'result' => false,
+            'errormsg' => ''
+        ];
+        $token = Yii::$app->request->get('access-token');
 
-        /*var that = this;
+        $auth = UserAuth::find()->where(['token'=>$token])->one();
 
-        //查用户名
-        mysql.query('SELECT * FROM `' + that.modelName + '` where username = ?',data.username, function (error, res) {
-            if (error){
-                return callback(error);
-            }
-            var result = {
-                error_msg : '未知错误',
-            success : false,
-            token : '',
-            user_id : 0,
-            user_info: {},
-            roles : []
-        };
-        if(res.length == 1){
-            var _res = res[0];
-
-            if(res[0].password==data.password){
-
-
-
-                result.success = true;
-                result.error_msg = false;
-                result.user_id = _res.id;
-                result.user_info = _res;
-
-
-                mysql.query('select ug.alias from `usergroup_user` ugu join `usergroup` ug on ugu.usergroup_id = ug.id where ugu.user_id = ? ',[_res.id], function (error, res) {
-                    if (error) throw error;
-
-                    var roles = [];
-                    if(res.length>0) {
-
-                        for (var i in res) {
-                            roles.push(res[i].alias);
-                        }
-                    }
-
-                    result.roles = roles;
-
-
-                    var token = generateToken(_res.id);
-                    result.token = token;
-                    var expired = new Date(new Date().getTime() + 60*60*24*1000);
-
-                    var expired_time = '';
-                    expired_time += expired.getFullYear();
-                    expired_time += "-"+ (expired.getMonth()+1 < 10 ? '0' + (expired.getMonth()+1) : (expired.getMonth()+1));
-                    expired_time += "-"+ (expired.getDate() < 10 ? '0' + expired.getDate() : expired.getDate());
-                    expired_time += " "+ (expired.getHours() < 10 ? '0' + expired.getHours() : expired.getHours());
-                    expired_time += ":"+ (expired.getMinutes() < 10 ? '0' + expired.getMinutes() : expired.getMinutes());
-                    expired_time += ":"+ (expired.getSeconds() < 10 ? '0' + expired.getSeconds() : expired.getSeconds());
-
-
-                    mysql.query('INSERT INTO `user_auth_token` SET ?',{user_id:_res.id,token:token,expired_time:expired_time}, function (error, res) {
-                        if (error) throw error;
-
-
-                        return callback(null,result);
-                        //return callback(null,{id:res.insertId});
-                    });
-                    //return callback(null,result);
-
-                });
-
-                //result.roles = auth_roles[_res.id]!=undefined?auth_roles[_res.id]:[];
-
-
-
-
-
-
-
-
+        if($auth){
+            $auth->expired_time = date('Y-m-d H:i:s',strtotime('-1 second'));
+            if($auth->save()){
+                $return['result'] = true;
             }else{
-                result.error_msg = '用户名或密码错误 (001)';
-                //return callback(null,{error:'don\'t find the user'});
-                return callback(null,result);
+                $return['errormsg'] = 'Token数据错误(001)';
             }
 
         }else{
-            //return callback(null,{error:'don\'t find the user'});
-            result.error_msg = '用户名或密码错误 (002)';
-            return callback(null,result);
+            $return['errormsg'] = 'Token数据错误(002)';
         }
+        return $return;
+    }
 
-    });*/
+    public function actionAuthUserInfo(){
+        $return = [
+            'result' => false,
+            'errormsg' => ''
+        ];
+        $token = Yii::$app->request->get('access-token');
+
+        $auth = UserAuth::find()->where(['token'=>$token])->one();
+
+        if($auth){
+            $user = User::find()->where(['id'=>$auth->user_id])->one();
+            if($user)
+                $return = $user->attributes;
+            else{
+                $return['errormsg'] = 'User数据错误';
+            }
+        }else{
+            $return['errormsg'] = 'Auth数据错误';
+        }
+        return $return;
     }
 
 
