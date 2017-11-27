@@ -3,6 +3,7 @@
 namespace app\modules\v1\controllers;
 
 
+use app\models\UserAuth;
 use Yii;
 
 use app\components\H_JWT;
@@ -29,7 +30,7 @@ class UserController extends ActiveController
             //'tokenParam' => 'access_token',
             'optional' => [
                 'index',
-                'view',
+                //'view',
                 'create',
                 //'signup-test',
                 //'view',
@@ -97,6 +98,15 @@ $pwd1 = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwYXNzd29yZCI6IjEyMzEyMzMifQ.ljI
             if($user){
                 if($user->password == md5($password)){
                     $return['result'] = true;
+                    $token = H_JWT::generateToken($user->id);
+                    $auth = new UserAuth();
+                    $auth->user_id = $user->id;
+                    $auth->token = $token;
+                    $auth->expired_time = date('Y-m-d H:i:s',strtotime('+1 day'));
+                    $auth->save();
+
+                    $return['token'] = $token;
+
                 }else{
                     $return['errormsg'] = '密码错误';
                 }
