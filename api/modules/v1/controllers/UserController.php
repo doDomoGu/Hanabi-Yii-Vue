@@ -21,6 +21,7 @@ class UserController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
+
         //$behaviors['contentNegotiator']['formats'] = ['application/json' => Response::FORMAT_JSON];
         $behaviors['authenticator'] = [
             'class' => QueryParamAuth::className(),
@@ -76,9 +77,18 @@ $pwd1 = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwYXNzd29yZCI6IjEyMzEyMzMifQ.ljI
     }
 
 
+    //重写checkAccess 控制权限
+    /*public function checkAccess($action, $model = null, $params = [])
+    {
+
+        throw new \yii\web\ForbiddenHttpException(sprintf('You can only %s articles that you\'ve created.', $action));
+
+    }*/
+
     public function actionAuth(){
-        $return = ['result' => false,
-                'errormsg' => ''
+        $return = [
+            'result' => false,
+            'errormsg' => ''
         ];
         $username = Yii::$app->request->post('username');
         $password = Yii::$app->request->post('password');
