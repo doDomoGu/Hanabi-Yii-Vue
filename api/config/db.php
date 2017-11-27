@@ -2,9 +2,9 @@
 
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=hanabi_yii_vue',
-    'username' => 'gljgljglj',
-    'password' => 'gljgogo',
+    'dsn' => 'mysql:host=localhost;dbname=db',
+    'username' => '',
+    'password' => '',
     'charset' => 'utf8',
 
     // Schema cache options (for production environment)

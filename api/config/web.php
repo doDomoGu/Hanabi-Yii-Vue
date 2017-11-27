@@ -1,7 +1,12 @@
 <?php
 
-$params = require __DIR__ . '/params.php';
-$db = require __DIR__ . '/db.php';
+$params = yii\helpers\ArrayHelper::merge(
+    require(__DIR__ . '/params.php'),
+    require(__DIR__ . '/params_local.php')
+);
+
+
+$db = require __DIR__ . '/db_local.php';
 
 $config = [
     'id' => 'hanabi-api',
@@ -53,14 +58,7 @@ $config = [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => true,
             'showScriptName' => false,
-            'rules' => [
-                [
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => ['v1/user'/*,'v1/auth'*/],
-                    'pluralize' => false
-                ],
-                'POST v1/auth' => 'v1/user/login',
-            ],
+            'rules' => require('rules.php'),
         ],
 
     ],
