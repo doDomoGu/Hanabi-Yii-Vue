@@ -4,7 +4,7 @@ $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
 $config = [
-    'id' => 'basic-console',
+    'id' => 'hanabi-console',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'controllerNamespace' => 'app\commands',
@@ -23,13 +23,18 @@ $config = [
         'db' => $db,
     ],
     'params' => $params,
-    /*
+
     'controllerMap' => [
-        'fixture' => [ // Fixture generation command line.
+        /*'fixture' => [ // Fixture generation command line.
             'class' => 'yii\faker\FixtureController',
-        ],
+        ],*/
+        /*'migrate' => [
+            //'class' => 'yii\console\controllers\MigrateController',
+            'class' => 'app\commands\MyMigrateController',
+            //'namespace' => 'console\controllers',
+        ],*/
     ],
-    */
+
 ];
 
 if (YII_ENV_DEV) {
