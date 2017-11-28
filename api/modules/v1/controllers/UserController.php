@@ -2,15 +2,18 @@
 
 namespace app\modules\v1\controllers;
 
-
-use app\models\UserAuth;
 use Yii;
 
-use app\components\H_JWT;
+use app\models\UserAuth;
 use app\models\User;
-use yii\rest\ActiveController;
+
+use app\components\H_JWT;
+
+use yii\helpers\ArrayHelper;
 use yii\web\Response;
+use yii\rest\ActiveController;
 use yii\filters\auth\QueryParamAuth;
+use yii\filters\Cors;
 
 class UserController extends ActiveController
 {
@@ -34,9 +37,30 @@ class UserController extends ActiveController
                 'create',
                 //'signup-test',
                 //'view',
-                'auth'
+                'auth',
+                'auth-user-info',
             ],
+
         ];
+
+        $behaviors = ArrayHelper::merge([
+            [
+                'class' => Cors::className(),
+            ],
+        ], $behaviors);
+
+        /*$behaviors['cors'] = [
+            'class' => Cors::className(),
+            'cors' => [
+                'Origin' => ['http://localhost'],//定义允许来源的数组
+                'Access-Control-Request-Method' => ['GET','POST','PUT','DELETE', 'HEAD', 'OPTIONS'],//允许动作的数组
+            ],
+            'actions' => [
+                'index' => [
+                    'Access-Control-Allow-Credentials' => true,
+                ]
+            ]
+        ];*/
         return $behaviors;
     }
 
@@ -50,8 +74,8 @@ class UserController extends ActiveController
 
     public function actionAuth(){
         $return = [
-            'result' => false,
-            'errormsg' => ''
+            'success' => false,
+            'error_msg' => ''
         ];
         $username = Yii::$app->request->post('username');
         $password = Yii::$app->request->post('password');
@@ -66,26 +90,28 @@ class UserController extends ActiveController
                     $auth->token = $token;
                     $auth->expired_time = date('Y-m-d H:i:s',strtotime('+1 day'));
                     $auth->save();
-
+                    $return['success'] = true;
                     $return['token'] = $token;
+                    $return['user_id'] = $user->id;
+                    $return['user_info'] = $user->attributes;
 
                 }else{
-                    $return['errormsg'] = '密码错误';
+                    $return['error_msg'] = '密码错误';
                 }
 
             }else{
-                $return['errormsg'] = '用户名错误';
+                $return['error_msg'] = '用户名错误';
             }
         }else{
-            $return['errormsg'] = '提交数据错误';
+            $return['error_msg'] = '提交数据错误';
         }
         return $return;
     }
 
     public function actionAuthDelete(){
         $return = [
-            'result' => false,
-            'errormsg' => ''
+            'success' => false,
+            'error_msg' => ''
         ];
         $token = Yii::$app->request->get('access-token');
 
@@ -94,23 +120,23 @@ class UserController extends ActiveController
         if($auth){
             $auth->expired_time = date('Y-m-d H:i:s',strtotime('-1 second'));
             if($auth->save()){
-                $return['result'] = true;
+                $return['success'] = true;
             }else{
-                $return['errormsg'] = 'Token数据错误(001)';
+                $return['error_msg'] = 'Token数据错误(001)';
             }
 
         }else{
-            $return['errormsg'] = 'Token数据错误(002)';
+            $return['error_msg'] = 'Token数据错误(002)';
         }
         return $return;
     }
 
     public function actionAuthUserInfo(){
         $return = [
-            'result' => false,
-            'errormsg' => ''
+            'success' => false,
+            'error_msg' => ''
         ];
-        $token = Yii::$app->request->get('access-token');
+        $token = Yii::$app->request->get('token');
 
         $auth = UserAuth::find()->where(['token'=>$token])->one();
 
@@ -119,10 +145,10 @@ class UserController extends ActiveController
             if($user)
                 $return = $user->attributes;
             else{
-                $return['errormsg'] = 'User数据错误';
+                $return['error_msg'] = 'User数据错误';
             }
         }else{
-            $return['errormsg'] = 'Auth数据错误';
+            $return['error_msg'] = 'Auth数据错误';
         }
         return $return;
     }
