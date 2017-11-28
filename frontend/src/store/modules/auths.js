@@ -10,7 +10,7 @@ const state = {
     user_id: 0,
     user_info:{},
     token: '',
-    roles: [],
+    //roles: [],
     routes: [],
 
     //add_routes: []
@@ -19,8 +19,8 @@ const state = {
 const actions = {
     Logout({ commit }){
         return new Promise((resolve, reject) => {
-            axios.post(
-                '/auths/delete',
+            axios.delete(
+                '/auth',
                 {
                     token: state.token
                 }
@@ -99,7 +99,7 @@ const actions = {
         commit('setLoginState');
         commit('setUserId',{user_id:data.user_id});
         commit('setUserInfo',{user_info:data.user_info});
-        commit('setRoles',{roles:data.roles});
+        //commit('setRoles',{roles:data.roles});
     },
     CleanStore({commit}){
         //console.warn("  ** cleanStore **");
@@ -149,7 +149,7 @@ const actions = {
 
 const getters = {
     token: state => state.token,
-    roles: state => state.roles,
+    //roles: state => state.roles,
     user_id: state => state.user_id,
     user_info: state => state.user_info,
     //add_routes: state => state.add_routes,
@@ -173,9 +173,9 @@ const mutations = {
     setUserInfo: (state, data) => {
         state.user_info = data.user_info;
     },
-    setRoles: (state, data) => {
+    /*setRoles: (state, data) => {
         state.roles = data.roles;
-    },
+    },*/
     /*setAddRoutes: (state, data) => {
         state.add_routes = data;
     },*/
@@ -184,7 +184,7 @@ const mutations = {
         state.user_id = 0;
         state.user_info = {};
         state.token = '';
-        state.roles = [];
+        //state.roles = [];
         localStorage.removeItem('__WPC_AUTH_TOKEN__');
     },
     setIsLogin: (state,isLogin) => {
