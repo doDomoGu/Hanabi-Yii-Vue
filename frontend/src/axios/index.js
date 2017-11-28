@@ -3,7 +3,7 @@ import qs from 'qs'
 
 
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
-console.log(process.env);
+/*console.log(process.env);*/
 axios.defaults.baseURL = process.env.AXIOS_BASEURL;
 
 //POST传参序列化
