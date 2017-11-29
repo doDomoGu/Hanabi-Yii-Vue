@@ -10,8 +10,12 @@ export default {
     /*data () {
         return {
           msg: 'Welcome to Your Vue.js App'
-        }
+        },
+
     }*/
+  mounted: function(){
+    this.$store.dispatch('common/SetTitle','404');
+  },
 }
 </script>
 

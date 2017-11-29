@@ -1,6 +1,15 @@
 <template>
     <div id="app">
-        <sidebar></sidebar>
+        <mt-header fixed :title="getTitle()" id="header">
+            <router-link to="/" slot="left">
+                <mt-button icon="back">返回</mt-button>
+            </router-link>
+
+            <!--<mt-button slot="left" @click="handleClose">关闭</mt-button>
+
+            <mt-button icon="more" slot="right"></mt-button>-->
+        </mt-header>
+        <!--<sidebar></sidebar>-->
         <div id="main">
             <router-view></router-view>
         </div>
@@ -10,32 +19,34 @@
 <script>
     import Sidebar from './sidebar'
     //import { mapState,mapMutations} from 'vuex'
+
     export default {
+          data () {
+            return {
+              title: this.$store.getters['common/title']
+            }
+          },
         name: 'app',
-        components: { 'sidebar': Sidebar }
+        components: { 'sidebar': Sidebar },
+      methods: {
+            getTitle:function(){
+                return this.$store.getters['common/title'];
+            }
+
+      },
+      created(){
+
+      },
     }
 </script>
 
 <style>
-    body {
+    /*body {
         margin:0;
-    }
-
-    html, body, #app {
-        height:100%;
-    }
-
-    #main {
-        margin-left:240px;
-        padding:24px;
-    }
-
-    /*#app {
-      font-family: 'Avenir', Helvetica, Arial, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      text-align: center;
-      color: #2c3e50;
-      margin-top: 60px;
     }*/
+
+    /*html, body, #app {
+        height:100%;
+    }*/
+
 </style>
