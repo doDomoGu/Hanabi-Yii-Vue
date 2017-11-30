@@ -4,6 +4,7 @@
 
         <mt-field label="密码" placeholder="请输入密码" type="password" v-model="form.password" @keydown.enter.native="onSubmit" ></mt-field>
 
+        <mt-button type="default" size="large" @click.native="onSubmit">submit</mt-button>
     </section>
 
 
