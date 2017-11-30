@@ -11,6 +11,9 @@
         <!--<img src="~@img/logo.png" />-->
         <div id="main">
             <router-view></router-view>
+            <!--<transition :name="transitionName">
+            <router-view class="child-view"></router-view>
+            </transition>-->
         </div>
     </div>
 </template>

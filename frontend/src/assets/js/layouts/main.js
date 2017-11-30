@@ -1,16 +1,21 @@
-import Sidebar from '@/views/layouts/sidebar'
+//import Sidebar from '@/views/layouts/sidebar'
 //import { mapState,mapMutations} from 'vuex'
 
 export default {
-  /*data(){
-      return {
-      }
-  },*/
-
   name: 'app',
-
-  components: { 'sidebar': Sidebar },
-
+  data () {
+    return {
+      //transitionName: 'slide-left'
+    }
+  },
+  // dynamically set transition based on route change
+  watch: {
+    /*'$route' (to, from) {
+      const toDepth = to.path.split('/').length
+      const fromDepth = from.path.split('/').length
+      this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
+    }*/
+  },
   methods: {
     getTitle(){
       let title = this.$store.getters['common/title'];
@@ -21,6 +26,10 @@ export default {
       return this.$route.path !=='/';
     }
   },
+
+  //components: { 'sidebar': Sidebar },
+
+
 
   /*created(){
 
