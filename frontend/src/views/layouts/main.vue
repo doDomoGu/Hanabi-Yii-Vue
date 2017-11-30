@@ -8,12 +8,10 @@
             <mt-button icon="more" slot="right"></mt-button>-->
         </mt-header>
         <!--<sidebar></sidebar>-->
-        <img src="~@img/logo.png" />
+        <!--<img src="~@img/logo.png" />-->
         <div id="main">
             <router-view></router-view>
         </div>
     </div>
 </template>
-
 <script src="@js/layouts/main.js"></script>
-
