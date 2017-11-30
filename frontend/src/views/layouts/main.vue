@@ -6,6 +6,9 @@
             </router-link>
             <!--<mt-button slot="left" @click="handleClose">关闭</mt-button>
             <mt-button icon="more" slot="right"></mt-button>-->
+            <router-link v-if="isLogin()" to="/logout" slot="right">
+                <mt-button icon="more" >退出</mt-button>
+            </router-link>
         </mt-header>
         <!--<sidebar></sidebar>-->
         <!--<img src="~@img/logo.png" />-->

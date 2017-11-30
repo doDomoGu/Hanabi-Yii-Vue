@@ -48,7 +48,7 @@ router.beforeEach((to, from, next) => {
   //console.warn('3. '+beCount+' path :'+ to.fullPath);
 
   if (to.path === "/logout") {
-    store.dispatch('auths/Logout').then(() => {
+    store.dispatch('auths/Logout',store.getters['auths/token']).then(() => {
       next({path: '/login'});
     })
   }else{
@@ -78,7 +78,6 @@ router.beforeEach((to, from, next) => {
           next({path:'/no-auth'});
         }
       }else {
-        console.log(localStorage.__WPC_AUTH_TOKEN__);
         let tokenInLocalStorage = localStorage.__WPC_AUTH_TOKEN__;
 
         if (typeof(tokenInLocalStorage)==='string' && tokenInLocalStorage !=='') {

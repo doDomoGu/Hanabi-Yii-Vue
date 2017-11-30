@@ -24,6 +24,9 @@ export default {
     },
     isTopPath(){
       return this.$route.path !=='/';
+    },
+    isLogin(){
+      return this.$store.getters['auths/is_login']===true;
     }
   },
 

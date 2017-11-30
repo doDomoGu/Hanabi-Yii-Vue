@@ -17,12 +17,14 @@ const state = {
 };
 
 const actions = {
-    Logout({ commit }){
+    Logout({ commit },token){
         return new Promise((resolve, reject) => {
             axios.delete(
                 '/auth',
                 {
-                    token: state.token
+                  params: {
+                    token: token
+                  }
                 }
             )
                 .then((res) => {

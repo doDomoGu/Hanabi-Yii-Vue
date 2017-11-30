@@ -18,6 +18,7 @@ use yii\filters\Cors;
 class UserController extends ActiveController
 {
     public function init(){
+
         $this->modelClass = User::className();
         parent::init();
     }
@@ -39,6 +40,7 @@ class UserController extends ActiveController
                 //'view',
                 'auth',
                 'auth-user-info',
+                'auth-delete',
             ],
 
         ];
@@ -109,11 +111,14 @@ class UserController extends ActiveController
     }
 
     public function actionAuthDelete(){
+        if(strtoupper($_SERVER['REQUEST_METHOD'])== 'OPTIONS'){
+            return true;
+        }
         $return = [
             'success' => false,
             'error_msg' => ''
         ];
-        $token = Yii::$app->request->get('access-token');
+        $token = Yii::$app->request->get('token');
 
         $auth = UserAuth::find()->where(['token'=>$token])->one();
 
@@ -131,6 +136,10 @@ class UserController extends ActiveController
         return $return;
     }
 
+    /*public function actionAuthOption(){
+        return true;
+    }*/
+
     public function actionAuthUserInfo(){
         $return = [
             'success' => false,
@@ -140,11 +149,16 @@ class UserController extends ActiveController
 
         $auth = UserAuth::find()->where(['token'=>$token])->one();
 
-        if($auth){
-            $user = User::find()->where(['id'=>$auth->user_id])->one();
-            if($user)
-                $return = $user->attributes;
-            else{
+        if($auth) {
+            $user = User::find()->where(['id' => $auth->user_id])->one();
+            if ($user){
+                $return['success'] = true;
+                $return['token'] = $token;
+                $return['tokenForceUpdate'] = true;
+                $return['user_id'] = $user->id;
+                $return['user_info'] = $user->attributes;
+                //$return = $user->attributes;
+            }else{
                 $return['error_msg'] = 'User数据错误';
             }
         }else{
