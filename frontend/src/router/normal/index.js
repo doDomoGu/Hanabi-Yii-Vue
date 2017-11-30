@@ -17,10 +17,10 @@ var routes = [{
       path: '',
       name: '首页',
       component: Index,
-      /*meta: {
+      meta: {
         requireAuths: true,
         requireRoles: '*'
-      }*/
+      }
     },
     {
       path: 'no-auth',

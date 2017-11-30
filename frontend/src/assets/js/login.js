@@ -28,7 +28,7 @@ export default {
           });*/
 
 
-          var redirectUrl = this.$route.query.redirectUrl;
+          let redirectUrl = this.$route.query.redirectUrl;
           if(redirectUrl)
             this.$router.push({ path: redirectUrl });
           else
