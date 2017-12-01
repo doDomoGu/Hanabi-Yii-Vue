@@ -24,5 +24,8 @@ export default {
         duration: 500
       });
     },
+    isNotAuth(){
+      return this.$store.getters['auths/is_login']!==true;
+    }
   }
 }

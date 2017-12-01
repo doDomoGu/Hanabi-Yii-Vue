@@ -163,7 +163,7 @@ const mutations = {
     setToken: (state, data) => {
         state.token = data.token;
         if(data.forceUpdate) {
-            localStorage.__WPC_AUTH_TOKEN__ = data.token;
+            localStorage.__HANABI_AUTH_TOKEN__ = data.token;
         }
     },
     setLoginState: (state) => {
@@ -187,7 +187,7 @@ const mutations = {
         state.user_info = {};
         state.token = '';
         //state.roles = [];
-        localStorage.removeItem('__WPC_AUTH_TOKEN__');
+        localStorage.removeItem('__HANABI_AUTH_TOKEN__');
     },
     setIsLogin: (state,isLogin) => {
         state.is_login = isLogin;

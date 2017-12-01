@@ -1,7 +1,7 @@
 <template>
     <div class="hello">
-        <mt-button type="primary" size="large" @click.native="toLogin">登录</mt-button><br/>
-        <mt-button type="danger" size="large" @click.native="toRegister">注册</mt-button>
+        <mt-button v-if="isNotAuth()" type="primary" size="large" @click.native="toLogin">登录</mt-button><br/>
+        <mt-button v-if="isNotAuth()" type="danger" size="large" @click.native="toRegister">注册</mt-button>
         <!--<router-link to="/ssr">admin user</router-link>-->
 
         <!--<h2>Essential Links2</h2>

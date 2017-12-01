@@ -5,9 +5,8 @@ import Router from 'vue-router'
 import store from '../store'
 
 import NormalRoutes from './normal'
-import AdminRoutes from './admin'
+//import AdminRoutes from './admin'
 import NotFound404Routes from './NotFound404'
-
 
 Vue.use(Router);
 
@@ -23,13 +22,16 @@ for(let i in NormalRoutes){
 /*routes.push(NormalRoutes);*/
 
 //载入admin相关路由
-routes.push(AdminRoutes);
+/*routes.push(AdminRoutes);*/
 
 //最后载入404页面
 routes.push(NotFound404Routes);
 
+
+//将路由配置写入Vuex
 store.dispatch('auths/SetRoutes',routes);
 
+//声明router对象
 const router = new Router({
   mode:'history',
   routes
@@ -39,67 +41,77 @@ const router = new Router({
 
 //console.log(router);
 
-//let beCount = 0;
 
-router.beforeEach((to, from, next) => {
-  //console.log('  ');
-  //beCount++;
-
-  //console.warn('3. '+beCount+' path :'+ to.fullPath);
-
+//有登录状态  进一步判断路由权限
+let auth_true = function(to, from, next){
   if (to.path === "/logout") {
+    //登出操作
     store.dispatch('auths/Logout',store.getters['auths/token']).then(() => {
       next({path: '/login'});
     })
+  }else if (to.path === "/login") {
+    next({path: '/'});
   }else{
     //if (router.meta..routePathsNotRequiredAuth.indexOf(to.path) !== -1) { // 在路由免登录白名单，直接进入
     if(!(to.meta.requireAuths)){
       next();
     }else{
-      let isLogin = store.getters['auths/is_login'];
-      if(isLogin){
-        //权限验证
-        let authFlag = false;
-        let requireRoles = to.meta.requireRoles;
-        let userRoles = store.getters['auths/roles'];
+      //权限验证
+      let authFlag = false;
+      let requireRoles = to.meta.requireRoles;
+      let userRoles = store.getters['auths/roles'];
 
-        if(requireRoles === '*' || userRoles.includes('super_admin')){
-          authFlag = true;
-        }else{
-          for(let i in requireRoles){
-            if(authFlag === false && userRoles.includes(requireRoles[i])){
-              authFlag = true;
-            }
+      if(requireRoles === '*' || userRoles.includes('super_admin')){
+        authFlag = true;
+      }else{
+        for(let i in requireRoles){
+          if(authFlag === false && userRoles.includes(requireRoles[i])){
+            authFlag = true;
           }
         }
-        if(authFlag){
-          next();
-        }else{
-          next({path:'/no-auth'});
-        }
-      }else {
-        let tokenInLocalStorage = localStorage.__WPC_AUTH_TOKEN__;
-
-        if (typeof(tokenInLocalStorage)==='string' && tokenInLocalStorage !=='') {
-
-          //console.warn(' checkToken start ',new Date().getTime());
-
-          store.dispatch('auths/CheckToken',tokenInLocalStorage).then(() => {
-
-            //console.warn(' checkToken finish',new Date().getTime());
-
-            if(store.getters['auths/is_login']){
-              next(to.path);
-            }else{
-              //console.log('token 222');
-              next('/login');
-            }
-          });
-        }else {
-          //next({path: '/login', query: {redirectUrl: to.fullPath}});
-          next({path: '/login',query:{redirectUrl:to.fullPath}});
-        }
       }
+      if(authFlag){
+        next();
+      }else{
+        next({path:'/no-auth'});
+      }
+    }
+  }
+};
+
+//无登录状态 跳转至登录页面
+let auth_false = function(to, from, next){
+  if(to.path !=='/login'){
+    next({path: '/login',query:{redirectUrl:to.fullPath}});
+  }else{
+    next();
+  }
+};
+
+//路由切换时走判断流程
+router.beforeEach((to, from, next) => {
+
+  //vuex读取登录状态
+  if(store.getters['auths/is_login']) {
+    auth_true(to, from, next);
+  } else {
+    //LocalStorage读取token
+    let tokenInLocalStorage = localStorage.__HANABI_AUTH_TOKEN__;
+    //token有值
+    if (typeof(tokenInLocalStorage) === 'string' && tokenInLocalStorage !== '') {
+      //发送token验证请求
+      store.dispatch('auths/CheckToken', tokenInLocalStorage).then(() => {
+        if (store.getters['auths/is_login']) {
+          //验证token 成功
+          auth_true(to, from, next);
+        } else {
+          //token错误 清空token
+          auth_false(to, from, next);
+        }
+      });
+    } else {
+      //未登录 也无token
+      auth_false(to, from, next);
     }
   }
 });
