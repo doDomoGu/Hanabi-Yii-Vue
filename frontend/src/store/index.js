@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 import common from './common';
 
 import users from './modules/users';
+import rooms from './modules/rooms';
 //import websites from './modules/websites';
 import auths from './modules/auths';
 import search from './search';
@@ -16,6 +17,7 @@ export default new Vuex.Store({
         users,
         auths,
         search,
+        rooms
         //websites
     }
 });

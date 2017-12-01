@@ -2,7 +2,7 @@
 //import Cookies from 'js-cookie'
 
 import axios from '../../axios'
-import Router from 'vue-router'
+//import Router from 'vue-router'
 
 
 const state = {

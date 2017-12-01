@@ -1,7 +1,22 @@
 <template>
     <div class="hello">
-        <mt-button v-if="isNotAuth()" type="primary" size="large" @click.native="toLogin">登录</mt-button><br/>
-        <mt-button v-if="isNotAuth()" type="danger" size="large" @click.native="toRegister">注册</mt-button>
+        <div v-if="isLogin()" >
+            <div  v-for="item in rooms">
+                <mt-cell :title="item.title"
+                         to="//github.com"
+                         is-link
+                         value="进入">
+                </mt-cell>
+
+                <!--<mt-cell v-title="item.title">22</mt-cell>-->
+            </div>
+        </div>
+
+        <div v-else>
+            <mt-button type="primary" size="large" @click.native="toLogin">登录</mt-button><br/>
+            <mt-button type="danger" size="large" @click.native="toRegister">注册</mt-button>
+
+        </div>
         <!--<router-link to="/ssr">admin user</router-link>-->
 
         <!--<h2>Essential Links2</h2>
