@@ -82,7 +82,11 @@ let auth_true = function(to, from, next){
 //无登录状态 跳转至登录页面
 let auth_false = function(to, from, next){
   if(to.path !=='/login'){
-    next({path: '/login',query:{redirectUrl:to.fullPath}});
+    if(!(to.meta.requireAuths)){
+      next();
+    }else{
+      next({path: '/login',query:{redirectUrl:to.fullPath}});
+    }
   }else{
     next();
   }
