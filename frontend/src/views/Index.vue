@@ -2,7 +2,7 @@
     <div class="hello">
         <div v-if="isLogin()" >
             <div  v-for="item in rooms">
-                <mt-cell :title="item.title"
+                <mt-cell :title="item._title"
                          to="//github.com"
                          is-link
                          value="进入">

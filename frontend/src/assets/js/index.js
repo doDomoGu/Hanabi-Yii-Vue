@@ -5,7 +5,7 @@ export default {
   name: 'index',
   data () {
     return {
-      rooms: []
+      //rooms: this.$store.getters['rooms/list']
     }
   },
   mounted: function(){
@@ -13,8 +13,28 @@ export default {
 
   },
   created: function(){
-    if(this.isLogin()){
+    this.getRoom();
+/*    if(this.isLogin()){
       this.getRoom();
+    }*/
+    //this.rooms = this.getRoom();
+  },
+  computed : {
+    rooms : function() {
+      let rooms = this.$store.getters['rooms/list'];
+
+
+      for(let room of rooms){
+        room._title = '<mt-badge size="small">'+room.id+'</mt-badge>'+' '+room.title;
+        room._title = (room.id<100?room.id<10?'00'+room.id:'0'+room.id:room.id)+' '+room.title;
+
+
+        if(room.password!=''){
+          room._title += '[lock]';
+          //room._title = room.id'[lock]';
+        }
+      }
+      return rooms;
     }
   },
   methods: {
@@ -32,10 +52,16 @@ export default {
       return this.$store.getters['auths/is_login'];
     },
     getRoom(){
-      let that = this;
-      this.$store.dispatch('rooms/LIST').then((res)=>{
-        that.rooms = res.data;
-      })
+      this.$store.dispatch('rooms/LIST');
+
+
+      /*this.$store.dispatch('rooms/LIST').then((res)=>{
+        //that.rooms = res.data;
+
+        //return res.data;
+      })*/
+
+      //return ;
     }
   }
 }
