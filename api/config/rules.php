@@ -3,6 +3,7 @@ $v = 'v1';
 return [
 
     'POST '.$v.'/room/enter' => $v.'/room/enter',  //进入房间 （是否有位置， 如有密码，密码验证）
+    'POST '.$v.'/room/is-in-room' => $v.'/room/is-in-room',  //判断是否在房间中  如是返回房间i
 
 
     [

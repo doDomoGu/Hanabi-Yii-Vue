@@ -3,7 +3,9 @@
 namespace app\models;
 
 use Yii;
-
+use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
+use yii\db\Expression;
 /**
  * This is the model class for table "room".
  *
@@ -13,7 +15,7 @@ use Yii;
  * @property string $edit_time
  * @property integer $status
  */
-class Room extends \yii\db\ActiveRecord
+class Room extends ActiveRecord
 {
     const STATUS_AVAILABLE = 0;  //可用的空房间
     const STATUS_PREPARING = 1;  //准备中，未开始
@@ -27,6 +29,25 @@ class Room extends \yii\db\ActiveRecord
     {
         return 'room';
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['created_at', 'updated_at'],
+                    ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at'],
+                ],
+                'value' => new Expression('NOW()'),  //时间戳（数字型）转为 日期字符串
+                //'value'=>$this->timeTemp(),
+            ]
+        ];
+    }
+
 
     /**
      * @inheritdoc
@@ -67,7 +88,9 @@ class Room extends \yii\db\ActiveRecord
         }elseif(count($userRoomUser)==0) {
             $room = Room::find()->where(['id' => $room_id])->one();
             if ($room) {
-                if ($room->password != '') {
+                if($room->status == self::STATUS_PLAYING){
+                    $msg = '房间已经开始游戏';
+                }else if ($room->password != '') {
                     $msg = '房间被锁住了';
                 } else {
                     $room_user = RoomUser::find()->where(['room_id' => $room->id])->andWhere(['in', 'role_type', [1, 2]])->all();
@@ -107,6 +130,24 @@ class Room extends \yii\db\ActiveRecord
             $msg = '数据错误，在多个房间中!!';
         }
 
-        return array($success,$msg);
+        return [$success,$msg];
+    }
+
+    public static function isInRoom($user_id){
+        $success = false;
+        $msg = '';
+        $room_id = false;
+        $userRoomUser = RoomUser::find()->where(['user_id'=>$user_id])->all();
+        if(count($userRoomUser)==1){
+            $msg = '已经在房间中了';
+            $room_id = $userRoomUser[0]->room_id;
+            $success = true;
+        }elseif(count($userRoomUser)==0) {
+            $msg = '不在房间中了';
+        }else{
+            $msg = '在多个房间中，数据错误';
+        }
+
+        return [$success,$msg,$room_id];
     }
 }

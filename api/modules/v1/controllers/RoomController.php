@@ -22,10 +22,29 @@ class RoomController extends MyActiveController
 
     public function actionEnter(){
         $return = $this->return;
+
         $room_id = Yii::$app->request->post('room_id');
+
         list($return['success'],$return['msg']) = Room::enter($room_id,Yii::$app->user->id);
-        //$return['success'] = $success;
-        //$return['msg'] = $msg;
+
+        if($return['success']){
+            $return['data'] = ['room_id'=>$room_id];
+        }
+
+        return $return;
+    }
+
+
+    public function actionIsInRoom(){
+        $return = $this->return;
+
+
+        list($return['success'],$return['msg'],$room_id) = Room::isInRoom(Yii::$app->user->id);
+
+        if($return['success']){
+            $return['data'] = ['room_id'=>$room_id];
+        }
+
         return $return;
     }
 
