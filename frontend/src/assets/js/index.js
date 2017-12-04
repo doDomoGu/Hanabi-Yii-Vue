@@ -13,6 +13,7 @@ export default {
 
   },
   created: function(){
+    this.$store.dispatch('rooms/IsInRoom');
     this.getRoom();
 /*    if(this.isLogin()){
       this.getRoom();
@@ -54,7 +55,6 @@ export default {
     },
     getRoom(){
       this.$store.dispatch('rooms/LIST');
-      this.$store.dispatch('rooms/IsInRoom');
 
 
       /*this.$store.dispatch('rooms/LIST').then((res)=>{

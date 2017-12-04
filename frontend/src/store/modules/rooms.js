@@ -42,7 +42,25 @@ const actions = {
         });
     });
   },
-  IsInRoom({commit},params){
+  Exit({commit}){
+    return new Promise((resolve, reject) => {
+
+      axios.post(
+        '/room/exit'+'?access_token='+this.getters['auths/token']
+      )
+        .then((res) => {
+          if(res.data.success){
+            commit('ExitRoom');
+          }
+
+          resolve(res.data);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  },
+  IsInRoom({commit}){
     return new Promise((resolve, reject) => {
 
       axios.post(
@@ -118,6 +136,9 @@ const mutations = {
     },
   SetRoomId(state, room_id){
       state.your_room_id = room_id;
+  },
+  ExitRoom(state){
+    state.your_room_id = false;
   }
 };
 

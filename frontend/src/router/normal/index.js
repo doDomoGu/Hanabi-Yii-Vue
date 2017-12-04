@@ -5,6 +5,8 @@ import About from '../../components/About'
 import Login from '../../views/Login'
 import NoAuth from '../../views/NoAuth'
 
+import Room from '../../views/room/Index'
+
 var routes = [{
   path: '/',
   component: Main,
@@ -21,6 +23,15 @@ var routes = [{
         requireAuths: true,
         requireRoles: '*'
       }*/
+    },
+    {
+      path: 'room/:room_id',
+      name: '房间',
+      component: Room,
+      meta: {
+        requireAuths: true,
+        requireRoles: '*'
+      }
     },
     {
       path: 'no-auth',
