@@ -27,8 +27,9 @@ export default {
     exit(){
       MessageBox.confirm('确定要退出房间?').then(action => {
         if(action=='confirm'){
-          this.$store.dispatch('rooms/Exit');
-          this.$router.push('/');
+          this.$store.dispatch('rooms/Exit').then(()=>{
+            this.$router.push('/');
+          });
         }else{
           return false;
         }
