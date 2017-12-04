@@ -19,6 +19,9 @@ use yii\db\Expression;
  */
 class RoomUser extends ActiveRecord
 {
+    const ROLE_TYPE_MASTER = 1;
+    const ROLE_TYPE_GUEST = 2;
+
     /**
      * @inheritdoc
      */

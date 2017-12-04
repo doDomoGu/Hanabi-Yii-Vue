@@ -3,6 +3,7 @@
 namespace app\modules\v1\controllers;
 
 use app\models\Room;
+use app\models\RoomUser;
 use Yii;
 
 class RoomController extends MyActiveController
@@ -22,18 +23,9 @@ class RoomController extends MyActiveController
     public function actionEnter(){
         $return = $this->return;
         $room_id = Yii::$app->request->post('room_id');
-        $room = Room::find()->where(['id'=>$room_id])->one();
-        if($room){
-            if($room->password!=''){
-                $return['msg'] = '房间被锁住了';
-            }else{
-                $return['success'] = true;
-                $return['msg'] = '房间进入成功';
-            }
-        }else{
-            $return['msg'] = '房间号错误';
-        }
-
+        list($return['success'],$return['msg']) = Room::enter($room_id,Yii::$app->user->id);
+        //$return['success'] = $success;
+        //$return['msg'] = $msg;
         return $return;
     }
 
