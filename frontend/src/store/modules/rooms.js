@@ -1,24 +1,45 @@
 import * as types from './../types.js';
 import axios from '../../axios'
 
-
 const state = {
-    count: 0,
-    attributes:{
-        /*id: 0,
-        username: "",
-        password: "",
-        name:"",
-        mobile: "",
-        email: "",
-        status: "1",
-        verify: "1",
-        usergroups: []*/
-    },
-    list:[]
+  count: 0,
+  attributes:{
+      /*id: 0,
+      username: "",
+      password: "",
+      name:"",
+      mobile: "",
+      email: "",
+      status: "1",
+      verify: "1",
+      usergroups: []*/
+  },
+  list:[],
 };
 
 const actions = {
+  Enter({commit},params){
+    return new Promise((resolve, reject) => {
+
+      axios.post(
+        '/room/enter'+'?access_token='+this.getters['auths/token'],
+        {
+          access_token:this.getters['auths/token'],
+          room_id:params.room_id,
+
+        }
+      )
+        .then((res) => {
+
+
+          //commit('Enter',res.data);
+          resolve(res);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  },
   [types.LIST]({commit}){
     return new Promise((resolve, reject) => {
 

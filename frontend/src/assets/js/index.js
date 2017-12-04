@@ -1,4 +1,4 @@
-import { Toast } from 'mint-ui';
+import { MessageBox } from 'mint-ui';
 
 
 export default {
@@ -62,6 +62,18 @@ export default {
       })*/
 
       //return ;
+    },
+    enterRoom(room_id){
+      this.$store.dispatch('rooms/Enter',{room_id:room_id}).then((res)=>{
+        //that.rooms = res.data;
+        console.log(res);
+        //return res.data;
+        MessageBox.alert(res.data.msg+'('+room_id+')').then(action => {
+
+        });
+      })
+
+
     }
   }
 }

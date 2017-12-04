@@ -3,8 +3,8 @@
         <div v-if="isLogin()" >
             <div  v-for="item in rooms">
                 <mt-cell :title="item._title"
-                         to="//github.com"
                          is-link
+                         @click.native="enterRoom(item.id)"
                          value="进入">
                 </mt-cell>
 
