@@ -1,7 +1,14 @@
 <template>
     <div class="hello">
         <div v-if="isLogin()" >
-            <div  v-for="item in rooms">
+            <div v-if="isInRoom()" >
+                <mt-cell title="您已在房间中！"
+                         :to="your_room_link"
+                         is-link
+                         value="进入">
+                </mt-cell>
+            </div>
+            <div  v-else v-for="item in rooms">
                 <mt-cell :title="item._title"
                          is-link
                          @click.native="enterRoom(item.id)"

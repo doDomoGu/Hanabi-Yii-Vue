@@ -20,14 +20,15 @@ export default {
     //this.rooms = this.getRoom();
   },
   computed : {
+    your_room_link: function(){
+      return '/room/'+this.$store.getters['rooms/your_room_id'];
+    },
     rooms : function() {
       let rooms = this.$store.getters['rooms/list'];
-
 
       for(let room of rooms){
         room._title = '<mt-badge size="small">'+room.id+'</mt-badge>'+' '+room.title;
         room._title = (room.id<100?room.id<10?'00'+room.id:'0'+room.id:room.id)+' '+room.title;
-
 
         if(room.password!=''){
           room._title += '[lock]';
@@ -53,6 +54,7 @@ export default {
     },
     getRoom(){
       this.$store.dispatch('rooms/LIST');
+      this.$store.dispatch('rooms/IsInRoom');
 
 
       /*this.$store.dispatch('rooms/LIST').then((res)=>{
@@ -64,16 +66,26 @@ export default {
       //return ;
     },
     enterRoom(room_id){
+      let that = this;
       this.$store.dispatch('rooms/Enter',{room_id:room_id}).then((res)=>{
-        //that.rooms = res.data;
-        //console.log(res);
-        //return res.data;
-        MessageBox.alert(res.data.msg+'('+room_id+')').then(action => {
-
-        });
+        if(res.success){
+          that.$router.push('/room/'+room_id);
+        }else {
+          MessageBox.alert(res.msg + '(' + room_id + ')').then(action => {
+            //console.log(action);
+          });
+        }
       })
+    },
+    isInRoom(){
+/*      let your_room_id = this.$store.getters['rooms/your_room_id'];
+      if(your_room_id!==false){
 
+      }*/
+
+      return this.$store.getters['rooms/your_room_id'];
 
     }
+
   }
 }

@@ -15,6 +15,7 @@ const state = {
       usergroups: []*/
   },
   list:[],
+  your_room_id:false
 };
 
 const actions = {
@@ -24,16 +25,36 @@ const actions = {
       axios.post(
         '/room/enter'+'?access_token='+this.getters['auths/token'],
         {
-          access_token:this.getters['auths/token'],
+          //access_token:this.getters['auths/token'],
           room_id:params.room_id,
 
         }
       )
         .then((res) => {
+          if(res.data.success){
+            commit('SetRoomId',res.data.data.room_id);
+          }
 
+          resolve(res.data);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  },
+  IsInRoom({commit},params){
+    return new Promise((resolve, reject) => {
 
-          //commit('Enter',res.data);
-          resolve(res);
+      axios.post(
+        '/room/is-in-room'+'?access_token='+this.getters['auths/token'],
+      )
+        .then((res) => {
+
+          if(res.data.success){
+            commit('SetRoomId',res.data.data.room_id);
+          }
+
+          resolve(res.data);
         })
         .catch(error => {
           reject(error);
@@ -73,10 +94,10 @@ const actions = {
 };
 
 const getters = {
-
-    attributes:state => state.attributes,
-    list: state => state.list,
-    getCount : state => state.count
+  attributes:state => state.attributes,
+  list: state => state.list,
+  getCount : state => state.count,
+  your_room_id:state=>state.your_room_id
 };
 
 const mutations = {
@@ -94,7 +115,10 @@ const mutations = {
     [types.LIST]( state, res) {
       state.list = res;
       state.count = res.length;
-    }
+    },
+  SetRoomId(state, room_id){
+      state.your_room_id = room_id;
+  }
 };
 
 export default {
