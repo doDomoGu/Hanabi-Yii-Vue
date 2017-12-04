@@ -150,4 +150,36 @@ class Room extends ActiveRecord
 
         return [$success,$msg,$room_id];
     }
+
+
+    public static function exitRoom($user_id){
+        $success = false;
+        $msg = '';
+        $room_id = false;
+        $userRoomUser = RoomUser::find()->where(['user_id'=>$user_id])->all();
+        if(count($userRoomUser)==1){
+            $roomUser = $userRoomUser[0];
+            //room如果有其他玩家(2p,自己是1P) 要对应改变其状态
+            if($roomUser->role_type==RoomUser::ROLE_TYPE_MASTER){
+                $guestUser = RoomUser::find()->where(['room_id'=>$roomUser->room_id,'role_type'=>RoomUser::ROLE_TYPE_GUEST])->one();
+                if($guestUser){
+                    $guestUser->role_type = RoomUser::ROLE_TYPE_MASTER;
+                    $guestUser->save();
+                }else{
+                    //没有2P 则要把房间状态 置位 空闲
+                    $room = Room::find()->where(['id'=>$roomUser->room_id])->one();
+                    $room->status = Room::STATUS_AVAILABLE;
+                    $room->save();
+                }
+            }
+            RoomUser::deleteAll(['user_id'=>$user_id]);
+            $success = true;
+        }elseif(count($userRoomUser)==0) {
+            $msg = '不在房间中了';
+        }else{
+            $msg = '在多个房间中，数据错误';
+        }
+
+        return [$success,$msg];
+    }
 }

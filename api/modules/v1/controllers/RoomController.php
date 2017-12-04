@@ -34,6 +34,14 @@ class RoomController extends MyActiveController
         return $return;
     }
 
+    public function actionExit(){
+        $return = $this->return;
+
+        list($return['success'],$return['msg']) = Room::exitRoom(Yii::$app->user->id);
+
+        return $return;
+    }
+
 
     public function actionIsInRoom(){
         $return = $this->return;
