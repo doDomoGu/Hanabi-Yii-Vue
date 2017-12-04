@@ -12,6 +12,22 @@ use yii\filters\Cors;
 
 class MyActiveController extends ActiveController
 {
+    public $return;
+
+    public function init(){
+        parent::init();
+        $this->initReturn();
+    }
+
+    //初始化 返回值 数据结构
+    private function initReturn(){
+        $this->return = [
+            'success'=>false,
+            'msg'=>'',
+            'data'=>false,
+        ];
+    }
+
     public function behaviors()
     {
         $behaviors = parent::behaviors();
@@ -20,7 +36,7 @@ class MyActiveController extends ActiveController
         $behaviors['authenticator'] = [
             'class' => QueryParamAuth::className(),
             // 设置token名称，默认是access-token
-            //'tokenParam' => 'access_token',
+            'tokenParam' => 'access_token',
             'optional' => [
                 'index',
                 //'view',
