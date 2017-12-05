@@ -81,6 +81,8 @@ const actions = {
 
           if(res.data.success){
             commit('SetRoomId',res.data.data.room_id);
+          }else{
+            commit('ClearRoom');
           }
 
           resolve(res.data);
@@ -103,6 +105,8 @@ const actions = {
 
           if(res.data.success){
             commit('SetRoomUser',res.data.data);
+          }else{
+            commit('ClearRoomUser');
           }
 
           resolve(res.data);
@@ -175,9 +179,24 @@ const mutations = {
   ExitRoom(state){
     state.your_room_id = false;
   },
+  ClearRoom(state){
+    state.your_room_id = false;
+  },
   SetRoomUser(state, data){
     state.your_room_master_user = data.master_user;
     state.your_room_guest_user = data.guest_user;
+  },
+  ClearRoomUser(state){
+    state.your_room_master_user = {
+      id:0,
+      username:"",
+      name:""
+    };
+    state.your_room_guest_user = {
+      id:0,
+      username:"",
+      name:""
+    };
   }
 };
 

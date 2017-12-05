@@ -3,10 +3,11 @@
 }
 
 .user-block {
+    height:80px;
     background: #7baadc;
     margin-bottom: 10px;
     padding:10px;
-    border-radius: 10px;
+    border-radius: 6px;
 }
 
 .user-info {

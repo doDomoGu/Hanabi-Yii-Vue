@@ -9,11 +9,14 @@ export default {
     }
   },
   mounted: function(){
-    this.$store.dispatch('common/SetTitle','首页');
+
 
   },
   created: function(){
-    this.$store.dispatch('rooms/IsInRoom');
+    this.$store.dispatch('common/SetTitle','Hanabi');
+    this.$store.dispatch('rooms/IsInRoom').then(()=>{
+      this.$store.dispatch('common/SetTitle','Hanabi ('+this.$store.getters['auths/user_id']+')');
+    });
     this.getRoom();
 /*    if(this.isLogin()){
       this.getRoom();
@@ -31,9 +34,8 @@ export default {
         room._title = '<mt-badge size="small">'+room.id+'</mt-badge>'+' '+room.title;
         room._title = (room.id<100?room.id<10?'00'+room.id:'0'+room.id:room.id)+' '+room.title;
 
-        if(room.password!=''){
+        if(room.password!==''){
           room._title += '[lock]';
-          //room._title = room.id'[lock]';
         }
       }
       return rooms;

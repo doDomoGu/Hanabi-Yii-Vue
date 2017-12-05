@@ -216,7 +216,7 @@ class Room extends ActiveRecord
                             'name'=>$u->user->nickname
                         ];
                     }elseif($u->role_type == RoomUser::ROLE_TYPE_GUEST){
-                        $data['guset_user'] = [
+                        $data['guest_user'] = [
                             'id'=>$u->user->id,
                             'username'=>$u->user->username,
                             'name'=>$u->user->nickname
