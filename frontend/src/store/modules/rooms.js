@@ -15,7 +15,18 @@ const state = {
       usergroups: []*/
   },
   list:[],
-  your_room_id:false
+  your_room_id:false,
+  your_room_master_user:{
+    id:0,
+    username:"",
+    name:""
+  },
+  your_room_guest_user:{
+    id:0,
+    username:"",
+    name:""
+  },
+
 };
 
 const actions = {
@@ -79,6 +90,28 @@ const actions = {
         });
     });
   },
+  GetRoomUser({commit},room_id){
+    return new Promise((resolve, reject) => {
+
+      axios.post(
+        '/room/get-user'+'?access_token='+this.getters['auths/token'],
+        {
+          room_id:room_id
+        }
+      )
+        .then((res) => {
+
+          if(res.data.success){
+            commit('SetRoomUser',res.data.data);
+          }
+
+          resolve(res.data);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  },
   [types.LIST]({commit}){
     return new Promise((resolve, reject) => {
 
@@ -115,7 +148,9 @@ const getters = {
   attributes:state => state.attributes,
   list: state => state.list,
   getCount : state => state.count,
-  your_room_id:state=>state.your_room_id
+  your_room_id:state=>state.your_room_id,
+  your_room_master_user:state=>state.your_room_master_user,
+  your_room_guest_user:state=>state.your_room_guest_user,
 };
 
 const mutations = {
@@ -135,10 +170,14 @@ const mutations = {
       state.count = res.length;
     },
   SetRoomId(state, room_id){
-      state.your_room_id = room_id;
+    state.your_room_id = room_id;
   },
   ExitRoom(state){
     state.your_room_id = false;
+  },
+  SetRoomUser(state, data){
+    state.your_room_master_user = data.master_user;
+    state.your_room_guest_user = data.guest_user;
   }
 };
 

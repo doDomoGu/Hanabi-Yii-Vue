@@ -9,19 +9,21 @@ export default {
     }
   },
   mounted: function(){
-    this.$store.dispatch('rooms/IsInRoom').then(()=>{
-      this.$store.dispatch('common/SetTitle','房间'+this.$store.getters['rooms/your_room_id']);
-    });
+
   },
   created: function(){
-    //this.getRoom();
-    /*    if(this.isLogin()){
-          this.getRoom();
-        }*/
-    //this.rooms = this.getRoom();
+    this.$store.dispatch('rooms/IsInRoom').then(()=>{
+      this.$store.dispatch('common/SetTitle','房间'+this.$store.getters['rooms/your_room_id']);
+      this.$store.dispatch('rooms/GetRoomUser',this.$store.getters['rooms/your_room_id']);
+    });
   },
   computed : {
-
+    master_user:function(){
+      return this.$store.getters['rooms/your_room_master_user'];
+    },
+    guest_user:function(){
+      return this.$store.getters['rooms/your_room_guest_user'];
+    }
   },
   methods: {
     exit(){
@@ -34,9 +36,9 @@ export default {
           return false;
         }
       });
+    },
+    getUser(){
+      this.$store.dispatch('rooms/GetRoomUser',this.$store.getters['rooms/your_room_id']);
     }
-    /*getUser(){
-      this.$store.dispatch('rooms/GetRoomUser');
-    }*/
   }
 }

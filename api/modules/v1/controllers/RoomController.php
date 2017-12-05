@@ -56,4 +56,13 @@ class RoomController extends MyActiveController
         return $return;
     }
 
+    public function actionGetUser(){
+        $return = $this->return;
+
+        $room_id = Yii::$app->request->post('room_id');
+
+        list($return['success'],$return['msg'],$return['data']) = Room::getUser($room_id);
+
+        return $return;
+    }
 }

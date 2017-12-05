@@ -76,4 +76,11 @@ class RoomUser extends ActiveRecord
             'updated_at' => 'Updated At',
         ];
     }
+
+
+    // 获取用户
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
 }

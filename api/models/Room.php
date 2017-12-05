@@ -182,4 +182,53 @@ class Room extends ActiveRecord
 
         return [$success,$msg];
     }
+
+
+    public static function getUser($room_id){
+        $success = false;
+        $msg = '';
+        $data = [
+            'master_user'=>
+            [
+                'id'=>0,
+                'username'=>'',
+                'name'=>''
+            ],
+            'guest_user'=>
+            [
+                'id'=>0,
+                'username'=>'',
+                'name'=>''
+            ],
+        ];
+        $room = Room::find()->where(['id'=>$room_id])->one();
+        if($room){
+            $roomUser = RoomUser::find()->where(['room_id'=>$room->id])->all();
+            if(count($roomUser)>2){
+                $msg = '房间中人数大于2，数据错误';
+            }else{
+                $msg = '获取成功';
+                foreach($roomUser as $u){
+                    if($u->role_type == RoomUser::ROLE_TYPE_MASTER){
+                        $data['master_user'] = [
+                            'id'=>$u->user->id,
+                            'username'=>$u->user->username,
+                            'name'=>$u->user->nickname
+                        ];
+                    }elseif($u->role_type == RoomUser::ROLE_TYPE_GUEST){
+                        $data['guset_user'] = [
+                            'id'=>$u->user->id,
+                            'username'=>$u->user->username,
+                            'name'=>$u->user->nickname
+                        ];
+                    }
+                }
+                $success = true;
+            }
+        }else{
+            $msg = '房间不存在！';
+        }
+
+        return [$success,$msg,$data];
+    }
 }
