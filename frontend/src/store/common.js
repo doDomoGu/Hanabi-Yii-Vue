@@ -1,5 +1,6 @@
 const state = {
-    title:'common'
+  title:'Hanabi',
+  title_suffix:'Hanabi'
 };
 const actions = {
     SetTitle({ commit }, data) {
@@ -12,6 +13,7 @@ const actions = {
 
 const getters = {
     title: state => state.title,
+    title_suffix: state => state.title_suffix,
     //default_users: state => state.default_users
 };
 

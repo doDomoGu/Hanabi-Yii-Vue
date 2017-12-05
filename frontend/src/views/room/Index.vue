@@ -6,7 +6,7 @@
         <section class="user-block">
             玩家：<div v-if="guest_user.id>0" class="user-info">{{'('+guest_user.id+')'+guest_user.name}}</div>
         </section>
-        <mt-button @click.native="exit" size="large" type="danger">退出</mt-button>
+        <mt-button @click.native="exit" size="large" class="room-exit-btn" type="danger">退出房间</mt-button>
     </div>
 </template>
 

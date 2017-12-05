@@ -13,7 +13,7 @@ export default {
   },
   created: function(){
     this.$store.dispatch('rooms/IsInRoom').then(()=>{
-      this.$store.dispatch('common/SetTitle','房间'+this.$store.getters['rooms/your_room_id']);
+      this.$store.dispatch('common/SetTitle',this.$store.getters['common/title_suffix']+' - '+'房间'+this.$store.getters['rooms/your_room_id']);
       this.$store.dispatch('rooms/GetRoomUser',this.$store.getters['rooms/your_room_id']);
     });
   },
