@@ -17,27 +17,30 @@ const state = {
 };
 
 const actions = {
-    Logout({ commit },token){
-        return new Promise((resolve, reject) => {
-            axios.delete(
-                '/auth',
-                {
-                  params: {
-                    token: token
-                  }
-                }
-            )
-                .then((res) => {
-                    if(res.data && res.data.success) {
-                        commit('cleanLoginState');
-                    }
-                    resolve(res);
-                })
-                .catch(error => {
-                    reject(error);
-                });
+  Logout({ dispatch,commit},token){
+    return new Promise((resolve, reject) => {
+
+      dispatch('rooms/Exit',null,{root:true}).then(()=>{
+        axios.delete(
+          '/auth',
+          {
+            params: {
+              token: token
+            }
+          }
+        )
+        .then((res) => {
+          if(res.data && res.data.success) {
+            commit('cleanLoginState');
+          }
+          resolve(res);
+        })
+        .catch(error => {
+          reject(error);
         });
-    },
+      });
+    })
+  },
     Login({ dispatch,commit }, formData) {
         const username = formData.username.trim();
         const password = formData.password.trim();

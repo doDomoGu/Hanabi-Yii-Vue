@@ -21,11 +21,14 @@ export default {
       );
       this.getUser();
 
-      setInterval(()=>{
+      this.intervalid1 = setInterval(()=>{
         this.getUser();
       },500);
 
     });
+  },
+  beforeDestroy () {
+    clearInterval(this.intervalid1)
   },
   computed : {
     master_user:function(){
