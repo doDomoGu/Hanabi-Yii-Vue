@@ -6,6 +6,7 @@ return [
     'POST '.$v.'/room/is-in-room' => $v.'/room/is-in-room',  //判断是否在房间中  如是返回房间i
     'POST '.$v.'/room/exit' => $v.'/room/exit',  //判断是否在房间中  如是返回房间i
     'POST '.$v.'/room/get-user' => $v.'/room/get-user',  //判断是否在房间中  如是返回房间i
+    'POST '.$v.'/room/do-ready' => $v.'/room/do-ready',  //判断是否在房间中  如是返回房间i
 
 
     [

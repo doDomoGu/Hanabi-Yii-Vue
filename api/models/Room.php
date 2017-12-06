@@ -198,7 +198,8 @@ class Room extends ActiveRecord
             [
                 'id'=>0,
                 'username'=>'',
-                'name'=>''
+                'name'=>'',
+                'is_ready'=>false
             ],
         ];
         $room = Room::find()->where(['id'=>$room_id])->one();
@@ -213,13 +214,14 @@ class Room extends ActiveRecord
                         $data['master_user'] = [
                             'id'=>$u->user->id,
                             'username'=>$u->user->username,
-                            'name'=>$u->user->nickname
+                            'name'=>$u->user->nickname,
                         ];
                     }elseif($u->role_type == RoomUser::ROLE_TYPE_GUEST){
                         $data['guest_user'] = [
                             'id'=>$u->user->id,
                             'username'=>$u->user->username,
-                            'name'=>$u->user->nickname
+                            'name'=>$u->user->nickname,
+                            'is_ready'=>$u->is_ready==1?true:false
                         ];
                     }
                 }
@@ -230,5 +232,33 @@ class Room extends ActiveRecord
         }
 
         return [$success,$msg,$data];
+    }
+
+    public static function doReady($room_id){
+        $success = false;
+        $msg = '';
+        $room = Room::find()->where(['id'=>$room_id])->one();
+        if($room){
+            $roomUser = RoomUser::find()->where(['room_id'=>$room->id])->all();
+            if(count($roomUser)>2){
+                $msg = '房间中人数大于2，数据错误';
+            }else if(count($roomUser)==2){
+
+                $msg = '获取成功';
+                foreach($roomUser as $u){
+                    if($u->role_type == RoomUser::ROLE_TYPE_GUEST){
+                        $u->is_ready = $u->is_ready==1?0:1;
+                        $u->save();
+                    }
+                }
+                $success = true;
+            }else{
+                $msg = '房间中人数不等于2，数据错误';
+            }
+        }else{
+            $msg = '房间不存在！';
+        }
+
+        return [$success,$msg];
     }
 }

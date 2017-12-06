@@ -32,10 +32,20 @@ export default {
   },
   computed : {
     master_user:function(){
-      return this.$store.getters['rooms/your_room_master_user'];
+      let user = this.$store.getters['rooms/your_room_master_user'];
+      user.is_you = false;
+      if(user.id == this.$store.getters['auths/user_id']){
+        user.is_you = true;
+      }
+      return user;
     },
     guest_user:function(){
-      return this.$store.getters['rooms/your_room_guest_user'];
+      let user = this.$store.getters['rooms/your_room_guest_user'];
+      user.is_you = false;
+      if(user.id == this.$store.getters['auths/user_id']){
+        user.is_you = true;
+      }
+      return user;
     }
   },
   methods: {
@@ -52,6 +62,9 @@ export default {
     },
     getUser(){
       this.$store.dispatch('rooms/GetRoomUser',this.$store.getters['rooms/your_room_id']);
+    },
+    doReady(){
+      this.$store.dispatch('rooms/DoReady',this.$store.getters['rooms/your_room_id']);
     }
   }
 }

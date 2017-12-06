@@ -65,4 +65,14 @@ class RoomController extends MyActiveController
 
         return $return;
     }
+
+    public function actionDoReady(){
+        $return = $this->return;
+
+        $room_id = Yii::$app->request->post('room_id');
+
+        list($return['success'],$return['msg']) = Room::doReady($room_id);
+
+        return $return;
+    }
 }

@@ -116,6 +116,30 @@ const actions = {
         });
     });
   },
+  DoReady({commit},room_id){
+    return new Promise((resolve, reject) => {
+
+      axios.post(
+        '/room/do-ready'+'?access_token='+this.getters['auths/token'],
+        {
+          room_id:room_id
+        }
+      )
+        .then((res) => {
+
+          if(res.data.success){
+            //commit('SetRoomUser',res.data.data);
+          }else{
+            //commit('ClearRoomUser');
+          }
+
+          resolve(res.data);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  },
   [types.LIST]({commit}){
     return new Promise((resolve, reject) => {
 
