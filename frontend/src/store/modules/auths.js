@@ -25,7 +25,7 @@ const actions = {
           '/auth',
           {
             params: {
-              token: token
+              access_token: token
             }
           }
         )
@@ -73,7 +73,7 @@ const actions = {
                 '/auth',
                 {
                     params: {
-                        token: token
+                      access_token: token
                     }
                 }
             )

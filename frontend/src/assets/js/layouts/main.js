@@ -16,6 +16,24 @@ export default {
       this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
     }*/
   },
+  created(){
+    /*this.intervalid1 = setInterval(()=>{
+
+      if(this.$store.getters['auths/token']!=''){
+        let token = this.$store.getters['auths/token'];
+        this.$store.dispatch('auths/CheckToken', [this.$store.getters['auths/token'],true]).then(()=>{
+          console.log(this.$store.getters['auths/is_login']);
+          if(this.$store.getters['auths/is_login']===false){
+            this.$store.dispatch('auths/Logout',token).then(() => {
+              clearInterval(this.intervalid1);
+              console.log('clear');
+              this.$router.push({path: '/login'});
+            })
+          }
+        })
+      }
+    },500);*/
+  },
   methods: {
     getTitle(){
       let title = this.$store.getters['common/title'];

@@ -14,14 +14,12 @@ export default {
   },
   created: function(){
     this.$store.dispatch('common/SetTitle','Hanabi');
-    this.$store.dispatch('rooms/IsInRoom').then(()=>{
-      this.$store.dispatch('common/SetTitle','Hanabi ('+this.$store.getters['auths/user_id']+')');
-    });
-    this.getRoom();
-/*    if(this.isLogin()){
+    if(this.isLogin()){
+      this.$store.dispatch('rooms/IsInRoom').then(()=>{
+        this.$store.dispatch('common/SetTitle','Hanabi ('+this.$store.getters['auths/user_id']+')');
+      });
       this.getRoom();
-    }*/
-    //this.rooms = this.getRoom();
+    }
   },
   computed : {
     your_room_link: function(){

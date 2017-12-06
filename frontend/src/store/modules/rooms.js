@@ -120,7 +120,12 @@ const actions = {
     return new Promise((resolve, reject) => {
 
       axios.get(
-        '/room'
+        '/room',
+        {
+          params:{
+            access_token : this.getters['auths/token']
+          }
+        }
       )
         .then((res) => {
           commit(types.LIST,res.data);

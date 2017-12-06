@@ -31,7 +31,7 @@ class UserController extends ActiveController
         $behaviors['authenticator'] = [
             'class' => QueryParamAuth::className(),
             // 设置token名称，默认是access-token
-            //'tokenParam' => 'access_token',
+            'tokenParam' => 'access_token',
             'optional' => [
                 'index',
                 //'view',
@@ -40,7 +40,7 @@ class UserController extends ActiveController
                 //'view',
                 'auth',
                 'auth-user-info',
-                'auth-delete',
+                //'auth-delete',
             ],
 
         ];
@@ -118,17 +118,23 @@ class UserController extends ActiveController
             'success' => false,
             'error_msg' => ''
         ];
-        $token = Yii::$app->request->get('token');
+        $token = Yii::$app->request->get('access_token');
 
         $auth = UserAuth::find()->where(['token'=>$token])->one();
 
         if($auth){
-            $auth->expired_time = date('Y-m-d H:i:s',strtotime('-1 second'));
-            if($auth->save()){
-                $return['success'] = true;
-            }else{
-                $return['error_msg'] = 'Token数据错误(001)';
+            //同步退出
+            $res = UserAuth::find()->select('id,expired_time')->where(['user_id'=>Yii::$app->user->id])->all();
+            $ids = [];
+            foreach($res as $r){
+                if($r->expired_time > date('Y-m-d H:i:s')){
+                    $ids[] = $r->id;
+                }
             }
+            UserAuth::updateAll(['expired_time'=>date('Y-m-d H:i:s',strtotime('-1 second'))],['in','id',$ids]);
+
+
+            $return['success'] = true;
 
         }else{
             $return['error_msg'] = 'Token数据错误(002)';
@@ -145,21 +151,25 @@ class UserController extends ActiveController
             'success' => false,
             'error_msg' => ''
         ];
-        $token = Yii::$app->request->get('token');
+        $token = Yii::$app->request->get('access_token');
 
         $auth = UserAuth::find()->where(['token'=>$token])->one();
 
         if($auth) {
-            $user = User::find()->where(['id' => $auth->user_id])->one();
-            if ($user){
-                $return['success'] = true;
-                $return['token'] = $token;
-                $return['tokenForceUpdate'] = true;
-                $return['user_id'] = $user->id;
-                $return['user_info'] = $user->attributes;
-                //$return = $user->attributes;
+            if($auth->expired_time > date('Y-m-d H:i:s')){
+                $user = User::find()->where(['id' => $auth->user_id])->one();
+                if ($user){
+                    $return['success'] = true;
+                    $return['token'] = $token;
+                    $return['tokenForceUpdate'] = true;
+                    $return['user_id'] = $user->id;
+                    $return['user_info'] = $user->attributes;
+                    //$return = $user->attributes;
+                }else{
+                    $return['error_msg'] = 'User数据错误';
+                }
             }else{
-                $return['error_msg'] = 'User数据错误';
+                $return['error_msg'] = 'Auth过期';
             }
         }else{
             $return['error_msg'] = 'Auth数据错误';
