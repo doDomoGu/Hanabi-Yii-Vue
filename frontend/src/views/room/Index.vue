@@ -7,7 +7,7 @@
                 <div>{{'('+master_user.id+(master_user.is_you?'*':'')+')'+master_user.name}}</div>
 
                 <div v-if="master_user.is_you">
-                    <mt-button size="small" :disabled="(guest_user.id>0 && guest_user.is_ready)?false:true" class="start-game-btn">开始游戏</mt-button>
+                    <mt-button size="small" @click.native="startGame" :disabled="(guest_user.id>0 && guest_user.is_ready)?false:true" class="start-game-btn">开始游戏</mt-button>
                 </div>
             </div>
         </section>

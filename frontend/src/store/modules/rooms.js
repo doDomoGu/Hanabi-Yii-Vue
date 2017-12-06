@@ -26,6 +26,7 @@ const state = {
     username:"",
     name:""
   },
+  your_room_is_playing:false
 
 };
 
@@ -92,11 +93,10 @@ const actions = {
         });
     });
   },
-  GetRoomUser({commit},room_id){
+  GetRoomInfo({commit},room_id=this.getters['rooms/your_room_id']){
     return new Promise((resolve, reject) => {
-
       axios.post(
-        '/room/get-user'+'?access_token='+this.getters['auths/token'],
+        '/room/get-room-info'+'?access_token='+this.getters['auths/token'],
         {
           room_id:room_id
         }
@@ -104,9 +104,9 @@ const actions = {
         .then((res) => {
 
           if(res.data.success){
-            commit('SetRoomUser',res.data.data);
+            commit('SetRoomInfo',res.data.data);
           }else{
-            commit('ClearRoomUser');
+            commit('ClearRoomInfo');
           }
 
           resolve(res.data);
@@ -116,7 +116,7 @@ const actions = {
         });
     });
   },
-  DoReady({commit},room_id){
+  DoReady({commit},room_id=this.getters['rooms/your_room_id']){
     return new Promise((resolve, reject) => {
 
       axios.post(
@@ -128,6 +128,31 @@ const actions = {
         .then((res) => {
 
           if(res.data.success){
+            //commit('SetRoomUser',res.data.data);
+          }else{
+            //commit('ClearRoomUser');
+          }
+
+          resolve(res.data);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  },
+  StartGame({commit},room_id=this.getters['rooms/your_room_id']){
+    return new Promise((resolve, reject) => {
+
+      axios.post(
+        '/room/start-game'+'?access_token='+this.getters['auths/token'],
+        {
+          room_id:room_id
+        }
+      )
+        .then((res) => {
+
+          if(res.data.success){
+            commit('SetRoomIsPlaying');
             //commit('SetRoomUser',res.data.data);
           }else{
             //commit('ClearRoomUser');
@@ -184,6 +209,7 @@ const getters = {
   your_room_id:state=>state.your_room_id,
   your_room_master_user:state=>state.your_room_master_user,
   your_room_guest_user:state=>state.your_room_guest_user,
+  your_room_is_playing:state=>state.your_room_is_playing,
 };
 
 const mutations = {
@@ -211,9 +237,13 @@ const mutations = {
   ClearRoom(state){
     state.your_room_id = false;
   },
-  SetRoomUser(state, data){
+  SetRoomInfo(state, data){
     state.your_room_master_user = data.master_user;
     state.your_room_guest_user = data.guest_user;
+    state.your_room_is_playing = data.is_playing;
+  },
+  SetRoomIsPlaying(state){
+    state.your_room_is_playing = true;
   },
   ClearRoomUser(state){
     state.your_room_master_user = {

@@ -184,7 +184,7 @@ class Room extends ActiveRecord
     }
 
 
-    public static function getUser($room_id){
+    public static function getRoomInfo($room_id){
         $success = false;
         $msg = '';
         $data = [
@@ -201,6 +201,7 @@ class Room extends ActiveRecord
                 'name'=>'',
                 'is_ready'=>false
             ],
+            'is_playing'=>false
         ];
         $room = Room::find()->where(['id'=>$room_id])->one();
         if($room){
@@ -225,6 +226,8 @@ class Room extends ActiveRecord
                         ];
                     }
                 }
+                $data['is_playing'] = $room->status == self::STATUS_PLAYING?true:false;
+
                 $success = true;
             }
         }else{
@@ -244,14 +247,19 @@ class Room extends ActiveRecord
                 $msg = '房间中人数大于2，数据错误';
             }else if(count($roomUser)==2){
 
-                $msg = '获取成功';
+
                 foreach($roomUser as $u){
                     if($u->role_type == RoomUser::ROLE_TYPE_GUEST){
                         $u->is_ready = $u->is_ready==1?0:1;
-                        $u->save();
+                        if($u->save()){
+                            $success = true;
+                            $msg = $u->is_ready==1?'准备完成':'取消准备';
+                        }
                     }
                 }
-                $success = true;
+                if($success==false){
+                    $msg = '未知错误';
+                }
             }else{
                 $msg = '房间中人数不等于2，数据错误';
             }
@@ -259,6 +267,47 @@ class Room extends ActiveRecord
             $msg = '房间不存在！';
         }
 
+        return [$success,$msg];
+    }
+
+
+    public static function startGame($room_id){
+        $success = false;
+        $msg = '';
+        $room = Room::find()->where(['id'=>$room_id])->one();
+        if($room){
+            if($room->status==self::STATUS_PREPARING){
+                $roomUser = RoomUser::find()->where(['room_id'=>$room->id])->all();
+                if(count($roomUser)>2){
+                    $msg = '房间中人数大于2，数据错误';
+                }else if(count($roomUser)==2){
+
+
+
+                    foreach($roomUser as $u){
+                        if($u->role_type == RoomUser::ROLE_TYPE_GUEST) {
+                            if ($u->is_ready == 1) {
+                                $room->status = self::STATUS_PLAYING;
+                                if ($room->save()) {
+                                    //TODO 添加 Game表相关
+                                    $success = true;
+                                    $msg = '开始游戏成功';
+                                }
+                            }
+                        }
+                    }
+                    if($success==false){
+                        $msg = '未知错误';
+                    }
+                }else{
+                    $msg = '房间中人数不等于2，数据错误';
+                }
+            }else{
+                $msg = '房间状态不是"准备中"！(STATUS_PREPARING)';
+            }
+        }else{
+            $msg = '房间不存在！';
+        }
         return [$success,$msg];
     }
 }

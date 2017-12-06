@@ -6,6 +6,7 @@ import Login from '../../views/Login'
 import NoAuth from '../../views/NoAuth'
 
 import Room from '../../views/room/Index'
+import Game from '../../views/game/Index'
 
 var routes = [{
   path: '/',
@@ -28,6 +29,16 @@ var routes = [{
       path: 'room/:room_id',
       name: '房间',
       component: Room,
+      meta: {
+        requireAuths: true,
+        requireRoles: '*'
+      }
+    },
+    {
+      path: 'game',
+      //path: 'game/:game_id',
+      name: '游戏中',
+      component: Game,
       meta: {
         requireAuths: true,
         requireRoles: '*'

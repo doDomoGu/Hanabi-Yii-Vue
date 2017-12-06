@@ -5,8 +5,9 @@ return [
     'POST '.$v.'/room/enter' => $v.'/room/enter',  //进入房间 （是否有位置， 如有密码，密码验证）
     'POST '.$v.'/room/is-in-room' => $v.'/room/is-in-room',  //判断是否在房间中  如是返回房间i
     'POST '.$v.'/room/exit' => $v.'/room/exit',  //判断是否在房间中  如是返回房间i
-    'POST '.$v.'/room/get-user' => $v.'/room/get-user',  //判断是否在房间中  如是返回房间i
+    'POST '.$v.'/room/get-room-info' => $v.'/room/get-room-info',  //判断是否在房间中  如是返回房间i
     'POST '.$v.'/room/do-ready' => $v.'/room/do-ready',  //判断是否在房间中  如是返回房间i
+    'POST '.$v.'/room/start-game' => $v.'/room/start-game',  //判断是否在房间中  如是返回房间i
 
 
     [

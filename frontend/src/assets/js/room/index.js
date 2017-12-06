@@ -19,10 +19,13 @@ export default {
         'common/SetTitle',
         this.$store.getters['common/title_suffix']+' - '+'房间'+this.$store.getters['rooms/your_room_id']
       );
-      this.getUser();
+      this.getRoomInfo();
 
       this.intervalid1 = setInterval(()=>{
-        this.getUser();
+        this.getRoomInfo();
+        if(this.$store.getters['rooms/your_room_is_playing']){
+          this.$router.push('/game');
+        }
       },500);
 
     });
@@ -60,11 +63,20 @@ export default {
         }
       });
     },
-    getUser(){
-      this.$store.dispatch('rooms/GetRoomUser',this.$store.getters['rooms/your_room_id']);
+    getRoomInfo(){
+      this.$store.dispatch('rooms/GetRoomInfo');
     },
     doReady(){
-      this.$store.dispatch('rooms/DoReady',this.$store.getters['rooms/your_room_id']);
+      this.$store.dispatch('rooms/DoReady');
+    },
+    startGame(){
+      this.$store.dispatch('rooms/StartGame')/*.then((res)=>{
+        if(res.success){
+          this.$router.push('/game');
+        }else{
+          alert('开始失败');
+        }
+      });*/
     }
   }
 }

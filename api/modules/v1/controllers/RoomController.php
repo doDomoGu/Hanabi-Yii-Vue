@@ -56,12 +56,12 @@ class RoomController extends MyActiveController
         return $return;
     }
 
-    public function actionGetUser(){
+    public function actionGetRoomInfo(){
         $return = $this->return;
 
         $room_id = Yii::$app->request->post('room_id');
 
-        list($return['success'],$return['msg'],$return['data']) = Room::getUser($room_id);
+        list($return['success'],$return['msg'],$return['data']) = Room::getRoomInfo($room_id);
 
         return $return;
     }
@@ -72,6 +72,17 @@ class RoomController extends MyActiveController
         $room_id = Yii::$app->request->post('room_id');
 
         list($return['success'],$return['msg']) = Room::doReady($room_id);
+
+        return $return;
+    }
+
+
+    public function actionStartGame(){
+        $return = $this->return;
+
+        $room_id = Yii::$app->request->post('room_id');
+
+        list($return['success'],$return['msg']) = Room::startGame($room_id);
 
         return $return;
     }
