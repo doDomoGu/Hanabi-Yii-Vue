@@ -1,6 +1,6 @@
 <template>
     <div id="game">
-        游戏中
+        
 
 
     </div>

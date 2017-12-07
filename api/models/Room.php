@@ -281,23 +281,22 @@ class Room extends ActiveRecord
                 if(count($roomUser)>2){
                     $msg = '房间中人数大于2，数据错误';
                 }else if(count($roomUser)==2){
-
-
-
                     foreach($roomUser as $u){
                         if($u->role_type == RoomUser::ROLE_TYPE_GUEST) {
                             if ($u->is_ready == 1) {
-                                $room->status = self::STATUS_PLAYING;
-                                if ($room->save()) {
-                                    //TODO 添加 Game表相关
-                                    $success = true;
-                                    $msg = '开始游戏成功';
+                                //新建Game
+                                if(Game::createOne($room_id)){
+                                    $room->status = self::STATUS_PLAYING;
+                                    if ($room->save()) {
+                                        $success = true;
+                                        $msg = '开始游戏成功';
+                                    }
                                 }
                             }
                         }
                     }
                     if($success==false){
-                        $msg = '未知错误';
+                        $msg = '未知错误001';
                     }
                 }else{
                     $msg = '房间中人数不等于2，数据错误';
