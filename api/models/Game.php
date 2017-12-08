@@ -135,15 +135,19 @@ class Game extends ActiveRecord
                             $game_id = $game->id;
                         }
                     }else{
+                        echo 11;exit;
                         //TODO 错误处理
                     }
                 }else{
+                    echo 22;exit;
                     //TODO 错误处理
                 }
             }else{
+                echo 33;exit;
                 //TODO 错误处理
             }
         }else{
+            echo 44;exit;
             //TODO 错误处理
         }
         return $game_id;

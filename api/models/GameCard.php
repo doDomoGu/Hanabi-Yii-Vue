@@ -89,8 +89,8 @@ class GameCard extends ActiveRecord
         $return = false;
         $game = Game::find()->where(['id'=>$game_id,'status'=>1])->one();
         if($game){
-            $cardCount = self::find()->where(['game_id'=>$game_id])->count();
-            if($cardCount>0){
+            $cardCount = self::find()->where(['game_id'=>$game->id])->count();
+            if($cardCount==0){
                 $cardArr = [];
                 foreach(Card::$colors as $k=>$v){
                     foreach(Card::$numbers as $k2=>$v2){
@@ -102,13 +102,13 @@ class GameCard extends ActiveRecord
                 $insertArr = [];
                 $ord = 1;
                 foreach($cardArr as $c){
-                    $insertArr[] = [$game_id,self::TYPE_IN_LIBRARY,$ord,0,$c[0],$c[1],$ord];
+                    $insertArr[] = [$game_id,self::TYPE_IN_LIBRARY,$ord,0,$c[0],$c[1],$ord,date('Y-m-d H:i:s'),date('Y-m-d H:i:s')];
                     $ord++;
                 }
 
                 Yii::$app->db->createCommand()->batchInsert(
                     self::tableName(),
-                    ['game_id','type','type_ord','player_num','color','num','ord'],
+                    ['game_id','type','type_ord','player_num','color','num','ord','created_at','updated_at'],
                     $insertArr
                 )->execute();
 
@@ -143,13 +143,13 @@ class GameCard extends ActiveRecord
                 //查找玩家手上排序最大的牌，确定新模的牌的序号 ord
                 $playerCard = self::find()->where(['game_id'=>$game_id,'type'=>self::TYPE_IN_PLAYER,'player_num'=>$player_num])->orderBy('type_ord desc')->one();
                 if($playerCard){
-                    $ord = $playerCard->ord+1;
+                    $ord = $playerCard->type_ord+1;
                 }else{
                     $ord = 1;
                 }
                 $card->type = self::TYPE_IN_PLAYER;
                 $card->player_num = $player_num;
-                $card->ord = $ord;
+                $card->type_ord = $ord;
                 if($card->save()){
                     $return = true;
                 }
