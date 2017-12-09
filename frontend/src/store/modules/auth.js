@@ -60,7 +60,7 @@ const actions = {
   },
   Logout({ dispatch,commit}){
     return new Promise((resolve, reject) => {
-      dispatch('room/Exit',null,{root:true}).then(()=>{
+      dispatch('my_room/Exit',null,{root:true}).then(()=>{
         axios.delete(
           '/auth',
           {

@@ -16,7 +16,7 @@ export default {
     if(this.isLogin()){
       this.getRoomList();
 
-      this.$store.dispatch('room/IsInRoom').then(()=>{
+      this.$store.dispatch('my_room/IsInRoom').then(()=>{
         this.$store.dispatch('common/SetTitle','Hanabi ('+this.$store.getters['auth/user_id']+')');
       });
 
@@ -24,7 +24,7 @@ export default {
   },
   computed : {
     your_room_link: function(){
-      return '/room/'+this.$store.getters['room/your_room_id'];
+      return '/room/'+this.$store.getters['my_room/room_id'];
     },
     room_list : function() {
       let room_list = this.$store.getters['room/list'];
@@ -60,7 +60,7 @@ export default {
 
     enterRoom(room_id){
       let that = this;
-      this.$store.dispatch('room/Enter',{room_id:room_id}).then((res)=>{
+      this.$store.dispatch('my_room/Enter',{room_id:room_id}).then((res)=>{
         if(res.success){
           that.$router.push('/room/'+room_id);
         }else {
@@ -71,12 +71,7 @@ export default {
       })
     },
     isInRoom(){
-/*      let your_room_id = this.$store.getters['room/your_room_id'];
-      if(your_room_id!==false){
-
-      }*/
-
-      return this.$store.getters['room/your_room_id'];
+      return this.$store.getters['my_room/room_id'];
 
     }
 

@@ -11,16 +11,16 @@ export default {
 
   },
   created: function(){
-    this.$store.dispatch('room/IsInRoom').then(()=>{
+    this.$store.dispatch('my_room/IsInRoom').then(()=>{
 
       this.$store.dispatch(
         'common/SetTitle',
-        this.$store.getters['common/title_suffix']+' - '+(this.$store.getters['room/your_room_is_playing']?'游戏中':'错误')
+        this.$store.getters['common/title_suffix']+' - '+(this.$store.getters['my_room/is_playing']?'游戏中':'错误')
       );
       this.getGameInfo();
       this.intervalid1 = setInterval(()=>{
         this.getGameInfo();
-        /*if(this.$store.getters['room/your_room_is_playing']){
+        /*if(this.$store.getters['my_room/is_playing']){
           this.$router.push('/game');
         }*/
       },500);
@@ -32,7 +32,7 @@ export default {
   },
   computed : {
     master_user:function(){
-      let user = this.$store.getters['room/your_room_master_user'];
+      let user = this.$store.getters['my_room/master_user'];
       let game = this.$store.getters['games']
       user.is_you = false;
       if(user.id == this.$store.getters['auth/user_id']){
@@ -41,7 +41,7 @@ export default {
       return user;
     },
     guest_user:function(){
-      let user = this.$store.getters['room/your_room_guest_user'];
+      let user = this.$store.getters['my_room/guest_user'];
       user.is_you = false;
       if(user.id == this.$store.getters['auth/user_id']){
         user.is_you = true;

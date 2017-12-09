@@ -2,200 +2,38 @@ import axios from '../../axios'
 
 const state = {
   count: 0,
-  attributes:{
-      /*id: 0,
-      username: "",
-      password: "",
-      name:"",
-      mobile: "",
-      email: "",
-      status: "1",
-      verify: "1",
-      usergroups: []*/
-  },
   list:[],
-  your_room_id:false,
-  your_room_master_user:{
-    id:0,
-    username:"",
-    name:""
-  },
-  your_room_guest_user:{
-    id:0,
-    username:"",
-    name:""
-  },
-  your_room_is_playing:false
-
 };
 
 const actions = {
-  Enter({commit},params){
-    return new Promise((resolve, reject) => {
-
-      axios.post(
-        '/room/enter'+'?access_token='+this.getters['auth/token'],
-        {
-          //access_token:this.getters['auth/token'],
-          room_id:params.room_id,
-
-        }
-      )
-        .then((res) => {
-          if(res.data.success){
-            commit('SetRoomId',res.data.data.room_id);
-          }
-
-          resolve(res.data);
-        })
-        .catch(error => {
-          reject(error);
-        });
-    });
-  },
-  Exit({commit}){
-    return new Promise((resolve, reject) => {
-
-      axios.post(
-        '/room/exit'+'?access_token='+this.getters['auth/token']
-      )
-        .then((res) => {
-          if(res.data.success){
-            commit('ExitRoom');
-          }
-
-          resolve(res.data);
-        })
-        .catch(error => {
-          reject(error);
-        });
-    });
-  },
-  IsInRoom({commit}){
-    return new Promise((resolve, reject) => {
-
-      axios.post(
-        '/room/is-in-room'+'?access_token='+this.getters['auth/token'],
-      )
-        .then((res) => {
-
-          if(res.data.success){
-            commit('SetRoomId',res.data.data.room_id);
-          }else{
-            commit('ClearRoom');
-          }
-
-          resolve(res.data);
-        })
-        .catch(error => {
-          reject(error);
-        });
-    });
-  },
-  GetRoomInfo({commit},room_id=this.getters['room/your_room_id']){
-    return new Promise((resolve, reject) => {
-      axios.post(
-        '/room/get-room-info'+'?access_token='+this.getters['auth/token'],
-        {
-          room_id:room_id
-        }
-      )
-        .then((res) => {
-
-          if(res.data.success){
-            commit('SetRoomInfo',res.data.data);
-          }else{
-            commit('ClearRoomInfo');
-          }
-
-          resolve(res.data);
-        })
-        .catch(error => {
-          reject(error);
-        });
-    });
-  },
-  DoReady({commit},room_id=this.getters['room/your_room_id']){
-    return new Promise((resolve, reject) => {
-
-      axios.post(
-        '/room/do-ready'+'?access_token='+this.getters['auth/token'],
-        {
-          room_id:room_id
-        }
-      )
-        .then((res) => {
-
-          if(res.data.success){
-            //commit('SetRoomUser',res.data.data);
-          }else{
-            //commit('ClearRoomUser');
-          }
-
-          resolve(res.data);
-        })
-        .catch(error => {
-          reject(error);
-        });
-    });
-  },
-  StartGame({commit},room_id=this.getters['room/your_room_id']){
-    return new Promise((resolve, reject) => {
-
-      axios.post(
-        '/room/start-game'+'?access_token='+this.getters['auth/token'],
-        {
-          room_id:room_id
-        }
-      )
-        .then((res) => {
-
-          if(res.data.success){
-            commit('SetRoomIsPlaying');
-            //commit('SetRoomUser',res.data.data);
-          }else{
-            //commit('ClearRoomUser');
-          }
-
-          resolve(res.data);
-        })
-        .catch(error => {
-          reject(error);
-        });
-    });
-  },
   List({commit}){
     return new Promise((resolve, reject) => {
       axios.get(
-        '/room'+'?access_token='+this.getters['auth/token'],
-      )
-        .then((res) => {
-          if(res.data){
-            commit('SetRoomList',res.data);
-          }else{
-            commit('ClearRoomList');
+        '/room',
+        {
+          params: {
+            access_token: this.getters['auth/token']
           }
-          resolve(res.data);
-        })
-        .catch(error => {
-          reject(error);
-        });
+        },
+      )
+      .then((res) => {
+        if(res.data){
+          commit('SetRoomList',res.data);
+        }else{
+          commit('ClearRoomList');
+        }
+        resolve(res.data);
+      })
+      .catch(error => {
+        reject(error);
+      });
     });
   },
 };
 
 const getters = {
-  attributes:state => state.attributes,
   list: state => state.list,
-  getCount : state => state.count,
-
-
-
-
-  your_room_id:state=>state.your_room_id,
-  your_room_master_user:state=>state.your_room_master_user,
-  your_room_guest_user:state=>state.your_room_guest_user,
-  your_room_is_playing:state=>state.your_room_is_playing,
+  count : state => state.count,
 };
 
 const mutations = {
@@ -205,39 +43,6 @@ const mutations = {
   ClearRoomList(state){
     state.list = [];
   },
-
-
-
-
-  SetRoomId(state, room_id){
-    state.your_room_id = room_id;
-  },
-  ExitRoom(state){
-    state.your_room_id = false;
-  },
-  ClearRoom(state){
-    state.your_room_id = false;
-  },
-  SetRoomInfo(state, data){
-    state.your_room_master_user = data.master_user;
-    state.your_room_guest_user = data.guest_user;
-    state.your_room_is_playing = data.is_playing;
-  },
-  SetRoomIsPlaying(state){
-    state.your_room_is_playing = true;
-  },
-  ClearRoomUser(state){
-    state.your_room_master_user = {
-      id:0,
-      username:"",
-      name:""
-    };
-    state.your_room_guest_user = {
-      id:0,
-      username:"",
-      name:""
-    };
-  }
 };
 
 export default {
