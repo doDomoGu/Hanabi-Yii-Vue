@@ -46,7 +46,7 @@ const router = new Router({
 let auth_true = function(to, from, next){
   if (to.path === "/logout") {
     //登出操作
-    store.dispatch('auth/Logout',store.getters['auth/token']).then(() => {
+    store.dispatch('auth/Logout').then(() => {
       next({path: '/login'});
     })
   }else if (to.path === "/login") {

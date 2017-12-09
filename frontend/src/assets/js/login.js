@@ -17,7 +17,8 @@ export default {
   },
   methods: {
     onSubmit() {
-      this.$store.dispatch('auth/Login', this.form).then((res) => {
+
+      this.$store.dispatch('auth/Login', [this.form.username.trim(),this.form.password.trim()]).then((res) => {
         if(res.data.success){
           //this.$store.dispatch('auth/SetStore', res.data);
 

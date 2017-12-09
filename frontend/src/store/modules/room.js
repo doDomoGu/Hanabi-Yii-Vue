@@ -166,7 +166,6 @@ const actions = {
   },
   List({commit}){
     return new Promise((resolve, reject) => {
-
       axios.get(
         '/room'+'?access_token='+this.getters['auth/token'],
       )
