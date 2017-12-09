@@ -27,10 +27,6 @@ for(let i in NormalRoutes){
 //最后载入404页面
 routes.push(NotFound404Routes);
 
-
-//将路由配置写入Vuex
-store.dispatch('auth/SetRoutes',routes);
-
 //声明router对象
 const router = new Router({
   mode:'history',

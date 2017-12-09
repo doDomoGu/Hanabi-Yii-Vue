@@ -5,12 +5,6 @@ const state = {
   user_id: 0,
   user_info:{},
   token: '',
-
-
-  //roles: [],
-  //routes: [],
-
-  //add_routes: []
 };
 
 const actions = {
@@ -55,7 +49,7 @@ const actions = {
           commit('setUserInfo',{user_info:res.data.user_info});
         }else{
           //提交的token 错误
-          commit('cleanLoginState');
+          commit('clearLoginState');
         }
         resolve(res);
       })
@@ -75,59 +69,18 @@ const actions = {
             }
           }
         )
-          .then((res) => {
-            if(res.data && res.data.success) {
-              commit('cleanLoginState');
-            }
-            resolve(res);
-          })
-          .catch(error => {
-            reject(error);
-          });
+        .then((res) => {
+          if(res.data && res.data.success) {
+            commit('clearLoginState');
+          }
+          resolve(res);
+        })
+        .catch(error => {
+          reject(error);
+        });
       });
     })
   },
-
-    SetRoutes({commit},routes){
-
-        let getRoutes = function(path,_routes){
-            //console.log(path,_routes);
-            let ret = [];
-            if(_routes.length>0){
-                //let path2 = path;
-                if(path!=='' && path!=='/'){
-                    path = path + '/';
-                }
-
-                for(let i in _routes){
-
-                    //ret.push(_routes[i]);
-                    if(_routes[i].path==='*'){
-                        ret['*'] = _routes[i].meta;
-                    }else{
-                        ret[path + _routes[i].path] = _routes[i].meta;
-
-                        if(_routes[i].children && _routes[i].children.length>0){
-                            let children = getRoutes(path + _routes[i].path,_routes[i].children);
-                            for(let j in children){
-                                ret[j] = children[j];
-                            }
-                        }
-                    }
-                }
-            }
-//console.log(ret);
-            return ret;
-
-        };
-
-        let data = getRoutes('',routes);
-
-
-
-
-        commit('setRoutes',data);
-    }
 };
 
 const getters = {
@@ -135,8 +88,6 @@ const getters = {
   user_id: state => state.user_id,
   user_info: state => state.user_info,
   is_login: state => state.is_login,
-
-  //routes: state => state.routes
 };
 
 const mutations = {
@@ -155,29 +106,13 @@ const mutations = {
   setUserInfo: (state, data) => {
     state.user_info = data.user_info;
   },
-
-
-
-    /*setRoles: (state, data) => {
-        state.roles = data.roles;
-    },*/
-    /*setAddRoutes: (state, data) => {
-        state.add_routes = data;
-    },*/
-    cleanLoginState: (state) => {
-        state.is_login = false;
-        state.user_id = 0;
-        state.user_info = {};
-        state.token = '';
-        //state.roles = [];
-        localStorage.removeItem('__HANABI_AUTH_TOKEN__');
-    },
-    setIsLogin: (state,isLogin) => {
-        state.is_login = isLogin;
-    },
-    setRoutes: (state,data) => {
-        state.routes = data;
-    }
+  clearLoginState: (state) => {
+    state.is_login = false;
+    state.user_id = 0;
+    state.user_info = {};
+    state.token = '';
+    localStorage.removeItem('__HANABI_AUTH_TOKEN__');
+  }
 };
 
 export default {
