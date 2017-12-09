@@ -37,7 +37,7 @@ class MyActiveController extends ActiveController
             'class' => QueryParamAuth::className(),
             // 设置token名称，默认是access-token
             'tokenParam' => 'access_token',
-            'optional' => [
+            /*'optional' => [
                 'index',
                 //'view',
                 'create',
@@ -46,7 +46,7 @@ class MyActiveController extends ActiveController
                 'auth',
                 'auth-user-info',
                 'auth-delete',
-            ],
+            ],*/
 
         ];
 

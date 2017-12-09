@@ -8,7 +8,7 @@
                          value="进入">
                 </mt-cell>
             </div>
-            <div  v-else v-for="item in rooms">
+            <div  v-else v-for="item in room_list">
                 <mt-cell :title="item._title"
                          is-link
                          @click.native="enterRoom(item.id)"

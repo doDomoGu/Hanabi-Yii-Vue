@@ -5,7 +5,6 @@ export default {
   name: 'index',
   data () {
     return {
-      //rooms: this.$store.getters['rooms/list']
     }
   },
   mounted: function(){
@@ -15,20 +14,22 @@ export default {
   created: function(){
     this.$store.dispatch('common/SetTitle','Hanabi');
     if(this.isLogin()){
-      this.$store.dispatch('rooms/IsInRoom').then(()=>{
-        this.$store.dispatch('common/SetTitle','Hanabi ('+this.$store.getters['auths/user_id']+')');
+      this.getRoomList();
+
+      this.$store.dispatch('room/IsInRoom').then(()=>{
+        this.$store.dispatch('common/SetTitle','Hanabi ('+this.$store.getters['auth/user_id']+')');
       });
-      this.getRoom();
+
     }
   },
   computed : {
     your_room_link: function(){
-      return '/room/'+this.$store.getters['rooms/your_room_id'];
+      return '/room/'+this.$store.getters['room/your_room_id'];
     },
-    rooms : function() {
-      let rooms = this.$store.getters['rooms/list'];
+    room_list : function() {
+      let room_list = this.$store.getters['room/list'];
 
-      for(let room of rooms){
+      for(let room of room_list){
         room._title = '<mt-badge size="small">'+room.id+'</mt-badge>'+' '+room.title;
         room._title = (room.id<100?room.id<10?'00'+room.id:'0'+room.id:room.id)+' '+room.title;
 
@@ -36,10 +37,13 @@ export default {
           room._title += '[lock]';
         }
       }
-      return rooms;
+      return room_list;
     }
   },
   methods: {
+    getRoomList(){
+      this.$store.dispatch('room/List');
+    },
     toLogin(){
       this.$router.push({path:'/login'});
     },
@@ -51,23 +55,12 @@ export default {
       });
     },*/
     isLogin(){
-      return this.$store.getters['auths/is_login'];
+      return this.$store.getters['auth/is_login'];
     },
-    getRoom(){
-      this.$store.dispatch('rooms/LIST');
 
-
-      /*this.$store.dispatch('rooms/LIST').then((res)=>{
-        //that.rooms = res.data;
-
-        //return res.data;
-      })*/
-
-      //return ;
-    },
     enterRoom(room_id){
       let that = this;
-      this.$store.dispatch('rooms/Enter',{room_id:room_id}).then((res)=>{
+      this.$store.dispatch('room/Enter',{room_id:room_id}).then((res)=>{
         if(res.success){
           that.$router.push('/room/'+room_id);
         }else {
@@ -78,12 +71,12 @@ export default {
       })
     },
     isInRoom(){
-/*      let your_room_id = this.$store.getters['rooms/your_room_id'];
+/*      let your_room_id = this.$store.getters['room/your_room_id'];
       if(your_room_id!==false){
 
       }*/
 
-      return this.$store.getters['rooms/your_room_id'];
+      return this.$store.getters['room/your_room_id'];
 
     }
 

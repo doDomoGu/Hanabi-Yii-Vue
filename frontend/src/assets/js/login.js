@@ -17,11 +17,11 @@ export default {
   },
   methods: {
     onSubmit() {
-      this.$store.dispatch('auths/Login', this.form).then((res) => {
+      this.$store.dispatch('auth/Login', this.form).then((res) => {
         if(res.data.success){
-          //this.$store.dispatch('auths/SetStore', res.data);
+          //this.$store.dispatch('auth/SetStore', res.data);
 
-          /*this.$store.dispatch('auths/GenerateRoutes', {roles: this.$store.getters['auths/roles'], router: this.$router}).then(() => { // 生成可访问的路由表
+          /*this.$store.dispatch('auth/GenerateRoutes', {roles: this.$store.getters['auth/roles'], router: this.$router}).then(() => { // 生成可访问的路由表
 //                          this.$router.addRoutes(this.$store.getters.auth_add_routes) // 动态添加可访问路由表
 
               this.$router.push({ path: '/' }); //登录成功之后重定向到首页

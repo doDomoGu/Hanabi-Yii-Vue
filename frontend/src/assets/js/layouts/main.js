@@ -19,12 +19,12 @@ export default {
   created(){
     /*this.intervalid1 = setInterval(()=>{
 
-      if(this.$store.getters['auths/token']!=''){
-        let token = this.$store.getters['auths/token'];
-        this.$store.dispatch('auths/CheckToken', [this.$store.getters['auths/token'],true]).then(()=>{
-          console.log(this.$store.getters['auths/is_login']);
-          if(this.$store.getters['auths/is_login']===false){
-            this.$store.dispatch('auths/Logout',token).then(() => {
+      if(this.$store.getters['auth/token']!=''){
+        let token = this.$store.getters['auth/token'];
+        this.$store.dispatch('auth/CheckToken', [this.$store.getters['auth/token'],true]).then(()=>{
+          console.log(this.$store.getters['auth/is_login']);
+          if(this.$store.getters['auth/is_login']===false){
+            this.$store.dispatch('auth/Logout',token).then(() => {
               clearInterval(this.intervalid1);
               console.log('clear');
               this.$router.push({path: '/login'});
@@ -44,7 +44,7 @@ export default {
       return this.$route.path !=='/';
     },
     isLogin(){
-      return this.$store.getters['auths/is_login']===true;
+      return this.$store.getters['auth/is_login']===true;
     }
   },
 

@@ -4,10 +4,9 @@ import Vuex from 'vuex'
 import common from './common';
 
 import users from './modules/users';
-import rooms from './modules/rooms';
-//import websites from './modules/websites';
-import auths from './modules/auths';
-import search from './search';
+import room from './modules/room';
+import your_game from './modules/your_game';
+import auth from './modules/auth';
 
 Vue.use(Vuex);
 
@@ -15,10 +14,9 @@ export default new Vuex.Store({
     modules: {
         common,
         users,
-        auths,
-        search,
-        rooms
-        //websites
+        auth,
+        room,
+        your_game
     }
 });
 

@@ -29,7 +29,7 @@ routes.push(NotFound404Routes);
 
 
 //将路由配置写入Vuex
-store.dispatch('auths/SetRoutes',routes);
+store.dispatch('auth/SetRoutes',routes);
 
 //声明router对象
 const router = new Router({
@@ -46,20 +46,20 @@ const router = new Router({
 let auth_true = function(to, from, next){
   if (to.path === "/logout") {
     //登出操作
-    store.dispatch('auths/Logout',store.getters['auths/token']).then(() => {
+    store.dispatch('auth/Logout',store.getters['auth/token']).then(() => {
       next({path: '/login'});
     })
   }else if (to.path === "/login") {
     next({path: '/'});
   }else{
     //if (router.meta..routePathsNotRequiredAuth.indexOf(to.path) !== -1) { // 在路由免登录白名单，直接进入
-    if(!(to.meta.requireAuths)){
+    if(!(to.meta.requireAuth)){
       next();
     }else{
       //权限验证
       let authFlag = false;
       let requireRoles = to.meta.requireRoles;
-      let userRoles = store.getters['auths/roles'];
+      let userRoles = store.getters['auth/roles'];
 
       if(requireRoles === '*' || userRoles.includes('super_admin')){
         authFlag = true;
@@ -82,7 +82,7 @@ let auth_true = function(to, from, next){
 //无登录状态 跳转至登录页面
 let auth_false = function(to, from, next){
   if(to.path !=='/login'){
-    if(!(to.meta.requireAuths)){
+    if(!(to.meta.requireAuth)){
       next();
     }else{
       next({path: '/login',query:{redirectUrl:to.fullPath}});
@@ -96,7 +96,7 @@ let auth_false = function(to, from, next){
 router.beforeEach((to, from, next) => {
 
   //vuex读取登录状态
-  if(store.getters['auths/is_login']) {
+  if(store.getters['auth/is_login']) {
     auth_true(to, from, next);
   } else {
     //LocalStorage读取token
@@ -104,8 +104,8 @@ router.beforeEach((to, from, next) => {
     //token有值
     if (typeof(tokenInLocalStorage) === 'string' && tokenInLocalStorage !== '') {
       //发送token验证请求
-      store.dispatch('auths/CheckToken', tokenInLocalStorage).then(() => {
-        if (store.getters['auths/is_login']) {
+      store.dispatch('auth/CheckToken', tokenInLocalStorage).then(() => {
+        if (store.getters['auth/is_login']) {
           //验证token 成功
           auth_true(to, from, next);
         } else {

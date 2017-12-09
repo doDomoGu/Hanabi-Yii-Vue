@@ -30,19 +30,19 @@ export default {
     data(){
 
         return {
-            username:this.$store.getters['auths/user_info'].name,
+            username:this.$store.getters['auth/user_info'].name,
         }
     },
     methods: {
         isAuth(path){
             let ret = false;
-            let routes = this.$store.getters['auths/routes'];
-            let roles = this.$store.getters['auths/roles'];
+            let routes = this.$store.getters['auth/routes'];
+            let roles = this.$store.getters['auth/roles'];
 
             if(path in routes){
                 let route = routes[path];
 
-                if(typeof route==='undefined' || !('requireAuths' in route) || route.requireAuths !== true || roles.indexOf('super_admin')>-1){
+                if(typeof route==='undefined' || !('requireAuth' in route) || route.requireAuth !== true || roles.indexOf('super_admin')>-1){
                     ret = true;
                 } else {
                     for(let i in route.requireRoles){
@@ -65,15 +65,15 @@ export default {
         }/*,
         test() {
             console.log('s    ');
-            console.log('is_login : ',this.$store.getters['auths/is_login']);
+            console.log('is_login : ',this.$store.getters['auth/is_login']);
 
-            if(this.$store.getters['auths/is_login']){
-                this.$store.dispatch('auths/SetIsLogin',false);
+            if(this.$store.getters['auth/is_login']){
+                this.$store.dispatch('auth/SetIsLogin',false);
             }else{
-                this.$store.dispatch('auths/SetIsLogin',true);
+                this.$store.dispatch('auth/SetIsLogin',true);
             }
 
-            console.log('is_login : ',this.$store.getters['auths/is_login']);
+            console.log('is_login : ',this.$store.getters['auth/is_login']);
             console.log(this.is_login);
 
         }*/

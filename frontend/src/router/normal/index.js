@@ -1,7 +1,6 @@
 import Main from '../../views/layouts/main';
 import Index from '../../views/Index'
 
-import About from '../../components/About'
 import Login from '../../views/Login'
 import NoAuth from '../../views/NoAuth'
 
@@ -12,7 +11,7 @@ var routes = [{
   path: '/',
   component: Main,
   /*meta: {
-    requireAuths: true,
+    requireAuth: true,
     requireRoles: '*'
   },*/
   children: [
@@ -21,7 +20,7 @@ var routes = [{
       name: '首页',
       component: Index,
       /*meta: {
-        requireAuths: true,
+        requireAuth: true,
         requireRoles: '*'
       }*/
     },
@@ -30,7 +29,7 @@ var routes = [{
       name: '房间',
       component: Room,
       meta: {
-        requireAuths: true,
+        requireAuth: true,
         requireRoles: '*'
       }
     },
@@ -40,7 +39,7 @@ var routes = [{
       name: '游戏中',
       component: Game,
       meta: {
-        requireAuths: true,
+        requireAuth: true,
         requireRoles: '*'
       }
     },
@@ -49,15 +48,9 @@ var routes = [{
       name: '没有权限',
       component: NoAuth,
       meta: {
-        requireAuths: true,
+        requireAuth: true,
         requireRoles: '*'
       }
-    },
-    {
-      path: 'about',
-      component: About,
-      name: '关于我们',
-      //hidden: true //hidden为自定义属性，侧边栏那章会纤细解释
     },
     {
       path: 'login',
@@ -70,7 +63,7 @@ var routes = [{
   path: 'logout',
   name: '登出',
   meta: {
-    requireAuths: true,
+    requireAuth: true,
     requireRoles: '*'
   }
 }];

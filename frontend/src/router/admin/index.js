@@ -7,7 +7,7 @@ var routes = {
     path: '/admin',
     name: '后台管理',
     meta: {
-        requireAuths: true,
+        requireAuth: true,
         requireRoles: ['user_admin','website_admin']
     },
     component: Main,
@@ -17,7 +17,7 @@ var routes = {
             name: '用户',
             component: User,
             meta: {
-                requireAuths: true,
+                requireAuth: true,
                 requireRoles: ['user_admin']
             }
         },
@@ -26,7 +26,7 @@ var routes = {
             name: '用户组',
             component: Usergroup,
             meta: {
-                requireAuths: true,
+                requireAuth: true,
                 requireRoles: ['user_admin']
             }
         },
@@ -35,7 +35,7 @@ var routes = {
             name: '网站',
             component: Website,
             meta: {
-                requireAuths: true,
+                requireAuth: true,
                 requireRoles: ['website_admin']
             }
         }

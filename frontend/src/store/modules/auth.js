@@ -1,9 +1,4 @@
-//import * as types from './../types.js';
-//import Cookies from 'js-cookie'
-
 import axios from '../../axios'
-//import Router from 'vue-router'
-
 
 const state = {
     is_login: false,
@@ -20,7 +15,7 @@ const actions = {
   Logout({ dispatch,commit},token){
     return new Promise((resolve, reject) => {
 
-      dispatch('rooms/Exit',null,{root:true}).then(()=>{
+      dispatch('room/Exit',null,{root:true}).then(()=>{
         axios.delete(
           '/auth',
           {
