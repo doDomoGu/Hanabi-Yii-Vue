@@ -6,7 +6,7 @@ use app\models\Room;
 use app\models\RoomUser;
 use Yii;
 
-class RoomController extends MyActiveController
+class MyRoomController extends MyActiveController
 {
     public function init(){
         $this->modelClass = Room::className();
@@ -20,7 +20,7 @@ class RoomController extends MyActiveController
     }
 
 
-    /*public function actionEnter(){
+    public function actionEnter(){
         $return = $this->return;
 
         $room_id = Yii::$app->request->post('room_id');
@@ -85,5 +85,5 @@ class RoomController extends MyActiveController
         list($return['success'],$return['msg']) = Room::startGame($room_id);
 
         return $return;
-    }*/
+    }
 }

@@ -6,6 +6,11 @@ $params = yii\helpers\ArrayHelper::merge(
 );
 
 
+$rules = yii\helpers\ArrayHelper::merge(
+    require(__DIR__ . '/rules.php'),
+    require(__DIR__ . '/rules_v1.php')
+);
+
 $db = require __DIR__ . '/db_local.php';
 
 $config = [
@@ -60,7 +65,7 @@ $config = [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => true,
             'showScriptName' => false,
-            'rules' => require('rules.php'),
+            'rules' => $rules,
         ],
 
     ],

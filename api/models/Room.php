@@ -184,7 +184,7 @@ class Room extends ActiveRecord
     }
 
 
-    public static function getRoomInfo($room_id){
+    public static function getInfo($room_id){
         $success = false;
         $msg = '';
         $data = [
