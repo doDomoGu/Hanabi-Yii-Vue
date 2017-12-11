@@ -14,10 +14,7 @@ export default {
 
     this.$store.dispatch('my_room/IsInRoom').then(()=>{
 
-      this.$store.dispatch(
-        'common/SetTitle',
-        this.$store.getters['common/title_suffix']+' - '+'房间'+this.$store.getters['my_room/room_id']
-      );
+      this.$store.dispatch('common/SetTitle2','房间'+this.$store.getters['my_room/room_id']);
       this.getRoomInfo();
 
       this.intervalid1 = setInterval(()=>{

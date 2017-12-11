@@ -12,12 +12,12 @@ export default {
 
   },
   created: function(){
-    this.$store.dispatch('common/SetTitle','Hanabi');
+    this.$store.dispatch('common/SetTitle2','Hanabi');
     if(this.isLogin()){
       this.getRoomList();
 
       this.$store.dispatch('my_room/IsInRoom').then(()=>{
-        this.$store.dispatch('common/SetTitle','Hanabi ('+this.$store.getters['auth/user_id']+')');
+        this.$store.dispatch('common/SetTitle2','('+this.$store.getters['auth/user_id']+')');
       });
 
     }

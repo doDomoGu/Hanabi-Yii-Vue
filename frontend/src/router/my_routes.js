@@ -1,11 +1,15 @@
-import Main from '../../views/layouts/main';
-import Index from '../../views/Index'
+import Main from '../views/layouts/main';
 
-import Login from '../../views/Login'
-import NoAuth from '../../views/NoAuth'
+import Index from '../views/index/Index'
+import Login from '../views/index/Login'
 
-import Room from '../../views/room/Index'
-import Game from '../../views/game/Index'
+import NoAuth from '../views/other/NoAuth'
+import NotFound404 from '../views/other/NotFound404'
+
+import Room from '../views/room/Index'
+import Game from '../views/game/Index'
+
+
 
 var routes = [{
   path: '/',
@@ -56,6 +60,11 @@ var routes = [{
       path: 'login',
       component: Login,
       name: '登录页',
+    },
+    {
+      path: '*',
+      name: '404',
+      component: NotFound404
     },
   ]
 },

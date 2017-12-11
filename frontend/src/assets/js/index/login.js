@@ -13,7 +13,7 @@ export default {
     }
   },
   mounted: function(){
-    this.$store.dispatch('common/SetTitle','登录');
+    this.$store.dispatch('common/SetTitle2','登录');
   },
   methods: {
     onSubmit() {

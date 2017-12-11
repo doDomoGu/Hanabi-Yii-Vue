@@ -3,9 +3,15 @@ const state = {
   title_suffix:'Hanabi'
 };
 const actions = {
-    SetTitle({ commit }, data) {
-        commit('set_title',data);
-    },
+  SetTitle({ commit }, data) {
+      commit('set_title',data);
+  },
+  SetTitle2({ commit }, data) {
+    if(data!=this.getters['common/title_suffix']){
+      data = this.getters['common/title_suffix'] + ' _ ' +data;
+    }
+    commit('set_title',data);
+  },
 };
 
 const getters = {

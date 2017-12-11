@@ -4,9 +4,8 @@ import Router from 'vue-router'
 
 import store from '../store'
 
-import NormalRoutes from './normal'
-//import AdminRoutes from './admin'
-import NotFound404Routes from './NotFound404'
+import my_routes from './my_routes'
+//import NotFound404Routes from './NotFound404'
 
 Vue.use(Router);
 
@@ -15,17 +14,12 @@ Vue.use(Router);
 let routes = [];
 
 //载入通用路由
-for(let i in NormalRoutes){
-  routes.push(NormalRoutes[i]);
+for(let i in my_routes){
+  routes.push(my_routes[i]);
 }
 
-/*routes.push(NormalRoutes);*/
-
-//载入admin相关路由
-/*routes.push(AdminRoutes);*/
-
 //最后载入404页面
-routes.push(NotFound404Routes);
+//routes.push(NotFound404Routes);
 
 //声明router对象
 const router = new Router({
