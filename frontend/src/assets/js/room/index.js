@@ -19,7 +19,7 @@ export default {
 
       this.intervalid1 = setInterval(()=>{
         this.getRoomInfo();
-        if(this.$store.getters['my_room/is_playing']){
+        if(this.$store.getters['my_game/game_id']>0){
           this.$router.push('/game');
         }
       },500);

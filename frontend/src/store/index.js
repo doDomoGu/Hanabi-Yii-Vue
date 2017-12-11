@@ -3,11 +3,14 @@ import Vuex from 'vuex'
 
 import common from './common';
 
-import room from './modules/room';
-import my_room from './modules/my_room';
-
-import your_game from './modules/your_game';
 import auth from './modules/auth';
+
+import room from './modules/room';
+
+import my_room from './modules/my_room';
+import my_game from './modules/my_game';
+
+
 
 Vue.use(Vuex);
 
@@ -17,7 +20,7 @@ export default new Vuex.Store({
         auth,
         room,
         my_room,
-        your_game
+        my_game
     }
 });
 

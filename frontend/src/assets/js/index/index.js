@@ -71,7 +71,7 @@ export default {
       })
     },
     isInRoom(){
-      return this.$store.getters['my_room/room_id'];
+      return this.$store.getters['my_room/room_id']>0;
 
     }
 

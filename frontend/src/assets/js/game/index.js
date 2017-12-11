@@ -15,7 +15,7 @@ export default {
 
       this.$store.dispatch(
         'common/SetTitle',
-        this.$store.getters['common/title_suffix']+' - '+(this.$store.getters['my_room/is_playing']?'游戏中':'错误')
+        this.$store.getters['common/title_suffix']+' - '+(this.$store.getters['my_game/game_id']>0?'游戏中':'错误')
       );
       this.getGameInfo();
       this.intervalid1 = setInterval(()=>{

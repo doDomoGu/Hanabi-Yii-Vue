@@ -1,13 +1,13 @@
 import axios from '../../axios'
 
 const state = {
-  game_id:false,
+  game_id:0,
   master_user_hand_cards:[],
   guest_user_hand_cards:[],
 };
 
 const actions = {
-  GetInfo({commit},game_id=this.getters['your_game/game_id']){
+  GetInfo({commit},game_id=this.getters['my_game/game_id']){
     return new Promise((resolve, reject) => {
       axios.post(
         '/game/get-your-game-info'+'?access_token='+this.getters['auth/token'],
@@ -16,7 +16,6 @@ const actions = {
         }
       )
         .then((res) => {
-
           if(res.data.success){
             commit('SetInfo',res.data.data);
           }else{
@@ -31,7 +30,31 @@ const actions = {
         });
     });
   },
+  StartGame({commit},room_id=this.getters['my_room/room_id']){
+    return new Promise((resolve, reject) => {
 
+      axios.post(
+        '/room/start-game'+'?access_token='+this.getters['auth/token'],
+        {
+          room_id:room_id
+        }
+      )
+        .then((res) => {
+
+          if(res.data.success){
+            //commit('SetRoomIsPlaying');
+            //commit('SetRoomUser',res.data.data);
+          }else{
+            //commit('ClearRoomUser');
+          }
+
+          resolve(res.data);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  },
 };
 
 const getters = {
@@ -45,14 +68,14 @@ const mutations = {
   SetGameId(state, game_id){
     state.game_id = game_id;
   },
-  ClearInfo(state){
-    state.game_id = false;
-    state.master_user_hand_cards = [];
-    state.guest_user_hand_cards = [];
-  },
   SetInfo(state, data){
     state.master_user_hand_cards = data.master_user_hand_cards;
     state.guest_user_hand_cards = data.guest_user_hand_cards;
+  },
+  ClearInfo(state){
+    state.game_id = 0;
+    state.master_user_hand_cards = [];
+    state.guest_user_hand_cards = [];
   },
 };
 

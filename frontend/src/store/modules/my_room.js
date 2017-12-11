@@ -12,14 +12,13 @@ const state = {
     username:"",
     name:""
   },
-  is_playing:false
 };
 
 const actions = {
   Enter({commit},params){
     return new Promise((resolve, reject) => {
       axios.post(
-        '/room/enter'+'?access_token='+this.getters['auth/token'],
+        '/my-room/enter'+'?access_token='+this.getters['auth/token'],
         {
           room_id:params.room_id
         }
@@ -38,7 +37,7 @@ const actions = {
   Exit({commit}){
     return new Promise((resolve, reject) => {
       axios.post(
-        '/room/exit'+'?access_token='+this.getters['auth/token']
+        '/my-room/exit'+'?access_token='+this.getters['auth/token']
       )
       .then((res) => {
         if(res.data.success){
@@ -54,7 +53,7 @@ const actions = {
   IsInRoom({commit}){
     return new Promise((resolve, reject) => {
       axios.post(
-        '/room/is-in-room'+'?access_token='+this.getters['auth/token']
+        '/my-room/is-in-room'+'?access_token='+this.getters['auth/token']
       )
       .then((res) => {
 
@@ -74,7 +73,7 @@ const actions = {
   GetRoomInfo({commit},room_id=this.getters['my_room/room_id']){
     return new Promise((resolve, reject) => {
       axios.post(
-        '/room/get-room-info'+'?access_token='+this.getters['auth/token'],
+        '/my-room/get-info'+'?access_token='+this.getters['auth/token'],
         {
           room_id:room_id
         }
@@ -96,7 +95,7 @@ const actions = {
     return new Promise((resolve, reject) => {
 
       axios.post(
-        '/room/do-ready'+'?access_token='+this.getters['auth/token'],
+        '/my-room/do-ready'+'?access_token='+this.getters['auth/token'],
         {
           room_id:room_id
         }
@@ -116,39 +115,12 @@ const actions = {
         });
     });
   },
-  StartGame({commit},room_id=this.getters['my_room/room_id']){
-    return new Promise((resolve, reject) => {
-
-      axios.post(
-        '/room/start-game'+'?access_token='+this.getters['auth/token'],
-        {
-          room_id:room_id
-        }
-      )
-        .then((res) => {
-
-          if(res.data.success){
-            commit('SetRoomIsPlaying');
-            //commit('SetRoomUser',res.data.data);
-          }else{
-            //commit('ClearRoomUser');
-          }
-
-          resolve(res.data);
-        })
-        .catch(error => {
-          reject(error);
-        });
-    });
-  },
-
 };
 
 const getters = {
   room_id:state=>state.room_id,
   master_user:state=>state.master_user,
   guest_user:state=>state.guest_user,
-  is_playing:state=>state.is_playing
 };
 
 const mutations = {
@@ -164,10 +136,6 @@ const mutations = {
   SetRoomInfo(state, data){
     state.master_user = data.master_user;
     state.guest_user = data.guest_user;
-    state.is_playing = data.is_playing;
-  },
-  SetRoomIsPlaying(state){
-    state.is_playing = true;
   },
   ClearRoomUser(state){
     state.master_user = {
