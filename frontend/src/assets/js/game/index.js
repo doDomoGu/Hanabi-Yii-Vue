@@ -20,12 +20,22 @@ export default {
       this.getRoomInfo();
 
       this.getGameInfo();
-      // this.intervalid1 = setInterval(()=>{
-      //   this.getGameInfo();
-      //   if(this.$store.getters['my_room/is_playing']){
-      //     this.$router.push('/game');
-      //   }
-      // },500);
+      this.intervalid1 = setInterval(()=>{
+        this.getGameInfo();
+
+        this.$store.dispatch('my_game/IsInGame').then(()=>{
+          if(this.$store.getters['my_game/game_id']==0){
+            clearInterval(this.intervalid1)
+
+            MessageBox('提示', '游戏已结束').then(action => {
+              if(action=='confirm'){
+                this.$router.push('/room');
+              }
+            });
+          }
+        });
+
+      },500);
 
     });
   },
@@ -59,6 +69,7 @@ export default {
       this.$store.dispatch('my_room/GetRoomInfo');
     },
     endGame(){
+
       this.$store.dispatch('my_game/End');
     }
   }

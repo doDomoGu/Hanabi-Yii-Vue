@@ -27,7 +27,7 @@
                 </div>
             </div>
         </section>
-        <mt-button @click.native="endGame" size="large" class="game-end-btn" type="danger">结束游戏</mt-button>
+        <mt-button v-if="master_user.is_you>0" @click.native="endGame" size="large" class="game-end-btn" type="danger">结束游戏</mt-button>
     </div>
 </template>
 
