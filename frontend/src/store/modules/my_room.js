@@ -15,17 +15,17 @@ const state = {
 };
 
 const actions = {
-  Enter({commit},params){
+  Enter({commit},room_id){
     return new Promise((resolve, reject) => {
       axios.post(
         '/my-room/enter'+'?access_token='+this.getters['auth/token'],
         {
-          room_id:params.room_id
+          room_id:room_id
         }
       )
       .then((res) => {
         if(res.data.success){
-          commit('SetRoomId',res.data.data.room_id);
+          commit('SetRoomId',room_id);
         }
         resolve(res.data);
       })
@@ -70,13 +70,10 @@ const actions = {
       });
     });
   },
-  GetRoomInfo({commit},room_id=this.getters['my_room/room_id']){
+  GetRoomInfo({commit}){
     return new Promise((resolve, reject) => {
       axios.post(
-        '/my-room/get-info'+'?access_token='+this.getters['auth/token'],
-        {
-          room_id:room_id
-        }
+        '/my-room/get-info'+'?access_token='+this.getters['auth/token']
       )
       .then((res) => {
         if(res.data.success){
@@ -91,14 +88,11 @@ const actions = {
       });
     });
   },
-  DoReady({commit},room_id=this.getters['my_room/room_id']){
+  DoReady({commit}){
     return new Promise((resolve, reject) => {
 
       axios.post(
-        '/my-room/do-ready'+'?access_token='+this.getters['auth/token'],
-        {
-          room_id:room_id
-        }
+        '/my-room/do-ready'+'?access_token='+this.getters['auth/token']
       )
         .then((res) => {
 

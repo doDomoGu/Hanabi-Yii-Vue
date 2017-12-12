@@ -60,7 +60,7 @@ export default {
 
     enterRoom(room_id){
       let that = this;
-      this.$store.dispatch('my_room/Enter',{room_id:room_id}).then((res)=>{
+      this.$store.dispatch('my_room/Enter',room_id).then((res)=>{
         if(res.success){
           that.$router.push('/room/'+room_id);
         }else {

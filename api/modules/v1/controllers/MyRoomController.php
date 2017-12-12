@@ -2,8 +2,8 @@
 
 namespace app\modules\v1\controllers;
 
-use app\models\Room;
 use Yii;
+use app\models\Room;
 
 class MyRoomController extends MyActiveController
 {
@@ -66,9 +66,7 @@ class MyRoomController extends MyActiveController
     public function actionDoReady(){
         $return = $this->return;
 
-        $room_id = Yii::$app->request->post('room_id');
-
-        list($return['success'],$return['msg']) = Room::doReady($room_id);
+        list($return['success'],$return['msg']) = Room::doReady();
 
         return $return;
     }
