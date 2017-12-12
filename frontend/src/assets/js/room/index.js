@@ -66,7 +66,7 @@ export default {
       this.$store.dispatch('my_room/DoReady');
     },
     startGame(){
-      this.$store.dispatch('my_room/StartGame')/*.then((res)=>{
+      this.$store.dispatch('my_game/Start')/*.then((res)=>{
         if(res.success){
           this.$router.push('/game');
         }else{

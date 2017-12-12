@@ -92,7 +92,61 @@ class Game extends ActiveRecord
         ];
     }
 
-    public static function createOne($room_id){
+
+    public static function start(){
+        $success = false;
+        $msg = '';
+        $game_id = 0;
+        $user_id = Yii::$app->user->id;
+        $userRoomUser = RoomUser::find()->where(['user_id'=>$user_id])->all();
+        if(count($userRoomUser) == 1){
+            //只有玩家1可以进行"开始游戏操作"
+            if($userRoomUser[0]->role_type==RoomUser::ROLE_TYPE_MASTER){
+                $room = Room::find()->where(['id'=>$userRoomUser[0]->room_id])->one();
+                if($room){
+                    if($room->status==Room::STATUS_PREPARING){
+                        $roomUser = RoomUser::find()->where(['room_id'=>$room->id])->all();
+                        if(count($roomUser)>2){
+                            $msg = '房间中人数大于2，数据错误';
+                        }else if(count($roomUser)==2){
+                            foreach($roomUser as $u){
+                                if($u->role_type == RoomUser::ROLE_TYPE_GUEST) {
+                                    if ($u->is_ready == 1) {
+                                        //新建Game
+                                        $game_id = self::createOne($room->id);
+                                        if($game_id){
+                                            $room->status = Room::STATUS_PLAYING;
+                                            if ($room->save()) {
+                                                $success = true;
+                                                $msg = '开始游戏成功';
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if($success==false){
+                                $msg = '未知错误001';
+                            }
+                        }else{
+                            $msg = '房间中人数不等于2，数据错误';
+                        }
+                    }else{
+                        $msg = '房间状态不是"准备中"！(STATUS_PREPARING)';
+                    }
+                }else{
+                    $msg = '房间不存在！';
+                }
+            }else{
+                $msg = '玩家角色错误';
+            }
+        }else{
+            $msg = '你不在房间中/不止在一个房间中，错误';
+        }
+
+        return [$success,$msg,$game_id];
+    }
+
+    private static function createOne($room_id){
         $game_id = false;
         $room = Room::find()->where(['id'=>$room_id,'status'=>Room::STATUS_PREPARING])->one();
         if($room){

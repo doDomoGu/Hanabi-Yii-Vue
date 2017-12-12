@@ -7,54 +7,47 @@ const state = {
 };
 
 const actions = {
-  GetInfo({commit},game_id=this.getters['my_game/game_id']){
+  Start({commit}){
     return new Promise((resolve, reject) => {
       axios.post(
-        '/game/get-your-game-info'+'?access_token='+this.getters['auth/token'],
-        {
-          game_id:game_id
-        }
+        '/my-game/start'+'?access_token='+this.getters['auth/token']
       )
-        .then((res) => {
-          if(res.data.success){
-            commit('SetInfo',res.data.data);
-          }else{
-            alert('222');
-            //commit('ClearInfo');
-          }
+      .then((res) => {
+        if(res.data.success){
+          commit('SetGameId',res.data.data.game_id);
+          //commit('SetRoomUser',res.data.data);
+        }else{
+          //commit('ClearRoomUser');
+        }
 
-          resolve(res.data);
-        })
-        .catch(error => {
-          reject(error);
-        });
+        resolve(res.data);
+      })
+      .catch(error => {
+        reject(error);
+      });
     });
   },
-  StartGame({commit},room_id=this.getters['my_room/room_id']){
+  GetGameInfo({commit},game_id=this.getters['my_game/game_id']){
     return new Promise((resolve, reject) => {
-
       axios.post(
-        '/room/start-game'+'?access_token='+this.getters['auth/token'],
-        {
-          room_id:room_id
-        }
+        '/my-game/get-info'+'?access_token='+this.getters['auth/token']
       )
-        .then((res) => {
+      .then((res) => {
+        if(res.data.success){
+          commit('SetInfo',res.data.data);
+        }else{
+          alert('222');
+          //commit('ClearInfo');
+        }
 
-          if(res.data.success){
-            //commit('SetRoomIsPlaying');
-            //commit('SetRoomUser',res.data.data);
-          }else{
-            //commit('ClearRoomUser');
-          }
-
-          resolve(res.data);
-        })
-        .catch(error => {
-          reject(error);
-        });
+        resolve(res.data);
+      })
+      .catch(error => {
+        reject(error);
+      });
     });
   },
+
 };
 
 const getters = {
