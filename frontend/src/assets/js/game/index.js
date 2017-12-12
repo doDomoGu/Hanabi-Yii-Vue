@@ -1,10 +1,23 @@
 import { MessageBox} from 'mint-ui';
 
+// let colors = {
+//   0: 'white',
+//   1: 'blue',
+//   2: 'yellow',
+//   3: 'red',
+//   4: 'green'
+// };
+
+let colors = ['white','blue','yellow','red','green'];
+
+let numbers = [1,1,1,2,2,3,3,4,4,5];
 
 export default {
   name: 'game',
   data () {
     return {
+      'colors':['white','blue','yellow','red','green'],
+      'numbers':[1,1,1,2,2,3,3,4,4,5]
     }
   },
   mounted: function(){
@@ -24,11 +37,11 @@ export default {
         this.getGameInfo();
 
         this.$store.dispatch('my_game/IsInGame').then(()=>{
-          if(this.$store.getters['my_game/game_id']==0){
+          if(this.$store.getters['my_game/game_id'] === 0){
             clearInterval(this.intervalid1)
 
             MessageBox('提示', '游戏已结束').then(action => {
-              if(action=='confirm'){
+              if(action ==='confirm'){
                 this.$router.push('/room');
               }
             });
@@ -46,18 +59,13 @@ export default {
     master_user:function(){
       let user = this.$store.getters['my_room/master_user'];
       user.cards = this.$store.getters['my_game/master_user_hand_cards'];
-      user.is_you = false;
-      if(user.id == this.$store.getters['auth/user_id']){
-        user.is_you = true;
-      }
+      user.is_you = user.id === this.$store.getters['auth/user_id'];
       return user;
     },
     guest_user:function(){
       let user = this.$store.getters['my_room/guest_user'];
-      user.is_you = false;
-      if(user.id == this.$store.getters['auth/user_id']){
-        user.is_you = true;
-      }
+      user.cards = this.$store.getters['my_game/guest_user_hand_cards'];
+      user.is_you = user.id === this.$store.getters['auth/user_id'];
       return user;
     }
   },

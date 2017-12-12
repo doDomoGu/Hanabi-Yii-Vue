@@ -3,7 +3,7 @@
 }
 
 .player-block {
-    height:140px;
+    overflow:hidden;
     background: #7baadc;
     margin-bottom: 10px;
     padding:10px;
@@ -14,12 +14,42 @@
     background: #dcd3bd;
     padding:10px;
     border-radius: 6px;
-    height:80px;
+    overflow:hidden;
 }
 
-.hand-card span{
-    width:100px;
-    height:80px;
-    margin-left:20px;
+.hand-card {
+
+}
+
+.hand-card > li{
+    padding:0;
+    list-style: none;
+    width:40px;
+    height:60px;
+    margin-right:10px;
     float:left;
+    border:1px solid #2c3e50;
+    overflow: hidden;
+}
+
+.hand-card > li > span{
+    display: block;
+    width:100%;
+    height:100%;
+}
+
+.hand-card > li > span.white-color {
+    background-color:#efefef;
+}
+.hand-card > li > span.blue-color {
+    background-color:#2234ff;
+}
+.hand-card > li > span.yellow-color {
+    background-color:#ffff12;
+}
+.hand-card > li > span.red-color {
+    background-color:#ff4444;
+}
+.hand-card > li > span.green-color {
+    background-color:#12ff12;
 }

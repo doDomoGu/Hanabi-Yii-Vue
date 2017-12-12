@@ -101,6 +101,7 @@ const mutations = {
   },
   SetInfo(state, data){
     state.master_user_hand_cards = data.card.master_hands;
+    state.guest_user_hand_cards = data.card.guest_hands;
     //state.guest_user_hand_cards = data.guest_user_hand_cards;
   },
   ClearGame(state){

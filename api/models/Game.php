@@ -331,6 +331,17 @@ class Game extends ActiveRecord
 
         $data['master_hands'] = $master_hands;
 
+        $guest_hands = [];
+        foreach($guestCard as $card){
+            $cardArr = [
+                'color'=>$card->color,
+                'num'=>$card->num
+            ];
+            $guest_hands[] = $cardArr;
+        }
+
+        $data['guest_hands'] = $guest_hands;
+
         return $data;
     }
 }
