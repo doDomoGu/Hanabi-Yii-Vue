@@ -3,7 +3,6 @@
 namespace app\modules\v1\controllers;
 
 use app\models\Room;
-use app\models\RoomUser;
 use Yii;
 
 class MyRoomController extends MyActiveController
@@ -25,7 +24,7 @@ class MyRoomController extends MyActiveController
 
         $room_id = Yii::$app->request->post('room_id');
 
-        list($return['success'],$return['msg']) = Room::enter($room_id,Yii::$app->user->id);
+        list($return['success'],$return['msg']) = Room::enter($room_id);
 
         if($return['success']){
             $return['data'] = ['room_id'=>$room_id];
@@ -37,7 +36,7 @@ class MyRoomController extends MyActiveController
     public function actionExit(){
         $return = $this->return;
 
-        list($return['success'],$return['msg']) = Room::exitRoom(Yii::$app->user->id);
+        list($return['success'],$return['msg']) = Room::exitRoom();
 
         return $return;
     }
@@ -47,7 +46,7 @@ class MyRoomController extends MyActiveController
         $return = $this->return;
 
 
-        list($return['success'],$return['msg'],$room_id) = Room::isInRoom(Yii::$app->user->id);
+        list($return['success'],$return['msg'],$room_id) = Room::isInRoom();
 
         if($return['success']){
             $return['data'] = ['room_id'=>$room_id];
@@ -59,9 +58,7 @@ class MyRoomController extends MyActiveController
     public function actionGetInfo(){
         $return = $this->return;
 
-        $room_id = Yii::$app->request->post('room_id');
-
-        list($return['success'],$return['msg'],$return['data']) = Room::getInfo($room_id);
+        list($return['success'],$return['msg'],$return['data']) = Room::getInfo();
 
         return $return;
     }
@@ -76,14 +73,4 @@ class MyRoomController extends MyActiveController
         return $return;
     }
 
-
-    public function actionStartGame(){
-        $return = $this->return;
-
-        $room_id = Yii::$app->request->post('room_id');
-
-        list($return['success'],$return['msg']) = Room::startGame($room_id);
-
-        return $return;
-    }
 }
