@@ -14,7 +14,10 @@ return [
     'POST '.$v.'/my-room/is-in-room' => $v.'/my-room/is-in-room',  //判断是否在房间中  如是返回房间i
     'POST '.$v.'/my-room/get-info' => $v.'/my-room/get-info',  //判断是否在房间中  如是返回房间i
     'POST '.$v.'/my-room/do-ready' => $v.'/my-room/do-ready',  //判断是否在房间中  如是返回房间i
+
+
     'POST '.$v.'/my-game/start' => $v.'/my-game/start',  //开始游戏
+    'POST '.$v.'/my-game/get-info' => $v.'/my-game/get-info',  //开始游戏
 
 
 

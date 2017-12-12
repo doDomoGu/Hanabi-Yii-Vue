@@ -17,13 +17,15 @@ export default {
         'common/SetTitle',
         this.$store.getters['common/title_suffix']+' - '+(this.$store.getters['my_game/game_id']>0?'游戏中':'错误')
       );
+      this.getRoomInfo();
+
       this.getGameInfo();
-      this.intervalid1 = setInterval(()=>{
-        this.getGameInfo();
-        /*if(this.$store.getters['my_room/is_playing']){
-          this.$router.push('/game');
-        }*/
-      },500);
+      // this.intervalid1 = setInterval(()=>{
+      //   this.getGameInfo();
+      //   if(this.$store.getters['my_room/is_playing']){
+      //     this.$router.push('/game');
+      //   }
+      // },500);
 
     });
   },
@@ -33,7 +35,7 @@ export default {
   computed : {
     master_user:function(){
       let user = this.$store.getters['my_room/master_user'];
-      let game = this.$store.getters['games']
+      user.cards = this.$store.getters['my_game/master_user_hand_cards'];
       user.is_you = false;
       if(user.id == this.$store.getters['auth/user_id']){
         user.is_you = true;
@@ -50,8 +52,14 @@ export default {
     }
   },
   methods: {
-    geGameInfo(){
-      this.$store.dispatch('game/GetGameInfo');
+    getGameInfo(){
+      this.$store.dispatch('my_game/GetGameInfo');
     },
+    getRoomInfo(){
+      this.$store.dispatch('my_room/GetRoomInfo');
+    },
+    endGame(){
+      this.$store.dispatch('my_game/End');
+    }
   }
 }

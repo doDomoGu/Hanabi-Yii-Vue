@@ -27,7 +27,27 @@ const actions = {
       });
     });
   },
-  GetGameInfo({commit},game_id=this.getters['my_game/game_id']){
+  End({commit}){
+    return new Promise((resolve, reject) => {
+      axios.post(
+        '/my-game/end'+'?access_token='+this.getters['auth/token']
+      )
+        .then((res) => {
+          if(res.data.success){
+            commit('SetGameId',res.data.data.game_id);
+            //commit('SetRoomUser',res.data.data);
+          }else{
+            //commit('ClearRoomUser');
+          }
+
+          resolve(res.data);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  },
+  GetGameInfo({commit}){
     return new Promise((resolve, reject) => {
       axios.post(
         '/my-game/get-info'+'?access_token='+this.getters['auth/token']
@@ -36,7 +56,6 @@ const actions = {
         if(res.data.success){
           commit('SetInfo',res.data.data);
         }else{
-          alert('222');
           //commit('ClearInfo');
         }
 
@@ -62,8 +81,8 @@ const mutations = {
     state.game_id = game_id;
   },
   SetInfo(state, data){
-    state.master_user_hand_cards = data.master_user_hand_cards;
-    state.guest_user_hand_cards = data.guest_user_hand_cards;
+    state.master_user_hand_cards = data.card.master_hands;
+    //state.guest_user_hand_cards = data.guest_user_hand_cards;
   },
   ClearInfo(state){
     state.game_id = 0;

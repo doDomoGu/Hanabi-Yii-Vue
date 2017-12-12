@@ -34,7 +34,7 @@ class MyGameController extends MyActiveController
     public function actionGetInfo(){
         $return = $this->return;
 
-        list($return['success'],$return['msg'],$data) = Game::getInfo();
+        list($return['success'],$return['msg'],$return['data']) = Game::getInfo();
 
         return $return;
     }

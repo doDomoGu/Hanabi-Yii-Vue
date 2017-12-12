@@ -206,4 +206,57 @@ class Game extends ActiveRecord
         }
         return $game_id;
     }
+
+
+    public static function getInfo(){
+        $success = false;
+        $msg = '';
+        $data = [];
+        $user_id = Yii::$app->user->id;
+        $userRoomUser = RoomUser::find()->where(['user_id'=>$user_id])->all();
+        if(count($userRoomUser) == 1){
+            $userGame = Game::find()->where(['room_id'=>$userRoomUser[0]->room_id,'status'=>1])->all();
+            if(count($userGame)==1){
+                $game = $userGame[0];
+                $gameCardCount = GameCard::find()->where(['game_id'=>$game->id])->count();
+                if($gameCardCount==Card::CARD_NUM_ALL){
+                    $cardInfo = self::getCardInfo($game->id);
+
+
+                    $data['card'] = $cardInfo;
+                    $success = true;
+                }else{
+                    $msg = '总卡牌数错误';
+                }
+            }else{
+                $msg = '你所在房间游戏未开始/或者有多个游戏，错误';
+            }
+        }else{
+            $msg = '你不在房间中/不止在一个房间中，错误';
+        }
+
+        return [$success,$msg,$data];
+    }
+
+    private static function getCardInfo($game_id){
+        $data = [];
+        $masterCard = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_IN_PLAYER,'player_num'=>1])->orderBy('type_ord asc')->all();
+        $guestCard = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_IN_PLAYER,'player_num'=>2])->orderBy('type_ord asc')->all();
+        $libraryCard = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_IN_LIBRARY])->orderBy('type_ord asc')->all();
+        $tableCard = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_ON_TABLE])->orderBy('type_ord asc')->all();
+        $discardCard = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_IN_DISCARD])->orderBy('type_ord asc')->all();
+
+        $master_hands = [];
+        foreach($masterCard as $card){
+            $cardArr = [
+                'color'=>$card->color,
+                'num'=>$card->num
+            ];
+            $master_hands[] = $cardArr;
+        }
+
+        $data['master_hands'] = $master_hands;
+
+        return $data;
+    }
 }
