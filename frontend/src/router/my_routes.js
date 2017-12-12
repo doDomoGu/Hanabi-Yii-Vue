@@ -29,7 +29,7 @@ var routes = [{
       }*/
     },
     {
-      path: 'room/:room_id',
+      path: 'room',
       name: '房间',
       component: Room,
       meta: {
@@ -39,7 +39,6 @@ var routes = [{
     },
     {
       path: 'game',
-      //path: 'game/:game_id',
       name: '游戏中',
       component: Game,
       meta: {

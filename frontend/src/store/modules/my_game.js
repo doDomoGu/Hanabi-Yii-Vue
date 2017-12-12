@@ -66,6 +66,25 @@ const actions = {
       });
     });
   },
+  IsInGame({commit}){
+    return new Promise((resolve, reject) => {
+      axios.post(
+        '/my-game/is-in-game'+'?access_token='+this.getters['auth/token']
+      )
+      .then((res) => {
+        if(res.data.success){
+          commit('SetGameId',res.data.data.game_id);
+        }else{
+          commit('ClearGame');
+        }
+
+        resolve(res.data);
+      })
+      .catch(error => {
+        reject(error);
+      });
+    });
+  },
 
 };
 
@@ -84,7 +103,7 @@ const mutations = {
     state.master_user_hand_cards = data.card.master_hands;
     //state.guest_user_hand_cards = data.guest_user_hand_cards;
   },
-  ClearInfo(state){
+  ClearGame(state){
     state.game_id = 0;
     state.master_user_hand_cards = [];
     state.guest_user_hand_cards = [];

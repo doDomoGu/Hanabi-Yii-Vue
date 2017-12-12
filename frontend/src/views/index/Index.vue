@@ -1,9 +1,16 @@
 <template>
     <div class="hello">
         <div v-if="isLogin()" >
-            <div v-if="isInRoom()" >
+            <div v-if="isInGame()" >
+                <mt-cell title="您的游戏正在进行中！"
+                         to="/game"
+                         is-link
+                         value="进入">
+                </mt-cell>
+            </div>
+            <div v-else-if="isInRoom()" >
                 <mt-cell title="您已在房间中！"
-                         :to="your_room_link"
+                         to="/room"
                          is-link
                          value="进入">
                 </mt-cell>

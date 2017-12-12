@@ -14,18 +14,13 @@ export default {
   created: function(){
     this.$store.dispatch('common/SetTitle2','Hanabi');
     if(this.isLogin()){
-      this.getRoomList();
-
-      this.$store.dispatch('my_room/IsInRoom').then(()=>{
-        this.$store.dispatch('common/SetTitle2','('+this.$store.getters['auth/user_id']+')');
-      });
-
+      this.$store.dispatch('common/SetTitle2','('+this.$store.getters['auth/user_id']+')');
+      this.$store.dispatch('room/List');
+      this.$store.dispatch('my_room/IsInRoom');
+      this.$store.dispatch('my_game/IsInGame');
     }
   },
   computed : {
-    your_room_link: function(){
-      return '/room/'+this.$store.getters['my_room/room_id'];
-    },
     room_list : function() {
       let room_list = this.$store.getters['room/list'];
 
@@ -41,28 +36,20 @@ export default {
     }
   },
   methods: {
-    getRoomList(){
-      this.$store.dispatch('room/List');
-    },
     toLogin(){
       this.$router.push({path:'/login'});
     },
     /*toRegister(){
-      Toast({
-        message: '提示',
-        position: 'bottom',
-        duration: 500
-      });
+
     },*/
     isLogin(){
       return this.$store.getters['auth/is_login'];
     },
-
     enterRoom(room_id){
       let that = this;
       this.$store.dispatch('my_room/Enter',room_id).then((res)=>{
         if(res.success){
-          that.$router.push('/room/'+room_id);
+          that.$router.push('/room');
         }else {
           MessageBox.alert(res.msg + '(' + room_id + ')').then(action => {
             //console.log(action);
@@ -72,7 +59,9 @@ export default {
     },
     isInRoom(){
       return this.$store.getters['my_room/room_id']>0;
-
+    },
+    isInGame(){
+      return this.$store.getters['my_game/game_id']>0;
     }
 
   }

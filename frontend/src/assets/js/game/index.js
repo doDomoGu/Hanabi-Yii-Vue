@@ -11,7 +11,7 @@ export default {
 
   },
   created: function(){
-    this.$store.dispatch('my_room/IsInRoom').then(()=>{
+    this.$store.dispatch('my_game/IsInGame').then(()=>{
 
       this.$store.dispatch(
         'common/SetTitle',

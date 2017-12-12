@@ -38,4 +38,13 @@ class MyGameController extends MyActiveController
 
         return $return;
     }
+
+
+    public function actionIsInGame(){
+        $return = $this->return;
+
+        list($return['success'],$return['msg'],$return['data']) = Game::isInGame();
+
+        return $return;
+    }
 }

@@ -16,3 +16,10 @@
     border-radius: 6px;
     height:80px;
 }
+
+.hand-card span{
+    width:100px;
+    height:80px;
+    margin-left:20px;
+    float:left;
+}

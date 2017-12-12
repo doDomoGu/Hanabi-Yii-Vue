@@ -46,11 +46,7 @@ class MyRoomController extends MyActiveController
         $return = $this->return;
 
 
-        list($return['success'],$return['msg'],$room_id) = Room::isInRoom();
-
-        if($return['success']){
-            $return['data'] = ['room_id'=>$room_id];
-        }
+        list($return['success'],$return['msg'],$return['data']) = Room::isInRoom();
 
         return $return;
     }

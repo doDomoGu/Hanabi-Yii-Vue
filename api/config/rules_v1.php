@@ -18,6 +18,8 @@ return [
 
     'POST '.$v.'/my-game/start' => $v.'/my-game/start',  //开始游戏
     'POST '.$v.'/my-game/get-info' => $v.'/my-game/get-info',  //开始游戏
+    'POST '.$v.'/my-game/is-in-game' => $v.'/my-game/is-in-game',  //开始游戏
+    'POST '.$v.'/my-game/end' => $v.'/my-game/end',  //开始游戏
 
 
 

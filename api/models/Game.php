@@ -31,6 +31,10 @@ class Game extends ActiveRecord
 
     public static $cue_types = ['color','num'];
 
+
+    const STATUS_PLAYING = 1;
+    const STATUS_END = 2;
+
     /**
      * @inheritdoc
      */
@@ -178,7 +182,7 @@ class Game extends ActiveRecord
                     $game->round_player = rand(1,2); //随机选择一个玩家开始第一个回合
                     $game->cue_num = self::DEFAULT_CUE;
                     $game->chance_num = self::DEFAULT_CHANCE;
-                    $game->status = 1;
+                    $game->status = Game::STATUS_PLAYING;
                     $game->score = 0;
                     if($game->save()){
                         if(GameCard::initLibrary($game->id)){
@@ -208,6 +212,31 @@ class Game extends ActiveRecord
     }
 
 
+
+    public static function isInGame(){
+        $success = false;
+        $msg = '';
+        $game_id = 0;
+        $user_id = Yii::$app->user->id;
+        $userRoomUser = RoomUser::find()->where(['user_id'=>$user_id])->all();
+        if(count($userRoomUser)==1){
+            $room_id = $userRoomUser[0]->room_id;
+            $userGame = Game::find()->where(['room_id'=>$room_id,'status'=>Game::STATUS_PLAYING])->all();
+            if(count($userGame)==1) {
+                $game_id = $userGame[0]->id;
+                $success = true;
+            }else{
+                $msg = '你所在房间游戏未开始/或者有多个游戏，错误';
+            }
+        }elseif(count($userRoomUser)==0) {
+            $msg = '不在房间中了';
+        }else{
+            $msg = '在多个房间中，数据错误';
+        }
+
+        return [$success,$msg,['game_id'=>$game_id]];
+    }
+
     public static function getInfo(){
         $success = false;
         $msg = '';
@@ -215,7 +244,7 @@ class Game extends ActiveRecord
         $user_id = Yii::$app->user->id;
         $userRoomUser = RoomUser::find()->where(['user_id'=>$user_id])->all();
         if(count($userRoomUser) == 1){
-            $userGame = Game::find()->where(['room_id'=>$userRoomUser[0]->room_id,'status'=>1])->all();
+            $userGame = Game::find()->where(['room_id'=>$userRoomUser[0]->room_id,'status'=>Game::STATUS_PLAYING])->all();
             if(count($userGame)==1){
                 $game = $userGame[0];
                 $gameCardCount = GameCard::find()->where(['game_id'=>$game->id])->count();

@@ -137,7 +137,7 @@ class Room extends ActiveRecord
     public static function isInRoom(){
         $success = false;
         $msg = '';
-        $room_id = false;
+        $room_id = 0;
         $user_id = Yii::$app->user->id;
         $userRoomUser = RoomUser::find()->where(['user_id'=>$user_id])->all();
         if(count($userRoomUser)==1){
@@ -150,7 +150,7 @@ class Room extends ActiveRecord
             $msg = '在多个房间中，数据错误';
         }
 
-        return [$success,$msg,$room_id];
+        return [$success,$msg,['room_id'=>$room_id]];
     }
 
 
