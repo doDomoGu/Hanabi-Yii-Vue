@@ -7,7 +7,7 @@
 
                     <div>{{'('+master_user.id+(master_user.is_you?'*':'')+')'+master_user.name}}</div>
 
-                    <div class="game-card" >
+                    <div class="hand-card">
                         <span v-for="card in master_user.cards">{{card.color+' - '+card.num}} </span>
                     </div>
                 </div>
@@ -21,7 +21,7 @@
 
                     <div>{{'('+guest_user.id+(guest_user.is_you?'*':'')+')'+guest_user.name}}</div>
 
-                    <div class="game-card" >
+                    <div class="hand-card">
                         <span v-for="card in guest_user.cards">{{card.color+' - '+card.num}} </span>
                     </div>
                 </div>

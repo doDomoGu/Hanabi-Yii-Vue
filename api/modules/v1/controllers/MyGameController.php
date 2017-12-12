@@ -47,4 +47,12 @@ class MyGameController extends MyActiveController
 
         return $return;
     }
+
+    public function actionEnd(){
+        $return = $this->return;
+
+        list($return['success'],$return['msg']) = Game::end();
+
+        return $return;
+    }
 }

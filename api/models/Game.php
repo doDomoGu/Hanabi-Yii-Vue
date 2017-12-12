@@ -212,6 +212,51 @@ class Game extends ActiveRecord
     }
 
 
+    public static function end(){
+        $success = false;
+        $msg = '';
+        $user_id = Yii::$app->user->id;
+        $userRoomUser = RoomUser::find()->where(['user_id'=>$user_id])->all();
+        if(count($userRoomUser) == 1){
+            //TODO 暂时只有玩家1可以进行"开始游戏操作"
+            if($userRoomUser[0]->role_type==RoomUser::ROLE_TYPE_MASTER){
+                $room = Room::find()->where(['id'=>$userRoomUser[0]->room_id])->one();
+                if($room){
+                    if($room->status==Room::STATUS_PLAYING){
+                        $userGame = Game::find()->where(['room_id'=>$room->id,'status'=>Game::STATUS_PLAYING])->all();
+                        if(count($userGame)==1) {
+                            $game = $userGame[0];
+                            // 1.修改游戏为结束状态
+                            $game->status = Game::STATUS_END;
+                            $game->save();
+                            // 2.修改房间为准备状态
+                            $room->status = Room::STATUS_PREPARING;
+                            $room->save();
+                            // 3.修改玩家2状态为"未准备"
+                            $guest_user = RoomUser::find()->where(['room_id'=>$room->id,'role_type'=>RoomUser::ROLE_TYPE_GUEST])->one();
+                            if($guest_user){
+                                $guest_user->is_ready = 0;
+                                $guest_user->save();
+                            }
+                            $success = true;
+                        }else{
+                            $msg = '你所在房间游戏未开始/或者有多个游戏，错误';
+                        }
+                    }else{
+                        $msg = '房间状态不是"游玩中"！(STATUS_PREPARING)';
+                    }
+                }else{
+                    $msg = '房间不存在！';
+                }
+            }else{
+                $msg = '玩家角色错误';
+            }
+        }else{
+            $msg = '你不在房间中/不止在一个房间中，错误';
+        }
+
+        return [$success,$msg];
+    }
 
     public static function isInGame(){
         $success = false;
