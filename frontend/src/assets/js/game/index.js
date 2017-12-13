@@ -1,13 +1,5 @@
 import { MessageBox} from 'mint-ui';
 
-// let colors = {
-//   0: 'white',
-//   1: 'blue',
-//   2: 'yellow',
-//   3: 'red',
-//   4: 'green'
-// };
-
 export default {
   name: 'game',
   data () {
@@ -90,6 +82,26 @@ export default {
     },
     endGame(){
       this.$store.dispatch('my_game/End');
+    },
+    cardOperation(cards,card,type){
+      //cards所有手牌
+      //card选中的手牌
+      //type 0:自己的手牌 1:对面的手牌
+      let index = cards.indexOf(card); //序号 从左至右 0-4
+      if(type===0){
+        MessageBox({
+          title:'',
+          message: '<mt-button type="default">default</mt-button>',
+          showCancelButton: true
+        }).then(action => {
+          /*if(action ==='confirm'){
+            this.$router.push('/room');
+          }*/
+        });
+      }else if(type===1){
+
+      }
+
     }
   }
 }

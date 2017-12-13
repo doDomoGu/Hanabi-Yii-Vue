@@ -49,6 +49,9 @@
 .player-block > .hand-card > li.green-color {
     background-color: #3ac34b;
 }
+.player-block > .hand-card > li.no-color {
+    background-color: #8f8f8b;
+}
 
 .player-block > .hand-card > li > span {
     position: absolute;

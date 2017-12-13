@@ -4,9 +4,11 @@
             <div class="player-name">房主： {{'('+master_user.id+')'+master_user.name}}</div>
 
             <div class="hand-card">
-                <li v-for="card in master_user.cards" :class="colors[card.color]+'-color'">
+                <li v-if="master_user.is_you===false" v-for="card in master_user.cards" :class="colors[card.color]+'-color'"
+                    @click="cardOperation(master_user.cards,card,1)">
                     <span>{{numbers[card.num]}}</span>
                 </li>
+                <li v-else class="no-color" @click="cardOperation(master_user.cards,card,0)"></li>
             </div>
         </section>
         <section class="middle-block">
@@ -18,7 +20,7 @@
                 <br/>机会数: {{chance_num}}
             </div>
             <div class="table-block">
-2222
+                2222
             </div>
             <div class="discard-block">
                 弃牌<br/>{{discard_cards_num}}张
@@ -28,9 +30,11 @@
             <div class="player-name">玩家：{{'('+guest_user.id+')'+guest_user.name}}</div>
 
             <div class="hand-card">
-                <li v-for="card in guest_user.cards" :class="colors[card.color]+'-color'">
-                    <span>{{numbers[card.num]}}</span>
+                <li v-if="guest_user.is_you===false"  v-for="card in guest_user.cards" :class="colors[card.color]+'-color'"
+                    @click="cardOperation(guest_user.cards,card,1)">
+                    <span @click="cardOperation(card)">{{numbers[card.num]}}</span>
                 </li>
+                <li v-else class="no-color" @click="cardOperation(guest_user.cards,card,0)"></li>
             </div>
         </section>
         <mt-button v-if="master_user.is_you>0" @click.native="endGame" size="large" class="game-end-btn" type="danger">结束游戏</mt-button>
