@@ -59,12 +59,49 @@
 }
 
 
-/*  table-block  */
+/*  middle-block  */
 
-.table-block {
+.middle-block {
     overflow:hidden;
     background: #aadcd6;
     margin-bottom: 10px;
     padding:10px;
     border-radius: 6px;
+}
+
+
+.middle-block > .library-block {
+    height:60px;
+    width:40px;
+    background-color:#fefefe;
+    float:left;
+    margin-right:10px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    border:1px solid #2c3e50;
+}
+
+.middle-block > .box-block {
+    float:left;
+    margin-right:10px;
+}
+
+
+.middle-block > .discard-block {
+    height:60px;
+    width:40px;
+    background-color:#fefefe;
+    float:right;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    border:1px solid #2c3e50;
+}
+
+.middle-block > .table-block {
+    height:60px;
+    background-color:#fefefe;
+    float:left;
+    border:1px solid #2c3e50;
 }

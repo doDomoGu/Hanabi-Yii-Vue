@@ -9,15 +9,20 @@
                 </li>
             </div>
         </section>
-        <section class="table-block">
+        <section class="middle-block">
             <div class="library-block">
-                牌库牌数：{{library_cards_num}}
-                <div class="draw-one-card">
-                    牌库摸牌
-                </div>
+                牌库<br/>{{library_cards_num}}张
             </div>
-            <div class="box-block"></div>
-            <div class="discard-block"></div>
+            <div class="box-block">
+                提示数: {{cue_num}}
+                <br/>机会数: {{chance_num}}
+            </div>
+            <div class="table-block">
+2222
+            </div>
+            <div class="discard-block">
+                弃牌<br/>{{discard_cards_num}}张
+            </div>
         </section>
         <section :class="'player-block' + (guest_user.is_you?' is_you':'')">
             <div class="player-name">玩家：{{'('+guest_user.id+')'+guest_user.name}}</div>

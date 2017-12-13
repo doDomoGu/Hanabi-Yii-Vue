@@ -67,6 +67,18 @@ export default {
     },
     library_cards_num:function(){
       return this.$store.getters['my_game/library_cards_num'];
+    },
+    cue_num:function(){
+      return this.$store.getters['my_game/cue_num'];
+    },
+    chance_num:function(){
+      return this.$store.getters['my_game/chance_num'];
+    },
+    discard_cards_num:function(){
+      return this.$store.getters['my_game/discard_cards_num'];
+    },
+    table_cards:function(){
+      return this.$store.getters['my_game/table_cards'];
     }
   },
   methods: {
