@@ -10,7 +10,12 @@
             </div>
         </section>
         <section class="table-block">
-            <div class="library-block"></div>
+            <div class="library-block">
+                牌库牌数：{{library_cards_num}}
+                <div class="draw-one-card">
+                    牌库摸牌
+                </div>
+            </div>
             <div class="box-block"></div>
             <div class="discard-block"></div>
         </section>

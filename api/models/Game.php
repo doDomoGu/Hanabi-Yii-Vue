@@ -297,7 +297,7 @@ class Game extends ActiveRecord
                     $cardInfo = self::getCardInfo($game->id);
 
 
-                    $data['card'] = $cardInfo;
+                    $data = $cardInfo;
                     $success = true;
                 }else{
                     $msg = '总卡牌数错误';
@@ -314,11 +314,13 @@ class Game extends ActiveRecord
 
     private static function getCardInfo($game_id){
         $data = [];
+        $game = Game::find()->where(['id'=>$game_id])->one();
+
         $masterCard = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_IN_PLAYER,'player_num'=>1])->orderBy('type_ord asc')->all();
         $guestCard = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_IN_PLAYER,'player_num'=>2])->orderBy('type_ord asc')->all();
-        $libraryCard = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_IN_LIBRARY])->orderBy('type_ord asc')->all();
+        $libraryCardCount = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_IN_LIBRARY])->orderBy('type_ord asc')->count();
         $tableCard = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_ON_TABLE])->orderBy('type_ord asc')->all();
-        $discardCard = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_IN_DISCARD])->orderBy('type_ord asc')->all();
+        $discardCardCount = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_IN_DISCARD])->orderBy('type_ord asc')->count();
 
         $master_hands = [];
         foreach($masterCard as $card){
@@ -329,8 +331,6 @@ class Game extends ActiveRecord
             $master_hands[] = $cardArr;
         }
 
-        $data['master_hands'] = $master_hands;
-
         $guest_hands = [];
         foreach($guestCard as $card){
             $cardArr = [
@@ -340,8 +340,21 @@ class Game extends ActiveRecord
             $guest_hands[] = $cardArr;
         }
 
-        $data['guest_hands'] = $guest_hands;
+        $table_cards = [];
+        foreach($tableCard as $card){
+            //TODO完整性检查
+            $table_cards[$card->color]++;
+        }
 
+        $data['master_hands'] = $master_hands;
+        $data['guest_hands'] = $guest_hands;
+        $data['library_cards_num'] = $libraryCardCount;
+        $data['discard_cards_num'] = $discardCardCount;
+
+        $data['table_cards'] = $table_cards;
+
+        $data['cue_num'] = $game->cue_num;
+        $data['chance_num'] = $game->chance_num;
         return $data;
     }
 }

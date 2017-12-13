@@ -8,10 +8,6 @@ import { MessageBox} from 'mint-ui';
 //   4: 'green'
 // };
 
-let colors = ['white','blue','yellow','red','green'];
-
-let numbers = [1,1,1,2,2,3,3,4,4,5];
-
 export default {
   name: 'game',
   data () {
@@ -33,6 +29,7 @@ export default {
       this.getRoomInfo();
 
       this.getGameInfo();
+
       this.intervalid1 = setInterval(()=>{
         this.getGameInfo();
 
@@ -67,6 +64,9 @@ export default {
       user.cards = this.$store.getters['my_game/guest_user_hand_cards'];
       user.is_you = user.id === this.$store.getters['auth/user_id'];
       return user;
+    },
+    library_cards_num:function(){
+      return this.$store.getters['my_game/library_cards_num'];
     }
   },
   methods: {
@@ -77,7 +77,6 @@ export default {
       this.$store.dispatch('my_room/GetRoomInfo');
     },
     endGame(){
-
       this.$store.dispatch('my_game/End');
     }
   }
