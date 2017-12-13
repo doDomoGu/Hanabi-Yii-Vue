@@ -2,26 +2,24 @@
 
 }
 
+/*  player-block  */
 .player-block {
     overflow:hidden;
-    background: #7baadc;
+    background: #dcd3bd;
     margin-bottom: 10px;
     padding:10px;
     border-radius: 6px;
 }
 
-.player-info {
-    background: #dcd3bd;
-    padding:10px;
-    border-radius: 6px;
-    overflow:hidden;
+.player-block.is_you > .player-name {
+    color: #a9580f;
 }
 
-.hand-card {
-
+.player-block > .hand-card {
+    margin-top:10px;
 }
 
-.hand-card > li{
+.player-block > .hand-card > li{
     padding:0;
     list-style: none;
     width:40px;
@@ -30,26 +28,43 @@
     float:left;
     border:1px solid #2c3e50;
     overflow: hidden;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    position: relative;
 }
 
-.hand-card > li > span{
-    display: block;
-    width:100%;
-    height:100%;
+.player-block > .hand-card > li.white-color {
+    background-color: #cdcdcd;
+}
+.player-block > .hand-card > li.blue-color {
+    background-color: #4f82c3;
+}
+.player-block > .hand-card > li.yellow-color {
+    background-color: #c3c30d;
+}
+.player-block > .hand-card > li.red-color {
+    background-color: #c33b00;
+}
+.player-block > .hand-card > li.green-color {
+    background-color: #3ac34b;
 }
 
-.hand-card > li > span.white-color {
-    background-color:#efefef;
+.player-block > .hand-card > li > span {
+    position: absolute;
+    font-size:32px;
+    left:12px;
+    top:10px;
+
 }
-.hand-card > li > span.blue-color {
-    background-color:#2234ff;
-}
-.hand-card > li > span.yellow-color {
-    background-color:#ffff12;
-}
-.hand-card > li > span.red-color {
-    background-color:#ff4444;
-}
-.hand-card > li > span.green-color {
-    background-color:#12ff12;
+
+
+/*  table-block  */
+
+.table-block {
+    overflow:hidden;
+    background: #aadcd6;
+    margin-bottom: 10px;
+    padding:10px;
+    border-radius: 6px;
 }
