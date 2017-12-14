@@ -8,6 +8,14 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
 
+let dev_config;
+if(process.env.host == '100'){
+  dev_config = require('../config/dev-100.env');
+  config.dev.host = dev.config.host;
+}else{
+  dev_config = require('../config/dev.env');
+}
+
 const devWebpackConfig = merge(baseWebpackConfig, {
   module: {
     rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap, usePostCSS: true })
@@ -36,8 +44,9 @@ const devWebpackConfig = merge(baseWebpackConfig, {
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env': require('../config/dev.env')
-    }), 
+      //'process.env': process.env.host == '100'?require('../config/dev-100.env'):require('../config/dev.env')
+      'process.env': dev_config
+    }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.
     new webpack.NoEmitOnErrorsPlugin(),
