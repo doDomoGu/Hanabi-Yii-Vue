@@ -1,11 +1,21 @@
-import { MessageBox} from 'mint-ui';
-
+//import { MessageBox} from 'mint-ui';
+//import { XDialog, XButton, Group, XSwitch, TransferDomDirective as TransferDom } from 'vux'
+import  XDialog from 'vux/src/components/x-dialog'
 export default {
   name: 'game',
+  components: {
+    XDialog,
+  },
   data () {
     return {
-      'colors':['white','blue','yellow','red','green'],
-      'numbers':[1,1,1,2,2,3,3,4,4,5]
+      colors:['white','blue','yellow','red','green'],
+      numbers:[1,1,1,2,2,3,3,4,4,5],
+      cardOperationShow:false,
+      cardOperationType:-1,
+      cardSelectOrd:-1,
+      cardSelectColor:-1,
+      cardSelectNum:-1,
+
     }
   },
   mounted: function(){
@@ -36,9 +46,7 @@ export default {
             });
           }
         });
-
       },500);
-
     });
   },
   beforeDestroy () {
@@ -83,25 +91,36 @@ export default {
     endGame(){
       this.$store.dispatch('my_game/End');
     },
-    cardOperation(cards,card,type){
+    showCardOperation(cards,card,type){
       //cards所有手牌
       //card选中的手牌
-      //type 0:自己的手牌 1:对面的手牌
+      //type 0:自己的手牌 1:对手的手牌
       let index = cards.indexOf(card); //序号 从左至右 0-4
-      if(type===0){
-        MessageBox({
-          title:'',
-          message: '<mt-button type="default">default</mt-button>',
-          showCancelButton: true
-        }).then(action => {
-          /*if(action ==='confirm'){
-            this.$router.push('/room');
-          }*/
-        });
-      }else if(type===1){
 
+      if(type===0){
+        this.cardSelectOrd = card.ord;
+      }else if(type===1){
+        this.cardSelectColor = card.color;
+        this.cardSelectNum = card.num;
+        this.cardSelectOrd = card.ord;
       }
 
+      this.cardOperationType = type;
+      this.cardOperationShow = true;
+    },
+    doDiscard(){
+      this.$store.dispatch('my_game/DoDiscard',this.cardSelectOrd).then((res)=>{
+        if(res.success){
+          this.cardOperationShow = false;
+        }
+      })
+    },
+    clearSelect(){
+      this.cardSelectColor = -1;
+      this.cardSelectNum = -1;
+      this.cardSelectOrd = -1;
+      this.cardOperationType = -1;
     }
+
   }
 }

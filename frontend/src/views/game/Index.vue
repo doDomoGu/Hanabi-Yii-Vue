@@ -5,10 +5,10 @@
 
             <div class="hand-card">
                 <li v-if="master_user.is_you===false" v-for="card in master_user.cards" :class="colors[card.color]+'-color'"
-                    @click="cardOperation(master_user.cards,card,1)">
+                    @click="showCardOperation(master_user.cards,card,1)">
                     <span>{{numbers[card.num]}}</span>
                 </li>
-                <li v-else class="no-color" @click="cardOperation(master_user.cards,card,0)"></li>
+                <li v-else class="no-color" @click="showCardOperation(master_user.cards,card,0)"></li>
             </div>
         </section>
         <section class="middle-block">
@@ -31,13 +31,35 @@
 
             <div class="hand-card">
                 <li v-if="guest_user.is_you===false"  v-for="card in guest_user.cards" :class="colors[card.color]+'-color'"
-                    @click="cardOperation(guest_user.cards,card,1)">
-                    <span @click="cardOperation(card)">{{numbers[card.num]}}</span>
+                    @click="showCardOperation(guest_user.cards,card,1)">
+                    <span @click="showCardOperation(card)">{{numbers[card.num]}}</span>
                 </li>
-                <li v-else class="no-color" @click="cardOperation(guest_user.cards,card,0)"></li>
+                <li v-else class="no-color" @click="showCardOperation(guest_user.cards,card,0)"></li>
             </div>
         </section>
         <mt-button v-if="master_user.is_you>0" @click.native="endGame" size="large" class="game-end-btn" type="danger">结束游戏</mt-button>
+
+        <x-dialog :show.sync="cardOperationShow" hide-on-blur :on-hide="clearSelect" class="">
+            <div v-if="cardOperationType===1" class="oppsite-card-operation">
+                操作对手手牌
+            </div>
+            <div v-if="cardOperationType===0" class="yourself-card-operation">
+                <div class="selected-card-info">
+                    {{cardSelectOrd}}
+                </div>
+                <div class="discard-btn">
+                    是否要弃掉这张牌
+                    <mt-button type="danger" size="small" @click.native="doDiscard">
+                        弃掉
+                    </mt-button>
+                </div>
+                <div class="change-card">
+                    <div>选择一张牌，与之调换位置</div>
+                    <li v-for="ordOne in [1,2,3,4,5]" class="no-color" @click="" v-if="ordOne!==cardSelectOrd">{{ordOne}}</li>
+                </div>
+            </div>
+        </x-dialog>
+
     </div>
 </template>
 

@@ -108,3 +108,50 @@
     float:left;
     border:1px solid #2c3e50;
 }
+
+/*  card-operation-dialog  */
+.yourself-card-operation {
+    padding:10px;
+    overflow: hidden;
+}
+.yourself-card-operation > .selected-card-info {
+    width:36px;
+    height:60px;
+    margin-right:10px;
+    padding-left:4px;
+    float:left;
+    border:1px solid #2c3e50;
+    overflow: hidden;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    background-color: #8f8f8b;
+    text-align:left;
+    margin-bottom:10px;
+}
+.yourself-card-operation > .discard-btn {
+    float:left;
+    margin-bottom:10px;
+}
+
+.yourself-card-operation > .change-card {
+    border-top:1px solid #333;
+    clear:both;
+    padding-top:10px;
+}
+
+.yourself-card-operation > .change-card > li {
+    width:36px;
+    height:60px;
+    margin-right:10px;
+    padding-left:4px;
+    list-style-type: none;
+    float:left;
+    border:1px solid #2c3e50;
+    overflow: hidden;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    background-color: #8f8f8b;
+    text-align:left;
+}

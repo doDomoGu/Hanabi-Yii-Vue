@@ -72,7 +72,7 @@ class GameCard extends ActiveRecord
             'id' => 'ID',
             'game_id' => 'Game ID',  //对应游戏ID
             'type' => 'Type',   //牌类型 1:玩家手上,2:牌库中,3:桌面上(燃放成功),4:弃牌堆(包括燃放失败也进入弃牌堆)
-            'type_ord' => 'Type Ord', //初始值 和 ord字段一样代表生成的随机花色和颜色排序（1至50），根据type不同，意义不同:1在玩家手中表示 从左至右的顺序(1-5),3设置为0，4表示弃牌堆的顺序从1开始增加 越大表示越后面丢弃
+            'type_ord' => 'Type Ord', //初始值 和 ord字段一样代表生成的随机花色和颜色排序（1至50），根据type不同，意义不同:1在玩家手中表示 从左至右的顺序(1-5),3设置为0，4表示弃牌堆的顺序从1开始增加 越大表示越新丢弃的
             'player_num' => 'Player Num', //玩家对应的序号，1：房主 2：2P
             'color' => 'Color', //颜色Card中colors数组 1-5
             'num' => 'Num', //数字Card中numbers数组 1-10
@@ -162,8 +162,45 @@ class GameCard extends ActiveRecord
         return $return;
     }
 
+
+    public static function discardCard($game_id,$player_num,$ord){
+        $return = false;
+        //统计牌的总数 应该为50张
+        $count = self::find()->where(['game_id'=>$game_id])->count();
+        if($count==Card::CARD_NUM_ALL){
+            //所选择的牌
+            $cardSelected = self::find()->where(['game_id'=>$game_id,'type'=>self::TYPE_IN_PLAYER,'player_num'=>$player_num,'type_ord'=>$ord])->one();
+            if($cardSelected){
+                //将牌丢进弃牌堆
+                $cardSelected->type = self::TYPE_IN_DISCARD;
+                $cardSelected->type_ord = self::getInsertDiscardOrd($game_id);
+                $cardSelected->player_num = 0;
+                $cardSelected->save();
+
+                //将排序靠后的手牌都往前移动
+                for($i = $ord+1;$i<=5;$i++){
+                    $otherCard = self::find()->where(['game_id'=>$game_id,'type'=>self::TYPE_IN_PLAYER,'player_num'=>$player_num,'type_ord'=>$i])->one();
+                    if($otherCard){
+                        $otherCard->type_ord = $otherCard->type_ord - 1;
+                        $otherCard->save();
+                    }
+                }
+
+
+
+                $return = true;
+            }else{
+                echo '没有找到选择的牌';
+            }
+        }else{
+            echo 'game card num wrong';
+        }
+        return $return;
+    }
+
+
     //交换手牌顺序
-    public static function changePlayerCardOrd($game_id,$player,$cardId1,$cardId2){
+    /*public static function changePlayerCardOrd($game_id,$player,$cardId1,$cardId2){
         $card1 = self::find()->where(['game_id'=>$game_id,'type'=>self::TYPE_IN_PLAYER,'player'=>$player,'id'=>$cardId1,'status'=>1])->one();
         $card2 = self::find()->where(['game_id'=>$game_id,'type'=>self::TYPE_IN_PLAYER,'player'=>$player,'id'=>$cardId2,'status'=>1])->one();
         if($card1 && $card2){
@@ -206,15 +243,15 @@ class GameCard extends ActiveRecord
             }
         }
         return $cardInfo;
-    }
+    }*/
 
     //获取当前应插入弃牌堆的ord数值，即当前弃牌堆最小排序的数值减1，没有则为49
-    public static function getInsertDiscardOrd($game_id){
-        $lastDiscardCard = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_IN_DISCARD,'status'=>1])->orderBy('ord asc')->one();
+    private static function getInsertDiscardOrd($game_id){
+        $lastDiscardCard = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_IN_DISCARD])->orderBy('type_ord desc')->one();
         if($lastDiscardCard){
-            $ord = $lastDiscardCard->ord - 1;
+            $ord = $lastDiscardCard->ord + 1;
         }else{
-            $ord = 49;
+            $ord = 1;
         }
         return $ord;
     }

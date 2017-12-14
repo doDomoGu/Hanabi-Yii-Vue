@@ -9,7 +9,8 @@ const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
 
 let dev_config;
-if(process.env.host == '100'){
+
+if(process.env.host!=undefined && process.env.host == '100'){
   dev_config = require('../config/dev-100.env');
   config.dev.host = dev_config.host;
 }else{

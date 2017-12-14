@@ -314,47 +314,154 @@ class Game extends ActiveRecord
 
     private static function getCardInfo($game_id){
         $data = [];
+
         $game = Game::find()->where(['id'=>$game_id])->one();
+        if($game) {
+            $user_id = Yii::$app->user->id;
+            //获取当前玩家角色  只获取对手手牌信息（花色和数字）  自己的手牌只获取排序信息
+            $userRoomUser = RoomUser::find()->where(['user_id' => $user_id, 'room_id' => $game->room_id])->one();
+            if (count($userRoomUser) == 1) {
+                $isMaster = false;
+                if($userRoomUser->role_type===RoomUser::ROLE_TYPE_MASTER){
+                    $isMaster = true;
+                }
+                $masterCard = GameCard::find()->where(['game_id' => $game_id, 'type' => GameCard::TYPE_IN_PLAYER, 'player_num' => 1])->orderBy('type_ord asc')->all();
+                $guestCard = GameCard::find()->where(['game_id' => $game_id, 'type' => GameCard::TYPE_IN_PLAYER, 'player_num' => 2])->orderBy('type_ord asc')->all();
 
-        $masterCard = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_IN_PLAYER,'player_num'=>1])->orderBy('type_ord asc')->all();
-        $guestCard = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_IN_PLAYER,'player_num'=>2])->orderBy('type_ord asc')->all();
-        $libraryCardCount = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_IN_LIBRARY])->orderBy('type_ord asc')->count();
-        $tableCard = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_ON_TABLE])->orderBy('type_ord asc')->all();
-        $discardCardCount = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_IN_DISCARD])->orderBy('type_ord asc')->count();
 
-        $master_hands = [];
-        foreach($masterCard as $card){
-            $cardArr = [
-                'color'=>$card->color,
-                'num'=>$card->num
-            ];
-            $master_hands[] = $cardArr;
+                $master_hands = [];
+                $guest_hands = [];
+
+                if($isMaster){
+                    foreach ($masterCard as $card) {
+                        $cardArr = [
+                            'ord' => $card->type_ord
+                        ];
+                        $master_hands[] = $cardArr;
+                    }
+
+                    foreach ($guestCard as $card) {
+                        $cardArr = [
+                            'color' => $card->color,
+                            'num' => $card->num,
+                            'ord' => $card->type_ord
+                        ];
+                        $guest_hands[] = $cardArr;
+                    }
+                }else{
+                    foreach ($masterCard as $card) {
+                        $cardArr = [
+                            'color' => $card->color,
+                            'num' => $card->num,
+                            'ord' => $card->type_ord
+                        ];
+                        $master_hands[] = $cardArr;
+                    }
+
+
+                    foreach ($guestCard as $card) {
+                        $cardArr = [
+                            'ord' => $card->type_ord
+                        ];
+                        $guest_hands[] = $cardArr;
+                    }
+                }
+
+
+                $libraryCardCount = GameCard::find()->where(['game_id' => $game_id, 'type' => GameCard::TYPE_IN_LIBRARY])->orderBy('type_ord asc')->count();
+                $tableCard = GameCard::find()->where(['game_id' => $game_id, 'type' => GameCard::TYPE_ON_TABLE])->orderBy('type_ord asc')->all();
+                $discardCardCount = GameCard::find()->where(['game_id' => $game_id, 'type' => GameCard::TYPE_IN_DISCARD])->orderBy('type_ord asc')->count();
+
+
+                $table_cards = [];
+                foreach ($tableCard as $card) {
+                    //TODO 完整性检查
+                    $table_cards[$card->color]++;
+                }
+
+                $data['master_hands'] = $master_hands;
+                $data['guest_hands'] = $guest_hands;
+                $data['library_cards_num'] = $libraryCardCount;
+                $data['discard_cards_num'] = $discardCardCount;
+
+                $data['table_cards'] = $table_cards;
+
+                $data['cue_num'] = $game->cue_num;
+                $data['chance_num'] = $game->chance_num;
+            }else{
+                //TODO
+            }
+        }else{
+            //TODO
         }
-
-        $guest_hands = [];
-        foreach($guestCard as $card){
-            $cardArr = [
-                'color'=>$card->color,
-                'num'=>$card->num
-            ];
-            $guest_hands[] = $cardArr;
-        }
-
-        $table_cards = [];
-        foreach($tableCard as $card){
-            //TODO完整性检查
-            $table_cards[$card->color]++;
-        }
-
-        $data['master_hands'] = $master_hands;
-        $data['guest_hands'] = $guest_hands;
-        $data['library_cards_num'] = $libraryCardCount;
-        $data['discard_cards_num'] = $discardCardCount;
-
-        $data['table_cards'] = $table_cards;
-
-        $data['cue_num'] = $game->cue_num;
-        $data['chance_num'] = $game->chance_num;
         return $data;
+    }
+
+
+    public static function discard($ord){
+        $success = false;
+        $msg = '';
+        $data = [];
+        $user_id = Yii::$app->user->id;
+        $userRoomUser = RoomUser::find()->where(['user_id'=>$user_id])->all();
+        if(count($userRoomUser) == 1){
+            $userGame = Game::find()->where(['room_id'=>$userRoomUser[0]->room_id,'status'=>Game::STATUS_PLAYING])->all();
+            if(count($userGame)==1){
+                $game = $userGame[0];
+                $gameCardCount = GameCard::find()->where(['game_id'=>$game->id])->count();
+                if($gameCardCount==Card::CARD_NUM_ALL){
+                    $player_num = $userRoomUser[0]->role_type;
+                    //丢弃一张牌
+                    GameCard::discardCard($game->id,$player_num,$ord);
+
+                    //给这个玩家摸一张牌
+                    GameCard::drawCard($game->id,$player_num);
+
+                    //恢复一个提示数
+                    self::recoverCue($game->id);
+
+                    //交换(下一个)回合
+                    self::changePlayerRound($game->id);
+
+                    //插入日志 record
+                    //TODO
+
+
+                    $success = true;
+                }else{
+                    $msg = '总卡牌数错误';
+                }
+            }else{
+                $msg = '你所在房间游戏未开始/或者有多个游戏，错误';
+            }
+        }else{
+            $msg = '你不在房间中/不止在一个房间中，错误';
+        }
+
+        return [$success,$msg,$data];
+    }
+
+
+    private static function recoverCue($game_id){
+        $game = Game::find()->where(['id'=>$game_id])->one();
+        if($game){
+            if($game->chance_num < self::DEFAULT_CUE){
+                $game->chance_num = $game->chance_num+1;
+                if($game->save())
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private static function changePlayerRound($game_id){
+        $game = Game::find()->where(['id'=>$game_id])->one();
+        if($game){
+            $game->round_player = $game->round_player==1?2:1;
+            $game->round_num = $game->round_num+1;
+            if($game->save())
+                return true;
+        }
+        return false;
     }
 }

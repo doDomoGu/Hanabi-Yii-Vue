@@ -55,4 +55,14 @@ class MyGameController extends MyActiveController
 
         return $return;
     }
+
+    public function actionDoDiscard(){
+        $return = $this->return;
+
+        $ord = Yii::$app->request->post('cardSelectOrd');
+
+        list($return['success'],$return['msg']) = Game::discard($ord);
+
+        return $return;
+    }
 }
