@@ -11,7 +11,7 @@ const portfinder = require('portfinder')
 let dev_config;
 if(process.env.host == '100'){
   dev_config = require('../config/dev-100.env');
-  config.dev.host = dev.config.host;
+  config.dev.host = dev_config.host;
 }else{
   dev_config = require('../config/dev.env');
 }
