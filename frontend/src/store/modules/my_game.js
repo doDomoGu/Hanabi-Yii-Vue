@@ -4,6 +4,7 @@ const state = {
   game_id:0,
   master_user_hand_cards:[],
   guest_user_hand_cards:[],
+  round_player:0,
   library_cards_num:0,
   discard_cards_num:0,
   cue_num:0,
@@ -59,7 +60,8 @@ const actions = {
       )
       .then((res) => {
         if(res.data.success){
-          commit('SetInfo',res.data.data);
+          commit('SetGameInfo',res.data.data.game);
+          commit('SetCardInfo',res.data.data.card);
         }else{
           //commit('ClearInfo');
         }
@@ -119,6 +121,7 @@ const getters = {
   game_id : state=>state.game_id,
   master_user_hand_cards : state=>state.master_user_hand_cards,
   guest_user_hand_cards : state=>state.guest_user_hand_cards,
+  round_player : state=>state.round_player,
   library_cards_num : state=>state.library_cards_num,
   discard_cards_num : state=>state.discard_cards_num,
   cue_num : state=>state.cue_num,
@@ -130,7 +133,7 @@ const mutations = {
   SetGameId(state, game_id){
     state.game_id = game_id;
   },
-  SetInfo(state, data){
+  SetCardInfo(state,data){
     state.master_user_hand_cards = data.master_hands;
     state.guest_user_hand_cards = data.guest_hands;
     state.library_cards_num = data.library_cards_num;
@@ -139,10 +142,14 @@ const mutations = {
     state.chance_num = data.chance_num;
     state.table_cards = data.table_cards;
   },
+  SetGameInfo(state, data){
+    state.round_player = data.round_player;
+  },
   ClearInfo(state){
     state.game_id = 0;
     state.master_user_hand_cards = [];
     state.guest_user_hand_cards = [];
+    state.round_player = 0;
     state.library_cards_num = 0;
     state.discard_cards_num = 0;
     state.cue_num = 0;

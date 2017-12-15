@@ -79,6 +79,9 @@ export default {
     },
     table_cards:function(){
       return this.$store.getters['my_game/table_cards'];
+    },
+    round_player:function(){
+      return this.$store.getters['my_game/round_player'];
     }
   },
   methods: {
@@ -112,6 +115,8 @@ export default {
       this.$store.dispatch('my_game/DoDiscard',this.cardSelectOrd).then((res)=>{
         if(res.success){
           this.cardOperationShow = false;
+        }else{
+          alert(res.msg);
         }
       })
     },

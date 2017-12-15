@@ -294,10 +294,13 @@ class Game extends ActiveRecord
                 $game = $userGame[0];
                 $gameCardCount = GameCard::find()->where(['game_id'=>$game->id])->count();
                 if($gameCardCount==Card::CARD_NUM_ALL){
+                    $data['game'] = [
+                        'round_player'=>$game->round_player,
+                        'round_num'=>$game->round_num
+                    ];
+
                     $cardInfo = self::getCardInfo($game->id);
-
-
-                    $data = $cardInfo;
+                    $data['card'] = $cardInfo;
                     $success = true;
                 }else{
                     $msg = '总卡牌数错误';
@@ -405,31 +408,36 @@ class Game extends ActiveRecord
         $user_id = Yii::$app->user->id;
         $userRoomUser = RoomUser::find()->where(['user_id'=>$user_id])->all();
         if(count($userRoomUser) == 1){
-            $userGame = Game::find()->where(['room_id'=>$userRoomUser[0]->room_id,'status'=>Game::STATUS_PLAYING])->all();
+            $roomUser = $userRoomUser[0];
+            $userGame = Game::find()->where(['room_id'=>$roomUser->room_id,'status'=>Game::STATUS_PLAYING])->all();
             if(count($userGame)==1){
                 $game = $userGame[0];
-                $gameCardCount = GameCard::find()->where(['game_id'=>$game->id])->count();
-                if($gameCardCount==Card::CARD_NUM_ALL){
-                    $player_num = $userRoomUser[0]->role_type;
-                    //丢弃一张牌
-                    GameCard::discardCard($game->id,$player_num,$ord);
+                if($game->round_player==$roomUser->role_type){
+                    $gameCardCount = GameCard::find()->where(['game_id'=>$game->id])->count();
+                    if($gameCardCount==Card::CARD_NUM_ALL){
+                        $player_num = $userRoomUser[0]->role_type;
+                        //丢弃一张牌
+                        GameCard::discardCard($game->id,$player_num,$ord);
 
-                    //给这个玩家摸一张牌
-                    GameCard::drawCard($game->id,$player_num);
+                        //给这个玩家摸一张牌
+                        GameCard::drawCard($game->id,$player_num);
 
-                    //恢复一个提示数
-                    self::recoverCue($game->id);
+                        //恢复一个提示数
+                        self::recoverCue($game->id);
 
-                    //交换(下一个)回合
-                    self::changePlayerRound($game->id);
+                        //交换(下一个)回合
+                        self::changePlayerRound($game->id);
 
-                    //插入日志 record
-                    //TODO
+                        //插入日志 record
+                        //TODO
 
 
-                    $success = true;
+                        $success = true;
+                    }else{
+                        $msg = '总卡牌数错误';
+                    }
                 }else{
-                    $msg = '总卡牌数错误';
+                    $msg = '当前不是你的回合';
                 }
             }else{
                 $msg = '你所在房间游戏未开始/或者有多个游戏，错误';

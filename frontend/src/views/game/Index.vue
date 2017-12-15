@@ -1,7 +1,7 @@
 <template>
     <div id="game">
         <section :class="'player-block' + (master_user.is_you?' is_you':'')">
-            <div class="player-name">房主： {{'('+master_user.id+')'+master_user.name}}</div>
+            <div class="player-name">房主： {{'('+master_user.id+')'+master_user.name}} {{round_player==1?'++':''}}</div>
 
             <div class="hand-card">
                 <li v-if="master_user.is_you===false" v-for="card in master_user.cards" :class="colors[card.color]+'-color'"
@@ -27,7 +27,7 @@
             </div>
         </section>
         <section :class="'player-block' + (guest_user.is_you?' is_you':'')">
-            <div class="player-name">玩家：{{'('+guest_user.id+')'+guest_user.name}}</div>
+            <div class="player-name">玩家：{{'('+guest_user.id+')'+guest_user.name}} {{round_player==2?'++':''}}</div>
 
             <div class="hand-card">
                 <li v-if="guest_user.is_you===false"  v-for="card in guest_user.cards" :class="colors[card.color]+'-color'"
@@ -40,7 +40,7 @@
         <mt-button v-if="master_user.is_you>0" @click.native="endGame" size="large" class="game-end-btn" type="danger">结束游戏</mt-button>
 
         <x-dialog :show.sync="cardOperationShow" hide-on-blur :on-hide="clearSelect" class="">
-            <div v-if="cardOperationType===1" class="oppsite-card-operation">
+            <div v-if="cardOperationType===1" class="opposite-card-operation">
                 操作对手手牌
             </div>
             <div v-if="cardOperationType===0" class="yourself-card-operation">
