@@ -1,7 +1,7 @@
 import axios from '../../axios'
 
 const state = {
-  game_id:0,
+  is_playing:false,
   master_user_hand_cards:[],
   guest_user_hand_cards:[],
   round_player:0,
@@ -80,7 +80,7 @@ const actions = {
       )
       .then((res) => {
         if(res.data.success){
-          commit('SetGameId',res.data.data.game_id);
+          commit('SetGameIsPlaying');
         }else{
           commit('ClearInfo');
         }
@@ -118,7 +118,7 @@ const actions = {
 };
 
 const getters = {
-  game_id : state=>state.game_id,
+  is_playing : state=>state.is_playing,
   master_user_hand_cards : state=>state.master_user_hand_cards,
   guest_user_hand_cards : state=>state.guest_user_hand_cards,
   round_player : state=>state.round_player,
@@ -130,8 +130,8 @@ const getters = {
 };
 
 const mutations = {
-  SetGameId(state, game_id){
-    state.game_id = game_id;
+  SetGameIsPlaying(state){
+    state.is_playing = true;
   },
   SetCardInfo(state,data){
     state.master_user_hand_cards = data.master_hands;
@@ -146,7 +146,7 @@ const mutations = {
     state.round_player = data.round_player;
   },
   ClearInfo(state){
-    state.game_id = 0;
+    state.is_playing = false;
     state.master_user_hand_cards = [];
     state.guest_user_hand_cards = [];
     state.round_player = 0;

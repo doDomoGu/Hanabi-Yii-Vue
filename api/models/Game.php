@@ -11,17 +11,13 @@ use yii\db\Expression;
 /**
  * This is the model class for table "game".
  *
- * @property integer $id
  * @property integer $room_id
- * @property integer $master_player_user_id
- * @property integer $guest_player_user_id
  * @property integer $round_num
- * @property integer $round_player
+ * @property integer $round_player_is_host
  * @property integer $cue_num
  * @property integer $chance_num
  * @property integer $status
  * @property integer $score
- * @property string $created_at
  * @property string $updated_at
  */
 class Game extends ActiveRecord
@@ -32,6 +28,7 @@ class Game extends ActiveRecord
     public static $cue_types = ['color','num'];
 
 
+    const STATUS_PREPARING = 0;
     const STATUS_PLAYING = 1;
     const STATUS_END = 2;
 
@@ -81,17 +78,13 @@ class Game extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
             'room_id' => 'Room ID',
-            'master_player_user_id'=>'1P玩家的ID',
-            'guest_player_user_id'=>'2P玩家的ID',
             'round_num' => '当前回合数',
-            'round_player' => '当前回合对应的玩家', //1或2 对应1P 2P
+            'round_player_is_host' => '当前回合对应的玩家', //是否是主机玩家
             'cue_num' => '剩余提示次数',
             'chance_num' => '剩余燃放机会次数',
             'status' => 'Status',  //1:游玩中,2:结束
             'score' => '分数',
-            'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
     }
@@ -102,19 +95,19 @@ class Game extends ActiveRecord
         $msg = '';
         $game_id = 0;
         $user_id = Yii::$app->user->id;
-        $userRoomUser = RoomUser::find()->where(['user_id'=>$user_id])->all();
+        $userRoomUser = RoomPlayer::find()->where(['user_id'=>$user_id])->all();
         if(count($userRoomUser) == 1){
             //只有玩家1可以进行"开始游戏操作"
-            if($userRoomUser[0]->role_type==RoomUser::ROLE_TYPE_MASTER){
+            if($userRoomUser[0]->player_num==RoomPlayer::ROLE_TYPE_MASTER){
                 $room = Room::find()->where(['id'=>$userRoomUser[0]->room_id])->one();
                 if($room){
                     if($room->status==Room::STATUS_PREPARING){
-                        $roomUser = RoomUser::find()->where(['room_id'=>$room->id])->all();
+                        $roomUser = RoomPlayer::find()->where(['room_id'=>$room->id])->all();
                         if(count($roomUser)>2){
                             $msg = '房间中人数大于2，数据错误';
                         }else if(count($roomUser)==2){
                             foreach($roomUser as $u){
-                                if($u->role_type == RoomUser::ROLE_TYPE_GUEST) {
+                                if($u->player_num == 2) {
                                     if ($u->is_ready == 1) {
                                         //新建Game
                                         $game_id = self::createOne($room->id);
@@ -154,7 +147,7 @@ class Game extends ActiveRecord
         $game_id = false;
         $room = Room::find()->where(['id'=>$room_id,'status'=>Room::STATUS_PREPARING])->one();
         if($room){
-            $roomUser = RoomUser::find()->where(['room_id'=>$room->id])->all();
+            $roomUser = RoomPlayer::find()->where(['room_id'=>$room->id])->all();
             $roomUserCount = count($roomUser);
             if($roomUserCount==2){
                 $masterFlag = false;
@@ -162,10 +155,10 @@ class Game extends ActiveRecord
                 $guestFlag = false;
                 $guestId = 0;
                 foreach($roomUser as $u){
-                    if($u->role_type==RoomUser::ROLE_TYPE_MASTER){
+                    if($u->player_num==1){
                         $masterFlag = true;
                         $masterId = $u->user_id;
-                    }elseif($u->role_type==RoomUser::ROLE_TYPE_GUEST){
+                    }elseif($u->player_num==RoomPlayer::ROLE_TYPE_GUEST){
                         if($u->is_ready){
                             $guestFlag = true;
                             $guestId = $u->user_id;
@@ -216,10 +209,10 @@ class Game extends ActiveRecord
         $success = false;
         $msg = '';
         $user_id = Yii::$app->user->id;
-        $userRoomUser = RoomUser::find()->where(['user_id'=>$user_id])->all();
+        $userRoomUser = RoomPlayer::find()->where(['user_id'=>$user_id])->all();
         if(count($userRoomUser) == 1){
             //TODO 暂时只有玩家1可以进行"开始游戏操作"
-            if($userRoomUser[0]->role_type==RoomUser::ROLE_TYPE_MASTER){
+            if($userRoomUser[0]->player_num==RoomPlayer::ROLE_TYPE_MASTER){
                 $room = Room::find()->where(['id'=>$userRoomUser[0]->room_id])->one();
                 if($room){
                     if($room->status==Room::STATUS_PLAYING){
@@ -233,7 +226,7 @@ class Game extends ActiveRecord
                             $room->status = Room::STATUS_PREPARING;
                             $room->save();
                             // 3.修改玩家2状态为"未准备"
-                            $guest_user = RoomUser::find()->where(['room_id'=>$room->id,'role_type'=>RoomUser::ROLE_TYPE_GUEST])->one();
+                            $guest_user = RoomPlayer::find()->where(['room_id'=>$room->id,'player_num'=>RoomPlayer::ROLE_TYPE_GUEST])->one();
                             if($guest_user){
                                 $guest_user->is_ready = 0;
                                 $guest_user->save();
@@ -261,25 +254,21 @@ class Game extends ActiveRecord
     public static function isInGame(){
         $success = false;
         $msg = '';
-        $game_id = 0;
         $user_id = Yii::$app->user->id;
-        $userRoomUser = RoomUser::find()->where(['user_id'=>$user_id])->all();
-        if(count($userRoomUser)==1){
-            $room_id = $userRoomUser[0]->room_id;
-            $userGame = Game::find()->where(['room_id'=>$room_id,'status'=>Game::STATUS_PLAYING])->all();
-            if(count($userGame)==1) {
-                $game_id = $userGame[0]->id;
+        $room_player = RoomPlayer::find()->where(['user_id'=>$user_id])->one();
+        if($room_player){
+            $room_id = $room_player->room_id;
+            $game = Game::find()->where(['room_id'=>$room_id,'status'=>Game::STATUS_PLAYING])->one();
+            if($game) {
                 $success = true;
             }else{
-                $msg = '你所在房间游戏未开始/或者有多个游戏，错误';
+                $msg = '你所在房间游戏未开始，错误';
             }
-        }elseif(count($userRoomUser)==0) {
-            $msg = '不在房间中了';
         }else{
-            $msg = '在多个房间中，数据错误';
+            $msg = '不在房间中';
         }
 
-        return [$success,$msg,['game_id'=>$game_id]];
+        return [$success,$msg];
     }
 
     public static function getInfo(){
@@ -287,7 +276,7 @@ class Game extends ActiveRecord
         $msg = '';
         $data = [];
         $user_id = Yii::$app->user->id;
-        $userRoomUser = RoomUser::find()->where(['user_id'=>$user_id])->all();
+        $userRoomUser = RoomPlayer::find()->where(['user_id'=>$user_id])->all();
         if(count($userRoomUser) == 1){
             $userGame = Game::find()->where(['room_id'=>$userRoomUser[0]->room_id,'status'=>Game::STATUS_PLAYING])->all();
             if(count($userGame)==1){
@@ -322,10 +311,10 @@ class Game extends ActiveRecord
         if($game) {
             $user_id = Yii::$app->user->id;
             //获取当前玩家角色  只获取对手手牌信息（花色和数字）  自己的手牌只获取排序信息
-            $userRoomUser = RoomUser::find()->where(['user_id' => $user_id, 'room_id' => $game->room_id])->one();
+            $userRoomUser = RoomPlayer::find()->where(['user_id' => $user_id, 'room_id' => $game->room_id])->one();
             if (count($userRoomUser) == 1) {
                 $isMaster = false;
-                if($userRoomUser->role_type===RoomUser::ROLE_TYPE_MASTER){
+                if($userRoomUser->player_num===RoomPlayer::ROLE_TYPE_MASTER){
                     $isMaster = true;
                 }
                 $masterCard = GameCard::find()->where(['game_id' => $game_id, 'type' => GameCard::TYPE_IN_PLAYER, 'player_num' => 1])->orderBy('type_ord asc')->all();
@@ -406,16 +395,16 @@ class Game extends ActiveRecord
         $msg = '';
         $data = [];
         $user_id = Yii::$app->user->id;
-        $userRoomUser = RoomUser::find()->where(['user_id'=>$user_id])->all();
+        $userRoomUser = RoomPlayer::find()->where(['user_id'=>$user_id])->all();
         if(count($userRoomUser) == 1){
             $roomUser = $userRoomUser[0];
             $userGame = Game::find()->where(['room_id'=>$roomUser->room_id,'status'=>Game::STATUS_PLAYING])->all();
             if(count($userGame)==1){
                 $game = $userGame[0];
-                if($game->round_player==$roomUser->role_type){
+                if($game->round_player==$roomUser->player_num){
                     $gameCardCount = GameCard::find()->where(['game_id'=>$game->id])->count();
                     if($gameCardCount==Card::CARD_NUM_ALL){
-                        $player_num = $userRoomUser[0]->role_type;
+                        $player_num = $userRoomUser[0]->player_num;
                         //丢弃一张牌
                         GameCard::discardCard($game->id,$player_num,$ord);
 
@@ -426,7 +415,7 @@ class Game extends ActiveRecord
                         self::recoverCue($game->id);
 
                         //交换(下一个)回合
-                        self::changePlayerRound($game->id);
+                        self::changeRoundPlayer($game->id);
 
                         //插入日志 record
                         //TODO
@@ -462,7 +451,7 @@ class Game extends ActiveRecord
         return false;
     }
 
-    private static function changePlayerRound($game_id){
+    private static function changeRoundPlayer($game_id){
         $game = Game::find()->where(['id'=>$game_id])->one();
         if($game){
             $game->round_player = $game->round_player==1?2:1;

@@ -7,27 +7,22 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 /**
- * This is the model class for table "room_user".
+ * This is the model class for table "room_player".
  *
- * @property integer $id
  * @property integer $room_id
  * @property integer $user_id
- * @property integer $role_type
+ * @property integer $is_host
  * @property integer $is_ready
- * @property string $created_at
  * @property string $updated_at
  */
-class RoomUser extends ActiveRecord
+class RoomPlayer extends ActiveRecord
 {
-    const ROLE_TYPE_MASTER = 1;
-    const ROLE_TYPE_GUEST = 2;
-
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'room_user';
+        return 'room_player';
     }
 
     /**
@@ -39,11 +34,10 @@ class RoomUser extends ActiveRecord
             [
                 'class' => TimestampBehavior::className(),
                 'attributes' => [
-                    ActiveRecord::EVENT_BEFORE_INSERT => ['created_at', 'updated_at'],
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['updated_at'],
                     ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at'],
                 ],
                 'value' => new Expression('NOW()'),  //时间戳（数字型）转为 日期字符串
-                //'value'=>$this->timeTemp(),
             ]
         ];
     }
@@ -54,9 +48,9 @@ class RoomUser extends ActiveRecord
     public function rules()
     {
         return [
-            [['room_id', 'user_id', 'role_type', 'is_ready'], 'required'],
-            [['room_id', 'user_id', 'role_type', 'is_ready'], 'integer'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['room_id', 'user_id', 'is_host', 'is_ready'], 'required'],
+            [['room_id', 'user_id', 'is_host', 'is_ready'], 'integer'],
+            [['updated_at'], 'safe'],
             [['room_id', 'user_id'], 'unique', 'targetAttribute' => ['room_id', 'user_id'], 'message' => 'The combination of Room ID and User ID has already been taken.'],
         ];
     }
@@ -70,9 +64,8 @@ class RoomUser extends ActiveRecord
             'id' => 'ID',
             'room_id' => 'Room ID',
             'user_id' => 'User ID',
-            'role_type' => 'Role Type',
+            'is_host' => '是否是主机玩家',
             'is_ready' => 'Is Ready',
-            'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
     }

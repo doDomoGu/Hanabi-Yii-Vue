@@ -10,23 +10,20 @@ use yii\db\Expression;
 /**
  * This is the model class for table "game_card".
  *
- * @property integer $id
- * @property integer $game_id
+ * @property integer $room_id
  * @property integer $type
  * @property integer $type_ord
- * @property integer $player_num
  * @property integer $color
  * @property integer $num
  * @property integer $ord
- * @property string $created_at
  * @property string $updated_at
  */
 class GameCard extends ActiveRecord
 {
-    const TYPE_IN_PLAYER = 1;
+    const TYPE_IN_HAND = 1;
     const TYPE_IN_LIBRARY = 2;
-    const TYPE_ON_TABLE = 3;
-    const TYPE_IN_DISCARD = 4;
+    const TYPE_SUCCESSED = 3;
+    const TYPE_DISCARDED = 4;
 
     /**
      * @inheritdoc
@@ -42,11 +39,10 @@ class GameCard extends ActiveRecord
             [
                 'class' => TimestampBehavior::className(),
                 'attributes' => [
-                    ActiveRecord::EVENT_BEFORE_INSERT => ['created_at', 'updated_at'],
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['updated_at'],
                     ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at'],
                 ],
                 'value' => new Expression('NOW()'),  //时间戳（数字型）转为 日期字符串
-                //'value'=>$this->timeTemp(),
             ]
         ];
     }
@@ -57,9 +53,9 @@ class GameCard extends ActiveRecord
     public function rules()
     {
         return [
-            [['game_id'], 'required'],
-            [['game_id', 'type', 'type_ord', 'player_num', 'color', 'num', 'ord'], 'integer'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['room_id'], 'required'],
+            [['room_id', 'type', 'type_ord', 'color', 'num', 'ord'], 'integer'],
+            [['updated_at'], 'safe'],
         ];
     }
 
@@ -69,20 +65,15 @@ class GameCard extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'game_id' => 'Game ID',  //对应游戏ID
+            'room_id' => '房间ID',  //对应房间ID
             'type' => 'Type',   //牌类型 1:玩家手上,2:牌库中,3:桌面上(燃放成功),4:弃牌堆(包括燃放失败也进入弃牌堆)
-            'type_ord' => 'Type Ord', //初始值 和 ord字段一样代表生成的随机花色和颜色排序（1至50），根据type不同，意义不同:1在玩家手中表示 从左至右的顺序(1-5),3设置为0，4表示弃牌堆的顺序从1开始增加 越大表示越新丢弃的
-            'player_num' => 'Player Num', //玩家对应的序号，1：房主 2：2P
-            'color' => 'Color', //颜色Card中colors数组 1-5
-            'num' => 'Num', //数字Card中numbers数组 1-10
-            'ord' => 'Ord', //初始排序 1-50
-            'created_at' => 'Created At',
+            'type_ord' => 'Type Ord', //初始值 和 ord字段一样代表生成的随机花色和颜色排序（0至49），根据type不同，意义不同:1在玩家手中表示 从左至右的顺序(0-4是主机玩家 5-9是来宾玩家),3设置为0，4表示弃牌堆的顺序从0开始增加 越大表示越近丢弃的
+            'color' => 'Color', //颜色Card中colors数组 0-4
+            'num' => 'Num', //数字Card中numbers数组 0-9
+            'ord' => 'Ord', //初始排序 0-49  #不会改变
             'updated_at' => 'Updated At',
         ];
     }
-
-
 
     //初始化牌库
     public static function initLibrary($game_id){
@@ -141,7 +132,7 @@ class GameCard extends ActiveRecord
             $card = self::find()->where(['game_id'=>$game_id,'type'=>self::TYPE_IN_LIBRARY])->orderBy('type_ord asc')->one();
             if($card){
                 //查找玩家手上排序最大的牌，确定新模的牌的序号 ord
-                $playerCard = self::find()->where(['game_id'=>$game_id,'type'=>self::TYPE_IN_PLAYER,'player_num'=>$player_num])->orderBy('type_ord desc')->one();
+                $playerCard = self::find()->where(['game_id'=>$game_id,'type'=>self::TYPE_IN_PLAYER])->orderBy('type_ord desc')->one();
                 if($playerCard){
                     $ord = $playerCard->type_ord+1;
                 }else{

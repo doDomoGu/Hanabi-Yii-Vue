@@ -11,6 +11,7 @@
                 <li v-else class="no-color" @click="showCardOperation(master_user.cards,card,0)"></li>
             </div>
         </section>
+
         <section class="middle-block">
             <div class="library-block">
                 牌库<br/>{{library_cards_num}}张
@@ -26,17 +27,19 @@
                 弃牌<br/>{{discard_cards_num}}张
             </div>
         </section>
+
         <section :class="'player-block' + (guest_user.is_you?' is_you':'')">
             <div class="player-name">玩家：{{'('+guest_user.id+')'+guest_user.name}} {{round_player==2?'++':''}}</div>
 
             <div class="hand-card">
                 <li v-if="guest_user.is_you===false"  v-for="card in guest_user.cards" :class="colors[card.color]+'-color'"
                     @click="showCardOperation(guest_user.cards,card,1)">
-                    <span @click="showCardOperation(card)">{{numbers[card.num]}}</span>
+                    <span>{{numbers[card.num]}}</span>
                 </li>
                 <li v-else class="no-color" @click="showCardOperation(guest_user.cards,card,0)"></li>
             </div>
         </section>
+
         <mt-button v-if="master_user.is_you>0" @click.native="endGame" size="large" class="game-end-btn" type="danger">结束游戏</mt-button>
 
         <x-dialog :show.sync="cardOperationShow" hide-on-blur :on-hide="clearSelect" class="">

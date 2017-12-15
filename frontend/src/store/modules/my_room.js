@@ -2,12 +2,12 @@ import axios from '../../axios'
 
 const state = {
   room_id:0,
-  master_user:{
+  host_player:{
     id:0,
     username:"",
     name:""
   },
-  guest_user:{
+  guest_player:{
     id:0,
     username:"",
     name:""
@@ -113,8 +113,8 @@ const actions = {
 
 const getters = {
   room_id:state=>state.room_id,
-  master_user:state=>state.master_user,
-  guest_user:state=>state.guest_user,
+  host_player:state=>state.host_player,
+  guest_player:state=>state.guest_player,
 };
 
 const mutations = {
@@ -128,16 +128,16 @@ const mutations = {
     state.room_id = 0;
   },
   SetRoomInfo(state, data){
-    state.master_user = data.master_user;
-    state.guest_user = data.guest_user;
+    state.host_player = data.host_player;
+    state.guest_player = data.guest_player;
   },
   ClearRoomUser(state){
-    state.master_user = {
+    state.host_player = {
       id:0,
       username:"",
       name:""
     };
-    state.guest_user = {
+    state.guest_player = {
       id:0,
       username:"",
       name:""

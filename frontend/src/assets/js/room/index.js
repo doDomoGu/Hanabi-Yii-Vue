@@ -1,5 +1,4 @@
-//import { MessageBox} from 'mint-ui';
-
+import { MessageBox} from 'mint-ui';
 
 export default {
   name: 'room',
@@ -32,27 +31,21 @@ export default {
     clearInterval(this.intervalid1)
   },
   computed : {
-    master_user:function(){
-      let user = this.$store.getters['my_room/master_user'];
-      user.is_you = false;
-      if(user.id == this.$store.getters['auth/user_id']){
-        user.is_you = true;
-      }
+    host_player:function(){
+      let user = this.$store.getters['my_room/host_player'];
+      user.is_you = user.id === this.$store.getters['auth/user_id'];
       return user;
     },
-    guest_user:function(){
-      let user = this.$store.getters['my_room/guest_user'];
-      user.is_you = false;
-      if(user.id == this.$store.getters['auth/user_id']){
-        user.is_you = true;
-      }
+    guest_player:function(){
+      let user = this.$store.getters['my_room/guest_player'];
+      user.is_you = user.id === this.$store.getters['auth/user_id'];
       return user;
     }
   },
   methods: {
     exit(){
       MessageBox.confirm('确定要退出房间?').then(action => {
-        if(action=='confirm'){
+        if(action==='confirm'){
           this.$store.dispatch('my_room/Exit').then(()=>{
             this.$router.push('/');
           });

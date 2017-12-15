@@ -43,7 +43,7 @@ class MyGameController extends MyActiveController
     public function actionIsInGame(){
         $return = $this->return;
 
-        list($return['success'],$return['msg'],$return['data']) = Game::isInGame();
+        list($return['success'],$return['msg']) = Game::isInGame();
 
         return $return;
     }
