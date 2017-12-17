@@ -216,40 +216,35 @@ class Room extends ActiveRecord
         $success = false;
         $msg = '';
         $user_id = Yii::$app->user->id;
-        $userRoomUser = RoomPlayer::find()->where(['user_id'=>$user_id])->all();
-
-        if(count($userRoomUser) == 1){
-            //只有玩家2可以进行"准备操作"
-            if($userRoomUser[0]->player_num==1){
-                $room = Room::find()->where(['id'=>$userRoomUser[0]->room_id])->one();
-                if($room){
-                    $roomUser = RoomPlayer::find()->where(['room_id'=>$room->id])->all();
-                    if(count($roomUser)>2){
-                        $msg = '房间中人数大于2，数据错误';
-                    }else if(count($roomUser)==2){
-                        foreach($roomUser as $u){
-                            if($u->user_id==$user_id && $u->player_num == RoomPlayer::ROLE_TYPE_GUEST){
-                                $u->is_ready = $u->is_ready==1?0:1;
-                                if($u->save()){
-                                    $success = true;
-                                    $msg = $u->is_ready==1?'准备完成':'取消准备';
-                                }
+        $room_player = RoomPlayer::find()->where(['user_id'=>$user_id])->one();
+        if($room_player){
+            $room = Room::find()->where(['id'=>$room_player->room_id])->one();
+            if($room){
+                $game = Game::find()->where(['room_id'=>$room->id,'status'=>Game::STATUS_PLAYING])->one();
+                if(!$game){
+                    $roomPlayerCount = RoomPlayer::find()->where(['room_id'=>$room->id])->count();
+                    if($roomPlayerCount==2){
+                        if($room_player->is_host==0){
+                            $room_player->is_ready = $room_player->is_ready==1?0:1;
+                            if($room_player->save()){
+                                $success = true;
+                            }else{
+                                $msg = '保存错误';
                             }
-                        }
-                        if($success==false){
-                            $msg = '未知错误';
+                        }else{
+                            $msg = '不是来宾角色';
                         }
                     }else{
                         $msg = '房间中人数不等于2，数据错误';
                     }
                 }else{
-                    $msg = '房间不存在！';
+                    $msg = '游戏已经开始';
                 }
             }else{
-                $msg = '玩家角色错误';
+                $msg = '房间不存在！';
             }
         }else{
-            $msg = '你不在房间中/不止在一个房间中，错误';
+            $msg = '你不在房间中，错误';
         }
 
         return [$success,$msg];
