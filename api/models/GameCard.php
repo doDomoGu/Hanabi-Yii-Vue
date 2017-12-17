@@ -76,11 +76,11 @@ class GameCard extends ActiveRecord
     }
 
     //初始化牌库
-    public static function initLibrary($game_id){
+    public static function initLibrary($room_id){
         $return = false;
-        $game = Game::find()->where(['id'=>$game_id,'status'=>1])->one();
+        $game = Game::find()->where(['room_id'=>$room_id,'status'=>Game::STATUS_PLAYING])->one();
         if($game){
-            $cardCount = self::find()->where(['game_id'=>$game->id])->count();
+            $cardCount = self::find()->where(['room_id'=>$game->room_id])->count();
             if($cardCount==0){
                 $cardArr = [];
                 foreach(Card::$colors as $k=>$v){
@@ -91,19 +91,19 @@ class GameCard extends ActiveRecord
                 shuffle($cardArr);
 
                 $insertArr = [];
-                $ord = 1;
+                $ord = 0;
                 foreach($cardArr as $c){
-                    $insertArr[] = [$game_id,self::TYPE_IN_LIBRARY,$ord,0,$c[0],$c[1],$ord,date('Y-m-d H:i:s'),date('Y-m-d H:i:s')];
+                    $insertArr[] = [$room_id,self::TYPE_IN_LIBRARY,$ord,$c[0],$c[1],$ord,date('Y-m-d H:i:s')];
                     $ord++;
                 }
 
                 Yii::$app->db->createCommand()->batchInsert(
                     self::tableName(),
-                    ['game_id','type','type_ord','player_num','color','num','ord','created_at','updated_at'],
+                    ['room_id','type','type_ord','color','num','ord','updated_at'],
                     $insertArr
                 )->execute();
 
-                $cards = GameCard::find()->where(['game_id'=>$game->id])->count();
+                $cards = GameCard::find()->where(['room_id'=>$game->room_id])->count();
                 if($cards==Card::CARD_NUM_ALL){
                     $return = true;
                 }else{
@@ -123,27 +123,45 @@ class GameCard extends ActiveRecord
     }
 
     //摸一张牌
-    public static function drawCard($game_id,$player_num){
+    public static function drawCard($room_id,$player_is_host){
         $return = false;
         //统计牌的总数 应该为50张
-        $count = self::find()->where(['game_id'=>$game_id])->count();
+        $count = self::find()->where(['room_id'=>$room_id])->count();
         if($count==Card::CARD_NUM_ALL){
             //选取牌库上的第一张牌
-            $card = self::find()->where(['game_id'=>$game_id,'type'=>self::TYPE_IN_LIBRARY])->orderBy('type_ord asc')->one();
+            $card = self::find()->where(['room_id'=>$room_id,'type'=>self::TYPE_IN_LIBRARY])->orderBy('type_ord asc')->one();
             if($card){
-                //查找玩家手上排序最大的牌，确定新模的牌的序号 ord
-                $playerCard = self::find()->where(['game_id'=>$game_id,'type'=>self::TYPE_IN_PLAYER])->orderBy('type_ord desc')->one();
-                if($playerCard){
-                    $ord = $playerCard->type_ord+1;
+                //根据player_is_host 限制type_ord 范围
+                if($player_is_host==1){
+                    //房主 序号 0~4
+                    $type_orders = [0,1,2,3,4];
                 }else{
-                    $ord = 1;
+                    //来宾 序号5~9
+                    $type_orders = [5,6,7,8,9];
                 }
-                $card->type = self::TYPE_IN_PLAYER;
-                $card->player_num = $player_num;
-                $card->type_ord = $ord;
-                if($card->save()){
-                    $return = true;
+                //最多5张手牌
+                $player_card_count = self::find()->where(['room_id'=>$room_id,'type'=>self::TYPE_IN_HAND,'type_ord'=>$type_orders])->count();
+                if($player_card_count<=5){
+                    //查找玩家手上排序最大的牌，确定摸牌的序号 type_ord
+                    $the_biggest_card = self::find()->where(['room_id'=>$room_id,'type'=>self::TYPE_IN_HAND,'type_ord'=>$type_orders])->orderBy('type_ord desc')->one();
+                    if($the_biggest_card){
+                        $ord = $the_biggest_card->type_ord + 1;
+                    }else{
+                        if($player_is_host==1){
+                            $ord = 0;
+                        }else{
+                            $ord = 5;
+                        }
+                    }
+                    $card->type = self::TYPE_IN_HAND;
+                    $card->type_ord = $ord;
+                    if($card->save()){
+                        $return = true;
+                    }
+                }else{
+                    echo '手牌不能超过5张';
                 }
+
             }else{
                 echo 'no card to draw';
             }

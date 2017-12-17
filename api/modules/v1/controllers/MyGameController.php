@@ -22,11 +22,7 @@ class MyGameController extends MyActiveController
     public function actionStart(){
         $return = $this->return;
 
-        list($return['success'],$return['msg'],$game_id) = Game::start();
-
-        if($return['success']){
-            $return['data'] = ['game_id'=>$game_id];
-        }
+        list($return['success'],$return['msg']) = Game::start();
 
         return $return;
     }

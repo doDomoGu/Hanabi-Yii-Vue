@@ -28,7 +28,6 @@ class Game extends ActiveRecord
     public static $cue_types = ['color','num'];
 
 
-    const STATUS_PREPARING = 0;
     const STATUS_PLAYING = 1;
     const STATUS_END = 2;
 
@@ -50,7 +49,7 @@ class Game extends ActiveRecord
             [
                 'class' => TimestampBehavior::className(),
                 'attributes' => [
-                    ActiveRecord::EVENT_BEFORE_INSERT => ['created_at', 'updated_at'],
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['updated_at'],
                     ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at'],
                 ],
                 'value' => new Expression('NOW()'),  //时间戳（数字型）转为 日期字符串
@@ -66,9 +65,9 @@ class Game extends ActiveRecord
     public function rules()
     {
         return [
-            [['room_id', 'master_player_user_id', 'guest_player_user_id', 'round_num', 'round_player'], 'required'],
-            [['room_id', 'master_player_user_id', 'guest_player_user_id', 'round_num', 'round_player', 'cue_num', 'chance_num','status','score'], 'integer'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['room_id', 'round_num', 'round_player_is_host'], 'required'],
+            [['room_id', 'round_num', 'round_player_is_host', 'cue_num', 'chance_num','status','score'], 'integer'],
+            [['updated_at'], 'safe'],
         ];
     }
 
@@ -93,42 +92,37 @@ class Game extends ActiveRecord
     public static function start(){
         $success = false;
         $msg = '';
-        $game_id = 0;
         $user_id = Yii::$app->user->id;
-        $userRoomUser = RoomPlayer::find()->where(['user_id'=>$user_id])->all();
-        if(count($userRoomUser) == 1){
+        $room_player = RoomPlayer::find()->where(['user_id'=>$user_id])->one();
+        if($room_player){
             //只有玩家1可以进行"开始游戏操作"
-            if($userRoomUser[0]->player_num==RoomPlayer::ROLE_TYPE_MASTER){
-                $room = Room::find()->where(['id'=>$userRoomUser[0]->room_id])->one();
+            if($room_player->is_host==1){
+                $room = Room::find()->where(['id'=>$room_player->room_id])->one();
                 if($room){
-                    if($room->status==Room::STATUS_PREPARING){
-                        $roomUser = RoomPlayer::find()->where(['room_id'=>$room->id])->all();
-                        if(count($roomUser)>2){
-                            $msg = '房间中人数大于2，数据错误';
-                        }else if(count($roomUser)==2){
-                            foreach($roomUser as $u){
-                                if($u->player_num == 2) {
-                                    if ($u->is_ready == 1) {
-                                        //新建Game
-                                        $game_id = self::createOne($room->id);
-                                        if($game_id){
-                                            $room->status = Room::STATUS_PLAYING;
-                                            if ($room->save()) {
-                                                $success = true;
-                                                $msg = '开始游戏成功';
-                                            }
-                                        }
+                    //存在对应的game 即表示有开始的游戏
+                    $game = Game::find()->where(['room_id'=>$room->id])->one();
+                    if(!$game){
+                        $room_player_count = RoomPlayer::find()->where(['room_id'=>$room->id])->count();
+                        if($room_player_count == 2){
+                            $guest_player = RoomPlayer::find()->where(['room_id'=>$room->id,'is_host'=>0])->one();
+                            if($guest_player){
+                                if($guest_player->is_ready==1){
+                                    if(self::createOne($room->id)){
+                                        $success = true;
+                                    }else{
+                                        $msg = '创建游戏失败';
                                     }
+                                }else{
+                                    $msg = '来宾玩家的状态不是"已准备"';
                                 }
-                            }
-                            if($success==false){
-                                $msg = '未知错误001';
+                            }else{
+                                $msg = '来宾玩家不存在';
                             }
                         }else{
                             $msg = '房间中人数不等于2，数据错误';
                         }
                     }else{
-                        $msg = '房间状态不是"准备中"！(STATUS_PREPARING)';
+                        $msg = '游戏已开始';
                     }
                 }else{
                     $msg = '房间不存在！';
@@ -137,71 +131,42 @@ class Game extends ActiveRecord
                 $msg = '玩家角色错误';
             }
         }else{
-            $msg = '你不在房间中/不止在一个房间中，错误';
+            $msg = '你不在房间中，错误';
         }
 
-        return [$success,$msg,$game_id];
+        return [$success,$msg];
     }
 
     private static function createOne($room_id){
-        $game_id = false;
-        $room = Room::find()->where(['id'=>$room_id,'status'=>Room::STATUS_PREPARING])->one();
+        $success = false;
+        $room = Room::find()->where(['id'=>$room_id])->one();
         if($room){
-            $roomUser = RoomPlayer::find()->where(['room_id'=>$room->id])->all();
-            $roomUserCount = count($roomUser);
-            if($roomUserCount==2){
-                $masterFlag = false;
-                $masterId = 0;
-                $guestFlag = false;
-                $guestId = 0;
-                foreach($roomUser as $u){
-                    if($u->player_num==1){
-                        $masterFlag = true;
-                        $masterId = $u->user_id;
-                    }elseif($u->player_num==RoomPlayer::ROLE_TYPE_GUEST){
-                        if($u->is_ready){
-                            $guestFlag = true;
-                            $guestId = $u->user_id;
-                        }
+            $game = new Game();
+            $game->room_id = $room->id;
+            $game->round_num = 1;
+            $game->round_player_is_host = rand(0,1); //随机选择一个玩家开始第一个回合
+            $game->cue_num = self::DEFAULT_CUE;
+            $game->chance_num = self::DEFAULT_CHANCE;
+            $game->status = Game::STATUS_PLAYING;
+            $game->score = 0;
+            if($game->save()){
+                if(GameCard::initLibrary($room_id)){
+                    for($i=0;$i<5;$i++){ //玩家 1 2 各模五张牌
+                        GameCard::drawCard($room_id,1);
+                        GameCard::drawCard($room_id,0);
                     }
-                }
-                //检测是否是"准备完成"状态
-                if($masterFlag && $guestFlag){
-                    $game = new Game();
-                    $game->room_id = $room->id;
-                    $game->master_player_user_id = $masterId;
-                    $game->guest_player_user_id = $guestId;
-                    $game->round_num = 1;
-                    $game->round_player = rand(1,2); //随机选择一个玩家开始第一个回合
-                    $game->cue_num = self::DEFAULT_CUE;
-                    $game->chance_num = self::DEFAULT_CHANCE;
-                    $game->status = Game::STATUS_PLAYING;
-                    $game->score = 0;
-                    if($game->save()){
-                        if(GameCard::initLibrary($game->id)){
-                            for($i=0;$i<5;$i++){ //玩家 1 2 各模五张牌
-                                GameCard::drawCard($game->id,1);
-                                GameCard::drawCard($game->id,2);
-                            }
-                            $game_id = $game->id;
-                        }
-                    }else{
-                        echo 11;exit;
-                        //TODO 错误处理
-                    }
-                }else{
-                    echo 22;exit;
-                    //TODO 错误处理
+                    $success = true;
                 }
             }else{
-                echo 33;exit;
+                echo 11;exit;
                 //TODO 错误处理
             }
+
         }else{
             echo 44;exit;
             //TODO 错误处理
         }
-        return $game_id;
+        return $success;
     }
 
 
