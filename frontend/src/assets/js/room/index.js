@@ -61,13 +61,7 @@ export default {
       this.$store.dispatch('my_room/DoReady');
     },
     startGame(){
-      this.$store.dispatch('my_game/Start')/*.then((res)=>{
-        if(res.success){
-          this.$router.push('/game');
-        }else{
-          alert('开始失败');
-        }
-      });*/
+      this.$store.dispatch('my_game/Start');
     }
   }
 }
