@@ -44,7 +44,9 @@
 
         <x-dialog :show.sync="cardOperationShow" hide-on-blur :on-hide="clearSelect" class="">
             <div v-if="cardOperationType===1" class="opposite-card-operation">
-                操作对手手牌
+                <div class="selected-card-info">
+                    {{cardSelectOrd+1}}
+                </div>
             </div>
             <div v-if="cardOperationType===0" class="yourself-card-operation">
                 <div class="selected-card-info">
@@ -54,6 +56,12 @@
                     是否要弃掉这张牌
                     <mt-button type="danger" size="small" @click.native="doDiscard">
                         弃掉
+                    </mt-button>
+                </div>
+                <div class="play-btn">
+                    是否要打出这张牌
+                    <mt-button type="success" size="small" @click.native="doPlay">
+                        打出
                     </mt-button>
                 </div>
                 <div class="change-card">

@@ -185,30 +185,9 @@ class GameCard extends ActiveRecord
                 $cardSelected->type_ord = self::getInsertDiscardOrd($room_id);
                 $cardSelected->save();
 
-                //根据type_ord 判断是否is_host
-                $type_ords = [];
-                $host_type_ords = [0,1,2,3,4];
-                $guest_type_ords = [5,6,7,8,9];
-                if(in_array($ord,$host_type_ords)){
-                    $type_ords = $host_type_ords;
-                }else if(in_array($ord,$guest_type_ords)){
-                    $type_ords = $guest_type_ords;
-                }
+                $return = self::moveHandCardsByLackOfCard($room_id,$ord);
 
-                if(!empty($type_ords)){
-                    //将排序靠后的手牌都往前移动
-                    for($i = $ord+1;$i<=max($type_ords);$i++){
-                        $otherCard = self::find()->where(['room_id'=>$room_id,'type'=>self::TYPE_IN_HAND,'type_ord'=>$i])->one();
-                        if($otherCard){
-                            $otherCard->type_ord = $otherCard->type_ord - 1;
-                            $otherCard->save();
-                        }
-                    }
 
-                    $return = true;
-                }else{
-                    echo '选择的手牌排序错误';
-                }
             }else{
                 echo '没有找到选择的牌';
             }
@@ -216,6 +195,47 @@ class GameCard extends ActiveRecord
             echo 'game card num wrong';
         }
         return $return;
+    }
+
+    public static function playCard($room_id,$ord){
+        $success = false;
+        $result = false;
+        //统计牌的总数 应该为50张
+        $count = self::find()->where(['room_id'=>$room_id])->count();
+        if($count==Card::CARD_NUM_ALL){
+            //所选择的牌
+            $cardSelected = self::find()->where(['room_id'=>$room_id,'type'=>self::TYPE_IN_HAND,'type_ord'=>$ord])->one();
+            if($cardSelected){
+                $game = Game::find()->where(['room_id'=>$room_id])->one();
+                if($game){
+                    $cardsSuccessTop = self::getInsertDiscardOrd($room_id);
+
+                    $colorTopNum = $cardsSuccessTop[$cardSelected->color]; //对应花色的目前成功的最大数值
+                    $num = Card::$numbers[$cardSelected->num];              //选中牌的数值
+
+                    if($colorTopNum + 1 == $num){
+                        $cardSelected->type = GameCard::TYPE_SUCCESSED;
+                        $cardSelected->type_ord = 0;
+                        $cardSelected->save();
+                        $result = true;
+                    }else{
+                        $cardSelected->type = self::TYPE_DISCARDED;
+                        $cardSelected->type_ord = self::getInsertDiscardOrd($room_id);
+                        $cardSelected->save();
+                        $result = false;
+                    }
+                    self::moveHandCardsByLackOfCard($room_id,$ord);
+                    $success = true;
+                }else{
+                    echo '游戏未开始';
+                }
+            }else{
+                echo '没有找到选择的牌';
+            }
+        }else{
+            echo 'game card num wrong';
+        }
+        return [$success,$result];
     }
 
 
@@ -287,26 +307,55 @@ class GameCard extends ActiveRecord
         }
     }
 
-    //获取桌面上成功燃放的烟花 卡牌
-    public static function getCardsTopOnTable($game_id){
-        $cardsOnTable = [
+    //移动手牌 因为打出/弃掉一张牌
+    private static function moveHandCardsByLackOfCard($room_id,$ord){
+        //根据type_ord 判断是否is_host
+        $type_ords = [];
+        $host_type_ords = [0,1,2,3,4];
+        $guest_type_ords = [5,6,7,8,9];
+        if(in_array($ord,$host_type_ords)){
+            $type_ords = $host_type_ords;
+        }else if(in_array($ord,$guest_type_ords)){
+            $type_ords = $guest_type_ords;
+        }
+
+        if(!empty($type_ords)){
+            //将排序靠后的手牌都往前移动
+            for($i = $ord+1;$i<=max($type_ords);$i++){
+                $otherCard = self::find()->where(['room_id'=>$room_id,'type'=>self::TYPE_IN_HAND,'type_ord'=>$i])->one();
+                if($otherCard){
+                    $otherCard->type_ord = $otherCard->type_ord - 1;
+                    $otherCard->save();
+                }
+            }
+
+            return true;
+        }else{
+            echo '选择的手牌排序错误';
+            return false;
+        }
+    }
+
+    //获取成功燃放的烟花 卡牌 每种花色的最高数值
+    private static function getCardsSuccessTop($room_id){
+        $cardsTypeSuccess = [
             [0,0,0,0,0],
             [0,0,0,0,0],
             [0,0,0,0,0],
             [0,0,0,0,0],
             [0,0,0,0,0]
         ];
-        $cards = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_ON_TABLE,'status'=>1])->all();
+        $cards = GameCard::find()->where(['room_id'=>$room_id,'type'=>GameCard::TYPE_SUCCESSED])->orderBy('color ,num')->all();
 
         foreach($cards as $c){
             $k1=$c->color;
             $k2=Card::$numbers[$c->num] - 1;
-            $cardsOnTable[$k1][$k2] = 1;
+            $cardsTypeSuccess[$k1][$k2] = 1;
         }
 
         $verify = true;//验证卡牌 ，按数字顺序
         $cardsTop = [0,0,0,0,0]; //每种颜色的最大数值
-        foreach($cardsOnTable as $k1 => $row){
+        foreach($cardsTypeSuccess as $k1 => $row){
             $count = 0;
             $top = 0;
             foreach($row as $k2=>$r){

@@ -114,6 +114,28 @@ const actions = {
         reject(error);
       });
     });
+  },
+  DoPlay({commit},cardSelectOrd){
+    return new Promise((resolve, reject) => {
+      axios.post(
+        '/my-game/do-play'+'?access_token='+this.getters['auth/token'],
+        {
+          cardSelectOrd:cardSelectOrd
+        }
+      )
+        .then((res) => {
+          if(res.data.success){
+            //commit('SetGameId',res.data.data.game_id);
+          }else{
+            //commit('ClearInfo');
+          }
+
+          resolve(res.data);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
   }
 
 };

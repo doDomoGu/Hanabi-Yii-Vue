@@ -95,6 +95,7 @@ export default {
       this.$store.dispatch('my_game/End');
     },
     showCardOperation(cards,card,type){
+      this.clearSelect();
       //cards所有手牌
       //card选中的手牌
       //type 0:自己的手牌 1:对手的手牌
@@ -111,6 +112,12 @@ export default {
       this.cardOperationType = type;
       this.cardOperationShow = true;
     },
+    clearSelect(){
+      this.cardSelectColor = -1;
+      this.cardSelectNum = -1;
+      this.cardSelectOrd = -1;
+      this.cardOperationType = -1;
+    },
     doDiscard(){
       this.$store.dispatch('my_game/DoDiscard',this.cardSelectOrd).then((res)=>{
         if(res.success){
@@ -120,12 +127,16 @@ export default {
         }
       })
     },
-    clearSelect(){
-      this.cardSelectColor = -1;
-      this.cardSelectNum = -1;
-      this.cardSelectOrd = -1;
-      this.cardOperationType = -1;
-    }
+    doPlay(){
+      this.$store.dispatch('my_game/DoPlay',this.cardSelectOrd).then((res)=>{
+        if(res.success){
+          this.cardOperationShow = false;
+        }else{
+          alert(res.msg);
+        }
+      })
+    },
+
 
   }
 }

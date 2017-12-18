@@ -61,4 +61,14 @@ class MyGameController extends MyActiveController
 
         return $return;
     }
+
+    public function actionDoPlay(){
+        $return = $this->return;
+
+        $ord = Yii::$app->request->post('cardSelectOrd');
+
+        list($return['success'],$return['msg']) = Game::play($ord);
+
+        return $return;
+    }
 }

@@ -332,7 +332,7 @@ class Game extends ActiveRecord
                 $discardCardCount = GameCard::find()->where(['room_id' => $room_id, 'type' => GameCard::TYPE_DISCARDED])->orderBy('type_ord asc')->count();
 
 
-                $table_cards = [];
+                $table_cards = [0,0,0,0,0];
                 foreach ($tableCard as $card) {
                     //TODO 完整性检查
                     $table_cards[$card->color]++;
@@ -402,12 +402,87 @@ class Game extends ActiveRecord
         return [$success,$msg,$data];
     }
 
+    //打出一张牌
+    public static function play($ord){
+        $success = false;
+        $msg = '';
+        $data = [];
+        $user_id = Yii::$app->user->id;
+        $room_player = RoomPlayer::find()->where(['user_id'=>$user_id])->one();
+        if($room_player){
+            $game = Game::find()->where(['room_id'=>$room_player->room_id,'status'=>Game::STATUS_PLAYING])->one();
+            if($game){
+                if($game->round_player_is_host==$room_player->is_host){
+                    $gameCardCount = GameCard::find()->where(['room_id'=>$game->room_id])->count();
+                    if($gameCardCount==Card::CARD_NUM_ALL){
+                        //打出一张牌
+                        list($success,$data['play_result']) = GameCard::playCard($game->room_id,$ord);
+
+                        //给这个玩家摸一张牌
+                        GameCard::drawCard($game->room_id,$room_player->is_host);
+
+                        if($data['play_result']){
+                            //恢复一个提示数
+                            self::recoverCue($game->room_id);
+                        }else{
+                            //恢复一个提示数
+                            self::useChance($game->room_id);
+                        }
+
+
+                        //交换(下一个)回合
+                        self::changeRoundPlayer($game->room_id);
+
+                        //插入日志 record
+                        //TODO
+
+                    }else{
+                        $msg = '总卡牌数错误';
+                    }
+                }else{
+                    $msg = '当前不是你的回合';
+                }
+            }else{
+                $msg = '你所在房间游戏未开始/或者有多个游戏，错误';
+            }
+        }else{
+            $msg = '你不在房间中/不止在一个房间中，错误';
+        }
+
+        return [$success,$msg,$data];
+    }
+
 
     private static function recoverCue($room_id){
         $game = Game::find()->where(['room_id'=>$room_id])->one();
         if($game){
-            if($game->chance_num < self::DEFAULT_CUE){
-                $game->chance_num = $game->chance_num+1;
+            if($game->cue_num < self::DEFAULT_CUE){
+                $game->cue_num = $game->cue_num+1;
+                if($game->save())
+                    return true;
+            }
+        }
+        return false;
+    }
+
+
+    private static function useCue($room_id){
+        $game = Game::find()->where(['room_id'=>$room_id])->one();
+        if($game){
+            if($game->cue_num > 0 ){
+                $game->cue_num = $game->cue_num - 1;
+                if($game->save())
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private static function useChance($room_id){
+        $game = Game::find()->where(['room_id'=>$room_id])->one();
+        if($game){
+            if($game->chance_num > 0){
+                $game->chance_num = $game->chance_num - 1;
                 if($game->save())
                     return true;
             }
