@@ -31,4 +31,4 @@
 </template>
 
 <script src="@js/room/index.js"></script>
-<style src="@css/room/index.css"></style>
+<style src="@css/room/index.scss"></style>

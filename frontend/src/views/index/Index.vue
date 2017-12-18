@@ -32,4 +32,4 @@
 </template>
 
 <script src="@js/index/index.js"></script>
-<style src="@css/index/index.css"></style>
+<style src="@css/index/index.scss"></style>
