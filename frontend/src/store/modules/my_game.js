@@ -2,8 +2,8 @@ import axios from '../../axios'
 
 const state = {
   is_playing:false,
-  master_user_hand_cards:[],
-  guest_user_hand_cards:[],
+  host_hands:[],
+  guest_hands:[],
   round_player:0,
   library_cards_num:0,
   discard_cards_num:0,
@@ -20,7 +20,7 @@ const actions = {
       )
       .then((res) => {
         if(res.data.success){
-          commit('SetGameId',res.data.data.game_id);
+          commit('SetGameIsPlaying');
           //commit('SetRoomUser',res.data.data);
         }else{
           //commit('ClearRoomUser');
@@ -60,6 +60,7 @@ const actions = {
       )
       .then((res) => {
         if(res.data.success){
+          commit('SetGameIsPlaying');
           commit('SetGameInfo',res.data.data.game);
           commit('SetCardInfo',res.data.data.card);
         }else{
@@ -119,8 +120,8 @@ const actions = {
 
 const getters = {
   is_playing : state=>state.is_playing,
-  master_user_hand_cards : state=>state.master_user_hand_cards,
-  guest_user_hand_cards : state=>state.guest_user_hand_cards,
+  host_hands : state=>state.host_hands,
+  guest_hands : state=>state.guest_hands,
   round_player : state=>state.round_player,
   library_cards_num : state=>state.library_cards_num,
   discard_cards_num : state=>state.discard_cards_num,
@@ -134,8 +135,8 @@ const mutations = {
     state.is_playing = true;
   },
   SetCardInfo(state,data){
-    state.master_user_hand_cards = data.master_hands;
-    state.guest_user_hand_cards = data.guest_hands;
+    state.host_hands = data.host_hands;
+    state.guest_hands = data.guest_hands;
     state.library_cards_num = data.library_cards_num;
     state.discard_cards_num = data.discard_cards_num;
     state.cue_num = data.cue_num;
@@ -143,12 +144,12 @@ const mutations = {
     state.table_cards = data.table_cards;
   },
   SetGameInfo(state, data){
-    state.round_player = data.round_player;
+    state.round_player_is_host = data.round_player_is_host;
   },
   ClearInfo(state){
     state.is_playing = false;
-    state.master_user_hand_cards = [];
-    state.guest_user_hand_cards = [];
+    state.host_hands = [];
+    state.guest_hands = [];
     state.round_player = 0;
     state.library_cards_num = 0;
     state.discard_cards_num = 0;

@@ -241,60 +241,62 @@ class Game extends ActiveRecord
         $msg = '';
         $data = [];
         $user_id = Yii::$app->user->id;
-        $userRoomUser = RoomPlayer::find()->where(['user_id'=>$user_id])->all();
-        if(count($userRoomUser) == 1){
-            $userGame = Game::find()->where(['room_id'=>$userRoomUser[0]->room_id,'status'=>Game::STATUS_PLAYING])->all();
-            if(count($userGame)==1){
-                $game = $userGame[0];
-                $gameCardCount = GameCard::find()->where(['game_id'=>$game->id])->count();
+        $room_player = RoomPlayer::find()->where(['user_id'=>$user_id])->one();
+        if($room_player){
+            $game = Game::find()->where(['room_id'=>$room_player->room_id])->one();
+            if($game){
+                $gameCardCount = GameCard::find()->where(['room_id'=>$game->room_id])->count();
                 if($gameCardCount==Card::CARD_NUM_ALL){
                     $data['game'] = [
-                        'round_player'=>$game->round_player,
-                        'round_num'=>$game->round_num
+                        'round_num'=>$game->round_num,
+                        'round_player_is_host'=>$game->round_player_is_host,
                     ];
 
-                    $cardInfo = self::getCardInfo($game->id);
+                    $cardInfo = self::getCardInfo($game->room_id);
                     $data['card'] = $cardInfo;
                     $success = true;
                 }else{
                     $msg = '总卡牌数错误';
                 }
             }else{
-                $msg = '你所在房间游戏未开始/或者有多个游戏，错误';
+                $msg = '你所在房间游戏未开始，错误';
             }
         }else{
-            $msg = '你不在房间中/不止在一个房间中，错误';
+            $msg = '你不在房间中，错误';
         }
 
         return [$success,$msg,$data];
     }
 
-    private static function getCardInfo($game_id){
+    private static function getCardInfo($room_id){
         $data = [];
 
-        $game = Game::find()->where(['id'=>$game_id])->one();
+        $game = Game::find()->where(['room_id'=>$room_id])->one();
         if($game) {
             $user_id = Yii::$app->user->id;
             //获取当前玩家角色  只获取对手手牌信息（花色和数字）  自己的手牌只获取排序信息
-            $userRoomUser = RoomPlayer::find()->where(['user_id' => $user_id, 'room_id' => $game->room_id])->one();
-            if (count($userRoomUser) == 1) {
-                $isMaster = false;
-                if($userRoomUser->player_num===RoomPlayer::ROLE_TYPE_MASTER){
-                    $isMaster = true;
-                }
-                $masterCard = GameCard::find()->where(['game_id' => $game_id, 'type' => GameCard::TYPE_IN_PLAYER, 'player_num' => 1])->orderBy('type_ord asc')->all();
-                $guestCard = GameCard::find()->where(['game_id' => $game_id, 'type' => GameCard::TYPE_IN_PLAYER, 'player_num' => 2])->orderBy('type_ord asc')->all();
+            $room_player = RoomPlayer::find()->where(['user_id' => $user_id, 'room_id' => $game->room_id])->one();
+            if ($room_player) {
+                $player_is_host = $room_player->is_host;
+                //房主手牌 序号 0~4
+                $type_orders_is_host = [0,1,2,3,4];
+                //来宾手牌 序号5~9
+                $type_orders_not_host = [5,6,7,8,9];
 
 
-                $master_hands = [];
+                $hostCard = GameCard::find()->where(['room_id' => $room_id, 'type' => GameCard::TYPE_IN_HAND, 'type_ord' => $type_orders_is_host])->orderBy('type_ord asc')->all();
+                $guestCard = GameCard::find()->where(['room_id' => $room_id, 'type' => GameCard::TYPE_IN_HAND, 'type_ord' => $type_orders_not_host])->orderBy('type_ord asc')->all();
+
+
+                $host_hands = [];
                 $guest_hands = [];
 
-                if($isMaster){
-                    foreach ($masterCard as $card) {
+                if($player_is_host){
+                    foreach ($hostCard as $card) {
                         $cardArr = [
                             'ord' => $card->type_ord
                         ];
-                        $master_hands[] = $cardArr;
+                        $host_hands[] = $cardArr;
                     }
 
                     foreach ($guestCard as $card) {
@@ -306,13 +308,13 @@ class Game extends ActiveRecord
                         $guest_hands[] = $cardArr;
                     }
                 }else{
-                    foreach ($masterCard as $card) {
+                    foreach ($hostCard as $card) {
                         $cardArr = [
                             'color' => $card->color,
                             'num' => $card->num,
                             'ord' => $card->type_ord
                         ];
-                        $master_hands[] = $cardArr;
+                        $host_hands[] = $cardArr;
                     }
 
 
@@ -325,9 +327,9 @@ class Game extends ActiveRecord
                 }
 
 
-                $libraryCardCount = GameCard::find()->where(['game_id' => $game_id, 'type' => GameCard::TYPE_IN_LIBRARY])->orderBy('type_ord asc')->count();
-                $tableCard = GameCard::find()->where(['game_id' => $game_id, 'type' => GameCard::TYPE_ON_TABLE])->orderBy('type_ord asc')->all();
-                $discardCardCount = GameCard::find()->where(['game_id' => $game_id, 'type' => GameCard::TYPE_IN_DISCARD])->orderBy('type_ord asc')->count();
+                $libraryCardCount = GameCard::find()->where(['room_id' => $room_id, 'type' => GameCard::TYPE_IN_LIBRARY])->orderBy('type_ord asc')->count();
+                $tableCard = GameCard::find()->where(['room_id' => $room_id, 'type' => GameCard::TYPE_SUCCESSED])->orderBy('type_ord asc')->all();
+                $discardCardCount = GameCard::find()->where(['room_id' => $room_id, 'type' => GameCard::TYPE_DISCARDED])->orderBy('type_ord asc')->count();
 
 
                 $table_cards = [];
@@ -336,7 +338,7 @@ class Game extends ActiveRecord
                     $table_cards[$card->color]++;
                 }
 
-                $data['master_hands'] = $master_hands;
+                $data['host_hands'] = $host_hands;
                 $data['guest_hands'] = $guest_hands;
                 $data['library_cards_num'] = $libraryCardCount;
                 $data['discard_cards_num'] = $discardCardCount;

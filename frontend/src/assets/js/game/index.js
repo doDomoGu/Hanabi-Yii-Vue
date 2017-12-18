@@ -53,17 +53,17 @@ export default {
     clearInterval(this.intervalid1)
   },
   computed : {
-    master_user:function(){
-      let user = this.$store.getters['my_room/master_user'];
-      user.cards = this.$store.getters['my_game/master_user_hand_cards'];
-      user.is_you = user.id === this.$store.getters['auth/user_id'];
-      return user;
+    host_player:function(){
+      let player = this.$store.getters['my_room/host_player'];
+      player.cards = this.$store.getters['my_game/host_hands'];
+      player.is_you = player.id === this.$store.getters['auth/user_id'];
+      return player;
     },
-    guest_user:function(){
-      let user = this.$store.getters['my_room/guest_user'];
-      user.cards = this.$store.getters['my_game/guest_user_hand_cards'];
-      user.is_you = user.id === this.$store.getters['auth/user_id'];
-      return user;
+    guest_player:function(){
+      let player = this.$store.getters['my_room/guest_player'];
+      player.cards = this.$store.getters['my_game/guest_hands'];
+      player.is_you = player.id === this.$store.getters['auth/user_id'];
+      return player;
     },
     library_cards_num:function(){
       return this.$store.getters['my_game/library_cards_num'];
