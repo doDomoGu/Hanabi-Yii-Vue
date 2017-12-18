@@ -174,34 +174,27 @@ class Game extends ActiveRecord
         $success = false;
         $msg = '';
         $user_id = Yii::$app->user->id;
-        $userRoomUser = RoomPlayer::find()->where(['user_id'=>$user_id])->all();
-        if(count($userRoomUser) == 1){
+        $room_player = RoomPlayer::find()->where(['user_id'=>$user_id])->one();
+        if($room_player){
             //TODO 暂时只有玩家1可以进行"开始游戏操作"
-            if($userRoomUser[0]->player_num==RoomPlayer::ROLE_TYPE_MASTER){
-                $room = Room::find()->where(['id'=>$userRoomUser[0]->room_id])->one();
+            if($room_player->is_host == 1){
+                $room = Room::find()->where(['id'=>$room_player->room_id])->one();
                 if($room){
-                    if($room->status==Room::STATUS_PLAYING){
-                        $userGame = Game::find()->where(['room_id'=>$room->id,'status'=>Game::STATUS_PLAYING])->all();
-                        if(count($userGame)==1) {
-                            $game = $userGame[0];
-                            // 1.修改游戏为结束状态
-                            $game->status = Game::STATUS_END;
-                            $game->save();
-                            // 2.修改房间为准备状态
-                            $room->status = Room::STATUS_PREPARING;
-                            $room->save();
-                            // 3.修改玩家2状态为"未准备"
-                            $guest_user = RoomPlayer::find()->where(['room_id'=>$room->id,'player_num'=>RoomPlayer::ROLE_TYPE_GUEST])->one();
-                            if($guest_user){
-                                $guest_user->is_ready = 0;
-                                $guest_user->save();
-                            }
-                            $success = true;
-                        }else{
-                            $msg = '你所在房间游戏未开始/或者有多个游戏，错误';
+                    $game = Game::find()->where(['room_id'=>$room->id,'status'=>Game::STATUS_PLAYING])->all();
+                    if($game) {
+                        // 1.删除游戏数据
+                        Game::deleteAll(['room_id'=>$room->id]);
+                        GameCard::deleteAll(['room_id'=>$room->id]);
+
+                        // 2.修改玩家2状态为"未准备"
+                        $guest_player = RoomPlayer::find()->where(['room_id'=>$room->id,'is_host'=>0])->one();
+                        if($guest_player){
+                            $guest_player->is_ready = 0;
+                            $guest_player->save();
                         }
+                        $success = true;
                     }else{
-                        $msg = '房间状态不是"游玩中"！(STATUS_PREPARING)';
+                        $msg = '你所在房间游戏未开始，错误';
                     }
                 }else{
                     $msg = '房间不存在！';
@@ -457,7 +450,7 @@ class Game extends ActiveRecord
         $game = Game::find()->where(['room_id'=>$room_id])->one();
         if($game){
             if($game->cue_num < self::DEFAULT_CUE){
-                $game->cue_num = $game->cue_num+1;
+                $game->cue_num = $game->cue_num + 1;
                 if($game->save())
                     return true;
             }
