@@ -67,4 +67,4 @@
 </template>
 
 <script src="@js/game/index.js"></script>
-<style src="@css/game/index.css"></style>
+<style lang="scss" src="@css/game/index.scss"></style>

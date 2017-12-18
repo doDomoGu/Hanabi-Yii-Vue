@@ -129,9 +129,11 @@
     text-align:left;
     margin-bottom:10px;
 }
-.yourself-card-operation > .discard-btn {
-    float:left;
-    margin-bottom:10px;
+.yourself-card-operation {
+    .discard-btn {
+        float:left;
+        margin-bottom:10px;
+    }
 }
 
 .yourself-card-operation > .change-card {
