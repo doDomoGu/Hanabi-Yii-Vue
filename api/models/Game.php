@@ -362,27 +362,24 @@ class Game extends ActiveRecord
         $msg = '';
         $data = [];
         $user_id = Yii::$app->user->id;
-        $userRoomUser = RoomPlayer::find()->where(['user_id'=>$user_id])->all();
-        if(count($userRoomUser) == 1){
-            $roomUser = $userRoomUser[0];
-            $userGame = Game::find()->where(['room_id'=>$roomUser->room_id,'status'=>Game::STATUS_PLAYING])->all();
-            if(count($userGame)==1){
-                $game = $userGame[0];
-                if($game->round_player==$roomUser->player_num){
-                    $gameCardCount = GameCard::find()->where(['game_id'=>$game->id])->count();
+        $room_player = RoomPlayer::find()->where(['user_id'=>$user_id])->one();
+        if($room_player){
+            $game = Game::find()->where(['room_id'=>$room_player->room_id,'status'=>Game::STATUS_PLAYING])->one();
+            if($game){
+                if($game->round_player_is_host==$room_player->is_host){
+                    $gameCardCount = GameCard::find()->where(['room_id'=>$game->room_id])->count();
                     if($gameCardCount==Card::CARD_NUM_ALL){
-                        $player_num = $userRoomUser[0]->player_num;
                         //丢弃一张牌
-                        GameCard::discardCard($game->id,$player_num,$ord);
+                        GameCard::discardCard($game->room_id,$ord);
 
                         //给这个玩家摸一张牌
-                        GameCard::drawCard($game->id,$player_num);
+                        GameCard::drawCard($game->room_id,$room_player->is_host);
 
                         //恢复一个提示数
-                        self::recoverCue($game->id);
+                        self::recoverCue($game->room_id);
 
                         //交换(下一个)回合
-                        self::changeRoundPlayer($game->id);
+                        self::changeRoundPlayer($game->room_id);
 
                         //插入日志 record
                         //TODO
@@ -406,8 +403,8 @@ class Game extends ActiveRecord
     }
 
 
-    private static function recoverCue($game_id){
-        $game = Game::find()->where(['id'=>$game_id])->one();
+    private static function recoverCue($room_id){
+        $game = Game::find()->where(['room_id'=>$room_id])->one();
         if($game){
             if($game->chance_num < self::DEFAULT_CUE){
                 $game->chance_num = $game->chance_num+1;
@@ -418,10 +415,10 @@ class Game extends ActiveRecord
         return false;
     }
 
-    private static function changeRoundPlayer($game_id){
-        $game = Game::find()->where(['id'=>$game_id])->one();
+    private static function changeRoundPlayer($room_id){
+        $game = Game::find()->where(['room_id'=>$room_id])->one();
         if($game){
-            $game->round_player = $game->round_player==1?2:1;
+            $game->round_player_is_host = $game->round_player_is_host==1?0:1;
             $game->round_num = $game->round_num+1;
             if($game->save())
                 return true;

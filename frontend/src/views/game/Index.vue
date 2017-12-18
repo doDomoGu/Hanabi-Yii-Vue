@@ -1,7 +1,7 @@
 <template>
     <div id="game">
         <section :class="'player-block' + (host_player.is_you?' is_you':'')">
-            <div class="player-name">房主： {{'('+host_player.id+')'+host_player.name}} {{round_player==1?'++':''}}</div>
+            <div class="player-name">房主： {{'('+host_player.id+')'+host_player.name}} {{round_player_is_host?'++':''}}</div>
 
             <div class="hand-card">
                 <li v-if="host_player.is_you===false" v-for="card in host_player.cards" :class="colors[card.color]+'-color'"
@@ -29,7 +29,7 @@
         </section>
 
         <section :class="'player-block' + (guest_player.is_you?' is_you':'')">
-            <div class="player-name">玩家：{{'('+guest_player.id+')'+guest_player.name}} {{round_player==2?'++':''}}</div>
+            <div class="player-name">玩家：{{'('+guest_player.id+')'+guest_player.name}} {{round_player_is_host?'':'++'}}</div>
 
             <div class="hand-card">
                 <li v-if="guest_player.is_you===false"  v-for="card in guest_player.cards" :class="colors[card.color]+'-color'"
@@ -48,7 +48,7 @@
             </div>
             <div v-if="cardOperationType===0" class="yourself-card-operation">
                 <div class="selected-card-info">
-                    {{cardSelectOrd}}
+                    {{cardSelectOrd+1}}
                 </div>
                 <div class="discard-btn">
                     是否要弃掉这张牌

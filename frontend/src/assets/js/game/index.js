@@ -26,7 +26,7 @@ export default {
 
       this.$store.dispatch(
         'common/SetTitle',
-        this.$store.getters['common/title_suffix']+' - '+(this.$store.getters['my_game/game_id']>0?'游戏中':'错误')
+        this.$store.getters['common/title_suffix']+' - '+(this.$store.getters['my_game/is_playing']>0?'游戏中':'错误')
       );
       this.getRoomInfo();
 
@@ -80,8 +80,8 @@ export default {
     table_cards:function(){
       return this.$store.getters['my_game/table_cards'];
     },
-    round_player:function(){
-      return this.$store.getters['my_game/round_player'];
+    round_player_is_host:function(){
+      return this.$store.getters['my_game/round_player_is_host'];
     }
   },
   methods: {

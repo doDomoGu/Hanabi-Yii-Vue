@@ -172,32 +172,43 @@ class GameCard extends ActiveRecord
     }
 
 
-    public static function discardCard($game_id,$player_num,$ord){
+    public static function discardCard($room_id,$ord){
         $return = false;
         //统计牌的总数 应该为50张
-        $count = self::find()->where(['game_id'=>$game_id])->count();
+        $count = self::find()->where(['room_id'=>$room_id])->count();
         if($count==Card::CARD_NUM_ALL){
             //所选择的牌
-            $cardSelected = self::find()->where(['game_id'=>$game_id,'type'=>self::TYPE_IN_PLAYER,'player_num'=>$player_num,'type_ord'=>$ord])->one();
+            $cardSelected = self::find()->where(['room_id'=>$room_id,'type'=>self::TYPE_IN_HAND,'type_ord'=>$ord])->one();
             if($cardSelected){
                 //将牌丢进弃牌堆
-                $cardSelected->type = self::TYPE_IN_DISCARD;
-                $cardSelected->type_ord = self::getInsertDiscardOrd($game_id);
-                $cardSelected->player_num = 0;
+                $cardSelected->type = self::TYPE_DISCARDED;
+                $cardSelected->type_ord = self::getInsertDiscardOrd($room_id);
                 $cardSelected->save();
 
-                //将排序靠后的手牌都往前移动
-                for($i = $ord+1;$i<=5;$i++){
-                    $otherCard = self::find()->where(['game_id'=>$game_id,'type'=>self::TYPE_IN_PLAYER,'player_num'=>$player_num,'type_ord'=>$i])->one();
-                    if($otherCard){
-                        $otherCard->type_ord = $otherCard->type_ord - 1;
-                        $otherCard->save();
-                    }
+                //根据type_ord 判断是否is_host
+                $type_ords = [];
+                $host_type_ords = [0,1,2,3,4];
+                $guest_type_ords = [5,6,7,8,9];
+                if(in_array($ord,$host_type_ords)){
+                    $type_ords = $host_type_ords;
+                }else if(in_array($ord,$guest_type_ords)){
+                    $type_ords = $guest_type_ords;
                 }
 
+                if(!empty($type_ords)){
+                    //将排序靠后的手牌都往前移动
+                    for($i = $ord+1;$i<=max($type_ords);$i++){
+                        $otherCard = self::find()->where(['room_id'=>$room_id,'type'=>self::TYPE_IN_HAND,'type_ord'=>$i])->one();
+                        if($otherCard){
+                            $otherCard->type_ord = $otherCard->type_ord - 1;
+                            $otherCard->save();
+                        }
+                    }
 
-
-                $return = true;
+                    $return = true;
+                }else{
+                    echo '选择的手牌排序错误';
+                }
             }else{
                 echo '没有找到选择的牌';
             }
@@ -254,13 +265,13 @@ class GameCard extends ActiveRecord
         return $cardInfo;
     }*/
 
-    //获取当前应插入弃牌堆的ord数值，即当前弃牌堆最小排序的数值减1，没有则为49
-    private static function getInsertDiscardOrd($game_id){
-        $lastDiscardCard = GameCard::find()->where(['game_id'=>$game_id,'type'=>GameCard::TYPE_IN_DISCARD])->orderBy('type_ord desc')->one();
+    //获取当前应插入弃牌堆的ord数值，即当前弃牌堆最小排序的数值加1，没有则为0
+    private static function getInsertDiscardOrd($room_id){
+        $lastDiscardCard = GameCard::find()->where(['room_id'=>$room_id,'type'=>GameCard::TYPE_DISCARDED])->orderBy('type_ord desc')->one();
         if($lastDiscardCard){
             $ord = $lastDiscardCard->ord + 1;
         }else{
-            $ord = 1;
+            $ord = 0;
         }
         return $ord;
     }
