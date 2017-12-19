@@ -19,7 +19,7 @@ export default {
       this.intervalid1 = setInterval(()=>{
         this.getRoomInfo();
         this.$store.dispatch('my_game/IsInGame').then(()=>{
-          if(this.$store.getters['my_game/game_id']>0){
+          if(this.$store.getters['my_game/is_playing']){
             this.$router.push('/game');
           }
         });
@@ -61,7 +61,11 @@ export default {
       this.$store.dispatch('my_room/DoReady');
     },
     startGame(){
-      this.$store.dispatch('my_game/Start');
+      this.$store.dispatch('my_game/Start').then((res)=>{
+        if(res.success){
+          this.$router.push('/game');
+        }
+      })
     }
   }
 }
