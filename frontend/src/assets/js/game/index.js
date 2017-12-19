@@ -1,4 +1,4 @@
-//import { MessageBox} from 'mint-ui';
+import { MessageBox} from 'mint-ui';
 //import { XDialog, XButton, Group, XSwitch, TransferDomDirective as TransferDom } from 'vux'
 import  XDialog from 'vux/src/components/x-dialog'
 export default {
@@ -36,7 +36,7 @@ export default {
         this.getGameInfo();
 
         this.$store.dispatch('my_game/IsInGame').then(()=>{
-          if(this.$store.getters['my_game/game_id'] === 0){
+          if(!this.$store.getters['my_game/is_playing']){
             clearInterval(this.intervalid1)
 
             MessageBox('提示', '游戏已结束').then(action => {
