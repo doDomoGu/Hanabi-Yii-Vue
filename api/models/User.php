@@ -52,17 +52,7 @@ class User extends ActiveRecord implements IdentityInterface
 				],
                 'value' => new Expression('NOW()'),  //时间戳（数字型）转为 日期字符串
                 //'value'=>$this->timeTemp(),
-            ],
-            [
-                'class'      => AttributeBehavior::className(),
-                'attributes' => [
-                    ActiveRecord::EVENT_BEFORE_INSERT => 'password',
-                    ActiveRecord::EVENT_BEFORE_UPDATE => 'password',
-                ],
-                'value'      => function ($event) {
-                    return md5($event->data);  //密码 md5变换
-                },
-            ],
+            ]
         ];
     }
 
@@ -72,13 +62,12 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['username', 'password', 'nickname', 'mobile', 'email'], 'required'],
+            [['username', 'password', 'nickname', 'mobile'], 'required'],
             [['gender', 'status'], 'integer'],
             [['birthday', 'created_at', 'updated_at'], 'safe'],
             [['username', 'password', 'nickname', 'mobile', 'email', 'avatar'], 'string', 'max' => 255],
             [['username'], 'unique'],
             [['mobile'], 'unique'],
-            [['email'], 'unique'],
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED, self::STATUS_BANNED]],
         ];

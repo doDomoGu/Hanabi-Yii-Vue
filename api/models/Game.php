@@ -36,7 +36,7 @@ class Game extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'game';
+        return '{{%game}}';
     }
 
 

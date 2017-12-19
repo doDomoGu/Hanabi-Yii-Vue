@@ -3,7 +3,9 @@
 namespace app\models;
 
 use Yii;
-
+use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
+use yii\db\Expression;
 /**
  * UserAuth model
  *
@@ -22,6 +24,20 @@ class UserAuth extends \yii\db\ActiveRecord
     {
         return '{{%user_auth}}';
     }
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['created_at']
+                ],
+                'value' => new Expression('NOW()'),  //时间戳（数字型）转为 日期字符串
+            ]
+        ];
+    }
+
 
     /**
      * @inheritdoc

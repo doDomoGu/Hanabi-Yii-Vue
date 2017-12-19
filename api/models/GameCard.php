@@ -30,7 +30,7 @@ class GameCard extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'game_card';
+        return '{{%game_card}}';
     }
 
     public function behaviors()
