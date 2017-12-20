@@ -9,7 +9,7 @@ const state = {
   discard_cards_num:0,
   cue_num:0,
   chance_num:0,
-  table_cards:[]
+  success_cards:[]
 };
 
 const actions = {
@@ -150,7 +150,7 @@ const getters = {
   discard_cards_num : state=>state.discard_cards_num,
   cue_num : state=>state.cue_num,
   chance_num : state=>state.chance_num,
-  table_cards : state=>state.table_cards
+  success_cards : state=>state.success_cards
 };
 
 const mutations = {
@@ -164,7 +164,7 @@ const mutations = {
     state.discard_cards_num = data.discard_cards_num;
     state.cue_num = data.cue_num;
     state.chance_num = data.chance_num;
-    state.table_cards = data.table_cards;
+    state.success_cards = data.success_cards;
   },
   SetGameInfo(state, data){
     state.round_player_is_host = data.round_player_is_host;
@@ -178,7 +178,7 @@ const mutations = {
     state.discard_cards_num = 0;
     state.cue_num = 0;
     state.chance_num = 0;
-    state.table_cards = [];
+    state.success_cards = [];
   },
 };
 

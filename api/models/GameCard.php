@@ -208,11 +208,10 @@ class GameCard extends ActiveRecord
             if($cardSelected){
                 $game = Game::find()->where(['room_id'=>$room_id])->one();
                 if($game){
-                    $cardsSuccessTop = self::getInsertDiscardOrd($room_id);
+                    $cardsSuccessTop = self::getCardsSuccessTop($room_id);
 
                     $colorTopNum = $cardsSuccessTop[$cardSelected->color]; //对应花色的目前成功的最大数值
                     $num = Card::$numbers[$cardSelected->num];              //选中牌的数值
-
                     if($colorTopNum + 1 == $num){
                         $cardSelected->type = GameCard::TYPE_SUCCESSED;
                         $cardSelected->type_ord = 0;

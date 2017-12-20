@@ -336,7 +336,7 @@ class Game extends ActiveRecord
                 $data['library_cards_num'] = $libraryCardCount;
                 $data['discard_cards_num'] = $discardCardCount;
 
-                $data['table_cards'] = $table_cards;
+                $data['success_cards'] = $table_cards;
 
                 $data['cue_num'] = $game->cue_num;
                 $data['chance_num'] = $game->chance_num;
@@ -418,7 +418,7 @@ class Game extends ActiveRecord
                             //恢复一个提示数
                             self::recoverCue($game->room_id);
                         }else{
-                            //恢复一个提示数
+                            //消耗一次机会
                             self::useChance($game->room_id);
                         }
 

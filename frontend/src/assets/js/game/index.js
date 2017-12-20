@@ -77,8 +77,8 @@ export default {
     discard_cards_num:function(){
       return this.$store.getters['my_game/discard_cards_num'];
     },
-    table_cards:function(){
-      return this.$store.getters['my_game/table_cards'];
+    success_cards:function(){
+      return this.$store.getters['my_game/success_cards'];
     },
     round_player_is_host:function(){
       return this.$store.getters['my_game/round_player_is_host'];

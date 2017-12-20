@@ -21,7 +21,7 @@
                 <br/>机会数: {{chance_num}}
             </div>
             <div class="table-block">
-                2222
+                <li v-for="(color,c_key) in colors" :class="colors[c_key]+'-color'">{{success_cards[c_key]}}</li>
             </div>
             <div class="discard-block">
                 弃牌<br/>{{discard_cards_num}}张
@@ -60,7 +60,7 @@
                 </div>
                 <div class="play-btn">
                     是否要打出这张牌
-                    <mt-button type="success" size="small" @click.native="doPlay">
+                    <mt-button type="primary" size="small" @click.native="doPlay">
                         打出
                     </mt-button>
                 </div>
