@@ -45,12 +45,12 @@
         <x-dialog :show.sync="cardOperationShow" hide-on-blur :on-hide="clearSelect" class="">
             <div v-if="cardOperationType===1" class="opposite-card-operation">
                 <div class="selected-card-info">
-                    {{cardSelectOrd+1}}
+                    <span :class="colors[cardSelectColor]+'-color'">{{numbers[cardSelectNum]}}</span>
                 </div>
             </div>
             <div v-if="cardOperationType===0" class="yourself-card-operation">
                 <div class="selected-card-info">
-                    {{cardSelectOrd+1}}
+                    {{is_host?cardSelectOrd+1:cardSelectOrd+1-5}}
                 </div>
                 <div class="discard-btn">
                     是否要弃掉这张牌
@@ -66,7 +66,7 @@
                 </div>
                 <div class="change-card">
                     <div>选择一张牌，与之调换位置</div>
-                    <li v-for="ordOne in [1,2,3,4,5]" class="no-color" @click="" v-if="ordOne!==cardSelectOrd">{{ordOne}}</li>
+                    <li v-for="ordOne in [0,1,2,3,4]" class="no-color" @click="" v-if="ordOne!==(is_host?cardSelectOrd:cardSelectOrd-5)">{{ordOne+1}}</li>
                 </div>
             </div>
         </x-dialog>

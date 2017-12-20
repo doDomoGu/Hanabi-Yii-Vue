@@ -187,3 +187,40 @@
   background-color: #8f8f8b;
   text-align:left;
 }
+
+.opposite-card-operation {
+    padding:10px;
+    > .selected-card-info {
+        float:left;
+        overflow: hidden;
+        > span {
+            width:36px;
+            height:60px;
+            display: block;
+            border:1px solid #2c3e50;
+            overflow: hidden;
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            border-radius: 4px;
+            font-size:32px;
+            &.white-color {
+                background-color: #cdcdcd;
+            }
+            &.blue-color {
+                background-color: #4f82c3;
+            }
+            &.yellow-color {
+                background-color: #c3c30d;
+            }
+            &.red-color {
+                background-color: #c33b00;
+            }
+            &.green-color {
+                background-color: #3ac34b;
+            }
+            &.no-color {
+                background-color: #8f8f8b;
+            }
+        }
+    }
+}

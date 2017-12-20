@@ -242,7 +242,11 @@ class Game extends ActiveRecord
                 if($gameCardCount==Card::CARD_NUM_ALL){
 
                     $cache = Yii::$app->cache;
-                    $cache_key = 'game_info_'.$game->room_id.'_no_update';  //存在则不更新游戏信息
+                    if($room_player->is_host){
+                        $cache_key  = 'game_info_'.$game->room_id.'_1_no_update';  //存在则不更新游戏信息
+                    }else{
+                        $cache_key  = 'game_info_'.$game->room_id.'_0_no_update';  //存在则不更新游戏信息
+                    }
                     $cache_data = $cache->get($cache_key);
                     if(!$forceUpdate && $cache_data){
                         $data = ['no_update'=>true];
@@ -255,18 +259,9 @@ class Game extends ActiveRecord
                         $cardInfo = self::getCardInfo($game->room_id);
                         $data['card'] = $cardInfo;
 
+
                         $cache->set($cache_key,true);
                     }
-
-                    /*if ($cache_data === false || json_encode($cache_data)!==json_encode($data)) {
-                        $cache_data = $data;
-                        $cache->set($cache_key, $cache_data, 60*60);
-                        $data['update'] = true;
-                    }else{
-                        $data['update'] = false;
-                    }*/
-
-
 
                     $success = true;
                 }else{
@@ -399,8 +394,10 @@ class Game extends ActiveRecord
                         //TODO
 
                         $cache = Yii::$app->cache;
-                        $cache_key = 'game_info_'.$game->room_id.'_no_update';
+                        $cache_key = 'game_info_'.$game->room_id.'_1_no_update';
+                        $cache_key2 = 'game_info_'.$game->room_id.'_0_no_update';
                         $cache->set($cache_key,false);
+                        $cache->set($cache_key2,false);
 
                         $success = true;
                     }else{
@@ -454,8 +451,10 @@ class Game extends ActiveRecord
                         //TODO
 
                         $cache = Yii::$app->cache;
-                        $cache_key = 'game_info_'.$game->room_id.'_no_update';
+                        $cache_key = 'game_info_'.$game->room_id.'_1_no_update';
+                        $cache_key2 = 'game_info_'.$game->room_id.'_0_no_update';
                         $cache->set($cache_key,false);
+                        $cache->set($cache_key2,false);
 
                     }else{
                         $msg = '总卡牌数错误';

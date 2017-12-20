@@ -99,7 +99,7 @@ export default {
       //cards所有手牌
       //card选中的手牌
       //type 0:自己的手牌 1:对手的手牌
-      let index = cards.indexOf(card); //序号 从左至右 0-4
+      //let index = cards.indexOf(card); //序号 从左至右 0-4
 
       if(type===0){
         this.cardSelectOrd = card.ord;
