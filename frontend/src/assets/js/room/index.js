@@ -30,14 +30,15 @@ export default {
     clearInterval(this.intervalid1)
   },
   computed : {
-    host_player:function(){
+    is_host :function() {
+      return this.$store.getters['my_room/is_host']
+    },
+    host_player :function(){
       let user = this.$store.getters['my_room/host_player'];
-      user.is_you = user.id === this.$store.getters['auth/user_id'];
       return user;
     },
     guest_player:function(){
       let user = this.$store.getters['my_room/guest_player'];
-      user.is_you = user.id === this.$store.getters['auth/user_id'];
       return user;
     }
   },

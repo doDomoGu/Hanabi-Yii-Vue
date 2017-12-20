@@ -123,7 +123,7 @@ class Room extends ActiveRecord
         $room_player = RoomPlayer::find()->where(['user_id'=>$user_id])->one();
         if($room_player){
             $room_id = $room_player->room_id;
-            $is_host = $room_player->is_host;
+            $is_host = $room_player->is_host==1;
             $success = true;
         }else{
             $msg = '不在房间中';
@@ -174,7 +174,6 @@ class Room extends ActiveRecord
                 'name'=>'',
                 'is_ready'=>false
             ],
-            //'is_playing'=>false
         ];
         $user_id = Yii::$app->user->id;
         $room_player = RoomPlayer::find()->where(['user_id'=>$user_id])->one();
@@ -201,8 +200,6 @@ class Room extends ActiveRecord
                             ];
                         }
                     }
-                    //$data['is_playing'] = $->status == self::STATUS_PLAYING?true:false;
-
                     $success = true;
                 }
             }else{

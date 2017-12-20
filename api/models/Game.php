@@ -242,7 +242,7 @@ class Game extends ActiveRecord
                 if($gameCardCount==Card::CARD_NUM_ALL){
                     $data['game'] = [
                         'round_num'=>$game->round_num,
-                        'round_player_is_host'=>$game->round_player_is_host,
+                        'round_player_is_host'=>$game->round_player_is_host==1,
                     ];
 
                     $cardInfo = self::getCardInfo($game->room_id);

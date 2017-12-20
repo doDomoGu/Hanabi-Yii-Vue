@@ -4,7 +4,8 @@ const state = {
   is_playing:false,
   host_hands:[],
   guest_hands:[],
-  round_player_is_host:-1,
+  round_num:-1,
+  round_player_is_host:false,
   library_cards_num:-1,
   discard_cards_num:-1,
   cue_num:-1,
@@ -143,9 +144,9 @@ const actions = {
 
 const getters = {
   is_playing : state=>state.is_playing,
-  player_is_host: state=>state.player_is_host,
   host_hands : state=>state.host_hands,
   guest_hands : state=>state.guest_hands,
+  round_num : state=>state.round_num,
   round_player_is_host : state=>state.round_player_is_host,
   library_cards_num : state=>state.library_cards_num,
   discard_cards_num : state=>state.discard_cards_num,
@@ -168,19 +169,19 @@ const mutations = {
     state.success_cards = data.success_cards;
   },
   SetGameInfo(state, data){
+    state.round_num = data.round_num;
     state.round_player_is_host = data.round_player_is_host;
-    state.player_is_host = data.player_is_host;
   },
   ClearInfo(state){
     state.is_playing = false;
-    state.player_is_host = false;
     state.host_hands = [];
     state.guest_hands = [];
-    state.round_player = 0;
-    state.library_cards_num = 0;
-    state.discard_cards_num = 0;
-    state.cue_num = 0;
-    state.chance_num = 0;
+    state.round_num = -1;
+    state.round_player_is_host = false;
+    state.library_cards_num = -1;
+    state.discard_cards_num = -1;
+    state.cue_num = -1;
+    state.chance_num = -1;
     state.success_cards = [];
   },
 };

@@ -2,7 +2,7 @@ import axios from '../../axios'
 
 const state = {
   room_id:-1,
-  is_host:-1,
+  is_host:false,
   host_player:{
     id:-1,
     username:null,
@@ -132,7 +132,7 @@ const mutations = {
     state.guest_player = data.guest_player;
   },
   ClearIsHost(state){
-    state.is_host = -1;
+    state.is_host = false;
   },
   ClearRoomId(state){
     state.room_id = -1;
