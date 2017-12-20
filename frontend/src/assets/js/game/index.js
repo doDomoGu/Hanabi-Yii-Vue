@@ -1,13 +1,13 @@
-import { MessageBox} from 'mint-ui';
-//import { XDialog, XButton, Group, XSwitch, TransferDomDirective as TransferDom } from 'vux'
+import { MessageBox } from 'mint-ui'
 import  XDialog from 'vux/src/components/x-dialog'
 export default {
   name: 'game',
   components: {
-    XDialog,
+    XDialog
   },
   data () {
     return {
+      //player_is_host:
       colors:['white','blue','yellow','red','green'],
       numbers:[1,1,1,2,2,3,3,4,4,5],
       cardOperationShow:false,
@@ -15,7 +15,6 @@ export default {
       cardSelectOrd:-1,
       cardSelectColor:-1,
       cardSelectNum:-1,
-
     }
   },
   mounted: function(){

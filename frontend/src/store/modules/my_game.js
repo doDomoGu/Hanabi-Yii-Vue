@@ -5,10 +5,10 @@ const state = {
   host_hands:[],
   guest_hands:[],
   round_player_is_host:-1,
-  library_cards_num:0,
-  discard_cards_num:0,
-  cue_num:0,
-  chance_num:0,
+  library_cards_num:-1,
+  discard_cards_num:-1,
+  cue_num:-1,
+  chance_num:-1,
   success_cards:[]
 };
 
@@ -143,6 +143,7 @@ const actions = {
 
 const getters = {
   is_playing : state=>state.is_playing,
+  player_is_host: state=>state.player_is_host,
   host_hands : state=>state.host_hands,
   guest_hands : state=>state.guest_hands,
   round_player_is_host : state=>state.round_player_is_host,
@@ -168,9 +169,11 @@ const mutations = {
   },
   SetGameInfo(state, data){
     state.round_player_is_host = data.round_player_is_host;
+    state.player_is_host = data.player_is_host;
   },
   ClearInfo(state){
     state.is_playing = false;
+    state.player_is_host = false;
     state.host_hands = [];
     state.guest_hands = [];
     state.round_player = 0;

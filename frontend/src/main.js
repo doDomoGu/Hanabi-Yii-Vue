@@ -5,19 +5,11 @@ import router from './router'
 import store from './store'
 
 import Mint from 'mint-ui';
-
 Vue.use(Mint);
-
-/*import { Button, Cell } from 'mint-ui'
-Vue.component(Button.name, Button)
-Vue.component(Cell.name, Cell)*/
-
 import 'mint-ui/lib/style.css'
-
 
 /*import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-
 Vue.use(ElementUI);*/
 
 

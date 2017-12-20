@@ -1,16 +1,17 @@
 import axios from '../../axios'
 
 const state = {
-  room_id:0,
+  room_id:-1,
+  is_host:-1,
   host_player:{
-    id:0,
-    username:"",
-    name:""
+    id:-1,
+    username:null,
+    name:null
   },
   guest_player:{
-    id:0,
-    username:"",
-    name:""
+    id:-1,
+    username:null,
+    name:null
   },
 };
 
@@ -58,8 +59,10 @@ const actions = {
 
         if(res.data.success){
           commit('SetRoomId',res.data.data.room_id);
+          commit('SetIsHost',res.data.data.is_host);
         }else{
           commit('ClearRoomId');
+          commit('ClearIsHost');
         }
 
         resolve(res.data);
@@ -112,6 +115,7 @@ const actions = {
 
 const getters = {
   room_id:state=>state.room_id,
+  is_host:state=>state.is_host,
   host_player:state=>state.host_player,
   guest_player:state=>state.guest_player,
 };
@@ -120,23 +124,29 @@ const mutations = {
   SetRoomId(state, room_id){
     state.room_id = room_id;
   },
+  SetIsHost(state, is_host){
+    state.is_host = is_host;
+  },
   SetRoomPlayer(state, data){
     state.host_player = data.host_player;
     state.guest_player = data.guest_player;
   },
+  ClearIsHost(state){
+    state.is_host = -1;
+  },
   ClearRoomId(state){
-    state.room_id = 0;
+    state.room_id = -1;
   },
   ClearRoomPlayer(state){
     state.host_player = {
-      id:0,
-      username:"",
-      name:""
+      id:-1,
+      username:null,
+      name:null
     };
     state.guest_player = {
-      id:0,
-      username:"",
-      name:""
+      id:-1,
+      username:null,
+      name:null
     };
   }
 };
