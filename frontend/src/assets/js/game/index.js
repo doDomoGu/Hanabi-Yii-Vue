@@ -7,7 +7,6 @@ export default {
   },
   data () {
     return {
-      //player_is_host:
       colors:['white','blue','yellow','red','green'],
       numbers:[1,1,1,2,2,3,3,4,4,5],
       cardOperationShow:false,
@@ -27,7 +26,9 @@ export default {
         'common/SetTitle',
         this.$store.getters['common/title_suffix']+' - '+(this.$store.getters['my_game/is_playing']>0?'游戏中':'错误')
       );
-      this.getRoomInfo();
+      this.$store.dispatch('my_room/IsInRoom');
+
+      this.$store.dispatch('my_room/GetRoomInfo');
 
       this.getGameInfo();
 
@@ -52,17 +53,20 @@ export default {
     clearInterval(this.intervalid1)
   },
   computed : {
+    is_host:function(){
+      return this.$store.getters['my_room/is_host'];
+    },
     host_player:function(){
-      let player = this.$store.getters['my_room/host_player'];
-      player.cards = this.$store.getters['my_game/host_hands'];
-      player.is_you = player.id === this.$store.getters['auth/user_id'];
-      return player;
+      return this.$store.getters['my_room/host_player'];
     },
     guest_player:function(){
-      let player = this.$store.getters['my_room/guest_player'];
-      player.cards = this.$store.getters['my_game/guest_hands'];
-      player.is_you = player.id === this.$store.getters['auth/user_id'];
-      return player;
+      return this.$store.getters['my_room/guest_player'];
+    },
+    host_hands:function(){
+      return this.$store.getters['my_game/host_hands'];
+    },
+    guest_hands:function(){
+      return this.$store.getters['my_game/guest_hands'];
     },
     library_cards_num:function(){
       return this.$store.getters['my_game/library_cards_num'];
@@ -86,9 +90,6 @@ export default {
   methods: {
     getGameInfo(){
       this.$store.dispatch('my_game/GetGameInfo');
-    },
-    getRoomInfo(){
-      this.$store.dispatch('my_room/GetRoomInfo');
     },
     endGame(){
       this.$store.dispatch('my_game/End');

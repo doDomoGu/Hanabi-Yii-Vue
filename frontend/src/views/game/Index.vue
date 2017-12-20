@@ -1,14 +1,14 @@
 <template>
     <div id="game">
-        <section :class="'player-block' + (host_player.is_you?' is_you':'')">
+        <section :class="'player-block' + (is_host?' is_you':'')">
             <div class="player-name">房主： {{'('+host_player.id+')'+host_player.name}} {{round_player_is_host?'++':''}}</div>
 
             <div class="hand-card">
-                <li v-if="host_player.is_you===false" v-for="card in host_player.cards" :class="colors[card.color]+'-color'"
-                    @click="showCardOperation(host_player.cards,card,1)">
+                <li v-if="!is_host" v-for="card in host_hands" :class="colors[card.color]+'-color'"
+                    @click="showCardOperation(host_hands,card,1)">
                     <span>{{numbers[card.num]}}</span>
                 </li>
-                <li v-else class="no-color" @click="showCardOperation(host_player.cards,card,0)"></li>
+                <li v-else class="no-color" @click="showCardOperation(host_hands,card,0)"></li>
             </div>
         </section>
 
@@ -28,19 +28,19 @@
             </div>
         </section>
 
-        <section :class="'player-block' + (guest_player.is_you?' is_you':'')">
+        <section :class="'player-block' + (!is_host?' is_you':'')">
             <div class="player-name">玩家：{{'('+guest_player.id+')'+guest_player.name}} {{round_player_is_host?'':'++'}}</div>
 
             <div class="hand-card">
-                <li v-if="guest_player.is_you===false"  v-for="card in guest_player.cards" :class="colors[card.color]+'-color'"
-                    @click="showCardOperation(guest_player.cards,card,1)">
+                <li v-if="is_host"  v-for="card in guest_hands" :class="colors[card.color]+'-color'"
+                    @click="showCardOperation(guest_hands,card,1)">
                     <span>{{numbers[card.num]}}</span>
                 </li>
-                <li v-else class="no-color" @click="showCardOperation(guest_player.cards,card,0)"></li>
+                <li v-else class="no-color" @click="showCardOperation(guest_hands,card,0)"></li>
             </div>
         </section>
 
-        <mt-button v-if="host_player.is_you>0" @click.native="endGame" size="large" class="game-end-btn" type="danger">结束游戏</mt-button>
+        <mt-button v-if="is_host" @click.native="endGame" size="large" class="game-end-btn" type="danger">结束游戏</mt-button>
 
         <x-dialog :show.sync="cardOperationShow" hide-on-blur :on-hide="clearSelect" class="">
             <div v-if="cardOperationType===1" class="opposite-card-operation">
