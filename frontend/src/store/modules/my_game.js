@@ -62,9 +62,11 @@ const actions = {
       )
       .then((res) => {
         if(res.data.success){
-          commit('SetGameIsPlaying');
-          commit('SetGameInfo',res.data.data.game);
-          commit('SetCardInfo',res.data.data.card);
+          if(this.getters['my_game/round_num']<0 || res.data.data.update){
+            commit('SetGameInfo',res.data.data.game);
+            commit('SetCardInfo',res.data.data.card);
+          }
+
         }else{
           //commit('ClearInfo');
         }
@@ -83,7 +85,9 @@ const actions = {
       )
       .then((res) => {
         if(res.data.success){
-          commit('SetGameIsPlaying');
+          //if(this.getters['my_game/round_num']<0 || res.data.data.update) {
+            commit('SetGameIsPlaying');
+          //}
         }else{
           commit('ClearInfo');
         }

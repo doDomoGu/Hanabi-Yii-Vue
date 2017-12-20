@@ -247,6 +247,21 @@ class Game extends ActiveRecord
 
                     $cardInfo = self::getCardInfo($game->room_id);
                     $data['card'] = $cardInfo;
+
+                    $cache = Yii::$app->cache;
+                    $cache_key = 'game_info_'.$user_id;
+                    $cache_data = $cache->get($cache_key);
+
+                    if ($cache_data === false || json_encode($cache_data)!==json_encode($data)) {
+                        $cache_data = $data;
+                        $cache->set($cache_key, $cache_data, 60*60);
+                        $data['update'] = true;
+                    }else{
+                        $data['update'] = false;
+                    }
+
+
+
                     $success = true;
                 }else{
                     $msg = '总卡牌数错误';
