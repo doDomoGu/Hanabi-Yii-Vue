@@ -30,7 +30,9 @@ class MyGameController extends MyActiveController
     public function actionGetInfo(){
         $return = $this->return;
 
-        list($return['success'],$return['msg'],$return['data']) = Game::getInfo();
+        $forceUpdate = Yii::$app->request->post('forceUpdate');
+
+        list($return['success'],$return['msg'],$return['data']) = Game::getInfo($forceUpdate);
 
         return $return;
     }

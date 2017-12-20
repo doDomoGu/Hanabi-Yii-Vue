@@ -56,13 +56,17 @@ const actions = {
     });
   },
   GetGameInfo({commit}){
+    let _param = {};
+    if(this.getters['my_game/round_num']<0){
+      _param.forceUpdate = true;
+    }
     return new Promise((resolve, reject) => {
       axios.post(
-        '/my-game/get-info'+'?access_token='+this.getters['auth/token']
+        '/my-game/get-info'+'?access_token='+this.getters['auth/token'],_param
       )
       .then((res) => {
         if(res.data.success){
-          if(this.getters['my_game/round_num']<0 || res.data.data.update){
+          if(!res.data.data.no_update){
             commit('SetGameInfo',res.data.data.game);
             commit('SetCardInfo',res.data.data.card);
           }

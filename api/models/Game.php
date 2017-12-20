@@ -229,7 +229,7 @@ class Game extends ActiveRecord
         return [$success,$msg];
     }
 
-    public static function getInfo(){
+    public static function getInfo($forceUpdate=false){
         $success = false;
         $msg = '';
         $data = [];
@@ -240,25 +240,31 @@ class Game extends ActiveRecord
             if($game){
                 $gameCardCount = GameCard::find()->where(['room_id'=>$game->room_id])->count();
                 if($gameCardCount==Card::CARD_NUM_ALL){
-                    $data['game'] = [
-                        'round_num'=>$game->round_num,
-                        'round_player_is_host'=>$game->round_player_is_host==1,
-                    ];
-
-                    $cardInfo = self::getCardInfo($game->room_id);
-                    $data['card'] = $cardInfo;
 
                     $cache = Yii::$app->cache;
-                    $cache_key = 'game_info_'.$user_id;
+                    $cache_key = 'game_info_'.$game->room_id.'_no_update';  //存在则不更新游戏信息
                     $cache_data = $cache->get($cache_key);
+                    if(!$forceUpdate && $cache_data){
+                        $data = ['no_update'=>true];
+                    }else{
+                        $data['game'] = [
+                            'round_num'=>$game->round_num,
+                            'round_player_is_host'=>$game->round_player_is_host==1,
+                        ];
 
-                    if ($cache_data === false || json_encode($cache_data)!==json_encode($data)) {
+                        $cardInfo = self::getCardInfo($game->room_id);
+                        $data['card'] = $cardInfo;
+
+                        $cache->set($cache_key,true);
+                    }
+
+                    /*if ($cache_data === false || json_encode($cache_data)!==json_encode($data)) {
                         $cache_data = $data;
                         $cache->set($cache_key, $cache_data, 60*60);
                         $data['update'] = true;
                     }else{
                         $data['update'] = false;
-                    }
+                    }*/
 
 
 
@@ -392,6 +398,9 @@ class Game extends ActiveRecord
                         //插入日志 record
                         //TODO
 
+                        $cache = Yii::$app->cache;
+                        $cache_key = 'game_info_'.$game->room_id.'_no_update';
+                        $cache->set($cache_key,false);
 
                         $success = true;
                     }else{
@@ -443,6 +452,10 @@ class Game extends ActiveRecord
 
                         //插入日志 record
                         //TODO
+
+                        $cache = Yii::$app->cache;
+                        $cache_key = 'game_info_'.$game->room_id.'_no_update';
+                        $cache->set($cache_key,false);
 
                     }else{
                         $msg = '总卡牌数错误';
