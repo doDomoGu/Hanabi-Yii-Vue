@@ -238,6 +238,50 @@ class GameCard extends ActiveRecord
     }
 
 
+    public static function cue($room_id,$ord,$type){
+        $success = false;
+        $result = false;
+        //统计牌的总数 应该为50张
+        $count = self::find()->where(['room_id'=>$room_id])->count();
+        if($count==Card::CARD_NUM_ALL){
+            //所选择的牌
+            $cardSelected = self::find()->where(['room_id'=>$room_id,'type'=>self::TYPE_IN_HAND,'type_ord'=>$ord])->one();
+            if($cardSelected){
+                $game = Game::find()->where(['room_id'=>$room_id])->one();
+                if($game){
+
+
+
+
+                    $cardsSuccessTop = self::getCardsSuccessTop($room_id);
+
+                    $colorTopNum = $cardsSuccessTop[$cardSelected->color]; //对应花色的目前成功的最大数值
+                    $num = Card::$numbers[$cardSelected->num];              //选中牌的数值
+                    if($colorTopNum + 1 == $num){
+                        $cardSelected->type = GameCard::TYPE_SUCCESSED;
+                        $cardSelected->type_ord = 0;
+                        $cardSelected->save();
+                        $result = true;
+                    }else{
+                        $cardSelected->type = self::TYPE_DISCARDED;
+                        $cardSelected->type_ord = self::getInsertDiscardOrd($room_id);
+                        $cardSelected->save();
+                        $result = false;
+                    }
+                    self::moveHandCardsByLackOfCard($room_id,$ord);
+                    $success = true;
+                }else{
+                    echo '游戏未开始';
+                }
+            }else{
+                echo '没有找到选择的牌';
+            }
+        }else{
+            echo 'game card num wrong';
+        }
+        return [$success,$result];
+    }
+
     //交换手牌顺序
     /*public static function changePlayerCardOrd($game_id,$player,$cardId1,$cardId2){
         $card1 = self::find()->where(['game_id'=>$game_id,'type'=>self::TYPE_IN_PLAYER,'player'=>$player,'id'=>$cardId1,'status'=>1])->one();

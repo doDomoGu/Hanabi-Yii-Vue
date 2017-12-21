@@ -22,6 +22,7 @@ return [
     'POST '.$v.'/my-game/end' => $v.'/my-game/end',  //开始游戏
     'POST '.$v.'/my-game/do-discard' => $v.'/my-game/do-discard',  //弃牌
     'POST '.$v.'/my-game/do-play' => $v.'/my-game/do-play',  //出牌
+    'POST '.$v.'/my-game/do-cue' => $v.'/my-game/do-cue',  //提示
 
 
 

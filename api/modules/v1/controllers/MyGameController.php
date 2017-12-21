@@ -73,4 +73,15 @@ class MyGameController extends MyActiveController
 
         return $return;
     }
+
+    public function actionDoCue(){
+        $return = $this->return;
+
+        $ord = Yii::$app->request->post('cardSelectOrd');
+        $type = Yii::$app->request->post('cueType');
+
+        list($return['success'],$return['msg']) = Game::cue($ord,$type);
+
+        return $return;
+    }
 }

@@ -193,6 +193,7 @@
     > .selected-card-info {
         float:left;
         overflow: hidden;
+        margin-right:10px;
         > span {
             width:36px;
             height:60px;
@@ -221,6 +222,22 @@
             &.no-color {
                 background-color: #8f8f8b;
             }
+        }
+    }
+    > .cue-btn {
+        height:30px;
+        float:left;
+        width:200px;
+            > button {
+                font-size:12px;
+                padding:2px 4px;
+                height:20px;
+            }
+        &.cue-color {
+            background: #ab79c3;
+        }
+        &.cue-num {
+            background: #00acc3;
         }
     }
 }

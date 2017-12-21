@@ -136,6 +136,15 @@ export default {
         }
       })
     },
+    doCue(cue_type){
+      this.$store.dispatch('my_game/DoCue',[this.cardSelectOrd,cue_type]).then((res)=>{
+        if(res.success){
+          this.cardOperationShow = false;
+        }else{
+          alert(res.msg);
+        }
+      })
+    },
 
 
   }

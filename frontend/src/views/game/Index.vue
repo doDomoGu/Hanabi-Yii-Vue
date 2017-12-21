@@ -47,6 +47,20 @@
                 <div class="selected-card-info">
                     <span :class="colors[cardSelectColor]+'-color'">{{numbers[cardSelectNum]}}</span>
                 </div>
+                <div class="cue-btn cue-color">
+                    <!--提示与之相同颜色的卡牌-->
+                    提示颜色
+                    <mt-button type="primary" size="small" @click.native="doCue('color')">
+                        确定
+                    </mt-button>
+                </div>
+                <div class="cue-btn cue-num">
+                    <!--提示与之相同数字的卡牌-->
+                    提示数字
+                    <mt-button type="primary" size="small" @click.native="doCue('num')">
+                        确定
+                    </mt-button>
+                </div>
             </div>
             <div v-if="cardOperationType===0" class="yourself-card-operation">
                 <div class="selected-card-info">
