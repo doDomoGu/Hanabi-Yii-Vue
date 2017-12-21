@@ -18,6 +18,10 @@ use yii\db\Expression;
  */
 class History extends \yii\db\ActiveRecord
 {
+    const STATUS_PLAYING = 1;
+    const STATUS_END = 2;
+
+
     /**
      * @inheritdoc
      */

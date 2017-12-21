@@ -108,6 +108,26 @@ class Game extends ActiveRecord
                             if($guest_player){
                                 if($guest_player->is_ready==1){
                                     if(self::createOne($room->id)){
+
+                                        //新建log 相关
+                                        $history = new History();
+                                        $history->room_id = $room->id;
+                                        $history->status = History::STATUS_PLAYING;
+                                        $history->score = 0;
+                                        if($history->save()){
+                                            $historyPlayer = new HistoryPlayer();
+                                            $historyPlayer->history_id = $history->id;
+                                            $historyPlayer->user_id = $room_player->user_id;
+                                            $historyPlayer->is_host = 1;
+                                            $historyPlayer->save();
+
+                                            $historyPlayer = new HistoryPlayer();
+                                            $historyPlayer->history_id = $history->id;
+                                            $historyPlayer->user_id = $guest_player->user_id;
+                                            $historyPlayer->is_host = 0;
+                                            $historyPlayer->save();
+                                        }
+
                                         $success = true;
                                     }else{
                                         $msg = '创建游戏失败';
@@ -176,7 +196,7 @@ class Game extends ActiveRecord
         $user_id = Yii::$app->user->id;
         $room_player = RoomPlayer::find()->where(['user_id'=>$user_id])->one();
         if($room_player){
-            //TODO 暂时只有玩家1可以进行"开始游戏操作"
+            //TODO 暂时只有玩家1可以进行"结束游戏操作"
             if($room_player->is_host == 1){
                 $room = Room::find()->where(['id'=>$room_player->room_id])->one();
                 if($room){
@@ -191,6 +211,13 @@ class Game extends ActiveRecord
                         if($guest_player){
                             $guest_player->is_ready = 0;
                             $guest_player->save();
+                        }
+
+                        //游戏结束 修改日志状态
+                        $history = History::find()->where(['room_id'=>$room->id,'status'=>History::STATUS_PLAYING])->one();
+                        if($history){
+                            $history->status = History::STATUS_END;
+                            $history->save();
                         }
                         $success = true;
                     }else{
