@@ -101,10 +101,39 @@ class m171219_143428_init extends Migration
         ], $tableOptions);
         $this->addPrimaryKey('pk','{{%game_card}}',['room_id','ord']);
 
+        $this->createTable('{{%history}}', [
+            'id'            => $this->primaryKey(),
+            'room_id'       => $this->integer(11)->notNull()->unsigned(),
+            'status'        => $this->smallInteger(1)->notNull()->unsigned()->defaultValue(0),
+            'score'         => $this->string(5)->notNull(),
+            'created_at'    => $this->dateTime()->notNull(),
+            'updated_at'    => $this->dateTime()->notNull()
+        ], $tableOptions);
+
+        $this->createTable('{{%history_log}}', [
+            'id'            => $this->primaryKey(),
+            'history_id'    => $this->integer(11)->notNull()->unsigned(),
+            'type'          => $this->smallInteger(1)->notNull()->unsigned()->defaultValue(0),
+            'content_param' => $this->text()->notNull(),
+            'content'       => $this->text()->notNull(),
+            'created_at'    => $this->dateTime()->notNull()
+        ], $tableOptions);
+
+
+        $this->createTable('{{%history_player}}', [
+            'history_id'    => $this->integer(11)->notNull()->unsigned(),
+            'user_id'       => $this->integer(11)->notNull()->unsigned(),
+            'is_host'       => $this->smallInteger(1)->notNull()->unsigned(),
+        ], $tableOptions);
+        $this->addPrimaryKey('pk','{{%history_player}}','history_id,user_id');
+
     }
 
     public function down()
     {
+        $this->dropTable('{{%history_player}}');
+        $this->dropTable('{{%history_log}}');
+        $this->dropTable('{{%history}}');
         $this->dropTable('{{%game_card}}');
         $this->dropTable('{{%game}}');
         $this->dropTable('{{%room_player}}');
