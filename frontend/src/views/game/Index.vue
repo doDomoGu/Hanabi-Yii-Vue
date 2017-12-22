@@ -27,6 +27,12 @@
                 弃牌<br/>{{discard_cards_num}}张
             </div>
         </section>
+        <section class="log-block">
+            游戏记录：
+            <div class="log-list">
+                1
+            </div>
+        </section>
 
         <section :class="'player-block' + (!is_host?' is_you':'')">
             <div class="player-name">玩家：{{'('+guest_player.id+')'+guest_player.name}} {{round_player_is_host?'':'++'}}</div>

@@ -241,3 +241,17 @@
         }
     }
 }
+
+/* log-block */
+
+.log-block {
+    overflow:hidden;
+    background: #c6dcbc;
+    margin-bottom: 10px;
+    padding:10px;
+    border-radius: 6px;
+    > .log-list {
+        border:1px solid #2c3e50;
+        background: #fefefe;
+    }
+}

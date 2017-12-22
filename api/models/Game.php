@@ -402,31 +402,52 @@ class Game extends ActiveRecord
         if($room_player){
             $game = Game::find()->where(['room_id'=>$room_player->room_id,'status'=>Game::STATUS_PLAYING])->one();
             if($game){
+                $room_id = $game->room_id;
                 if($game->round_player_is_host==$room_player->is_host){
-                    $gameCardCount = GameCard::find()->where(['room_id'=>$game->room_id])->count();
+                    $gameCardCount = GameCard::find()->where(['room_id'=>$room_id])->count();
+
                     if($gameCardCount==Card::CARD_NUM_ALL){
                         //丢弃一张牌
-                        GameCard::discardCard($game->room_id,$ord);
+                        list($discard_success,$card_ord) =GameCard::discardCard($room_id,$ord);
+                        if($discard_success){
+                            //给这个玩家摸一张牌
+                            GameCard::drawCard($room_id,$room_player->is_host);
 
-                        //给这个玩家摸一张牌
-                        GameCard::drawCard($game->room_id,$room_player->is_host);
+                            //恢复一个提示数
+                            self::recoverCue($room_id);
 
-                        //恢复一个提示数
-                        self::recoverCue($game->room_id);
 
-                        //交换(下一个)回合
-                        self::changeRoundPlayer($game->room_id);
 
-                        //插入日志 record
-                        //TODO
+                            //插入日志 record
+                            //TODO
+                            $history = History::find()->where(['room_id'=>$room_id,'status'=>History::STATUS_PLAYING])->one();
+                            if($history){
+                                list($get_content_success,$content_param,$content) = HistoryLog::getContentByDiscard($room_id,$card_ord);
+                                if($get_content_success){
+                                    $historyLog = new HistoryLog();
+                                    $historyLog->history_id = $history->id;
+                                    $historyLog->type = HistoryLog::TYPE_DISCARD_CARD;
+                                    $historyLog->content_param = $content_param;
+                                    $historyLog->content = $content;
+                                    $historyLog->save();
+                                    //var_dump($historyLog->errors);exit;
+                                }
+                            }
 
-                        $cache = Yii::$app->cache;
-                        $cache_key = 'game_info_'.$game->room_id.'_1_no_update';
-                        $cache_key2 = 'game_info_'.$game->room_id.'_0_no_update';
-                        $cache->set($cache_key,false);
-                        $cache->set($cache_key2,false);
+                            //交换(下一个)回合
+                            self::changeRoundPlayer($room_id);
 
-                        $success = true;
+                            $cache = Yii::$app->cache;
+                            $cache_key = 'game_info_'.$room_id.'_1_no_update';
+                            $cache_key2 = 'game_info_'.$room_id.'_0_no_update';
+                            $cache->set($cache_key,false);
+                            $cache->set($cache_key2,false);
+
+                            $success = true;
+                        }else{
+                            $msg = '弃牌发生问题';
+                        }
+
                     }else{
                         $msg = '总卡牌数错误';
                     }

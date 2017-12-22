@@ -173,28 +173,35 @@ class GameCard extends ActiveRecord
 
 
     public static function discardCard($room_id,$ord){
-        $return = false;
+        $success = false;
+        $card_ord = -1;
+        $msg = '';
         //统计牌的总数 应该为50张
         $count = self::find()->where(['room_id'=>$room_id])->count();
         if($count==Card::CARD_NUM_ALL){
             //所选择的牌
             $cardSelected = self::find()->where(['room_id'=>$room_id,'type'=>self::TYPE_IN_HAND,'type_ord'=>$ord])->one();
             if($cardSelected){
+                $card_ord = $cardSelected->ord;
                 //将牌丢进弃牌堆
                 $cardSelected->type = self::TYPE_DISCARDED;
                 $cardSelected->type_ord = self::getInsertDiscardOrd($room_id);
-                $cardSelected->save();
-
-                $return = self::moveHandCardsByLackOfCard($room_id,$ord);
-
-
+                if($cardSelected->save()){
+                    if(self::moveHandCardsByLackOfCard($room_id,$ord)){
+                        $success = true;
+                    }else{
+                        $msg = '补牌失败';
+                    }
+                }else{
+                    $msg = '弃牌失败';
+                }
             }else{
-                echo '没有找到选择的牌';
+                $msg = '没有找到选择的牌';
             }
         }else{
-            echo 'game card num wrong';
+            $msg = 'game card num wrong';
         }
-        return $return;
+        return [$success,$card_ord,$msg];
     }
 
     public static function playCard($room_id,$ord){
@@ -374,7 +381,7 @@ class GameCard extends ActiveRecord
 
             return true;
         }else{
-            echo '选择的手牌排序错误';
+            //echo '选择的手牌排序错误';
             return false;
         }
     }

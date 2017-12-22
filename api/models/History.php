@@ -16,7 +16,7 @@ use yii\db\Expression;
  * @property string $created_at
  * @property string $updated_at
  */
-class History extends \yii\db\ActiveRecord
+class History extends ActiveRecord
 {
     const STATUS_PLAYING = 1;
     const STATUS_END = 2;
@@ -51,9 +51,8 @@ class History extends \yii\db\ActiveRecord
     {
         return [
             [['room_id', 'status'], 'required'],
-            [['room_id', 'status'], 'integer'],
+            [['room_id', 'status','score'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
-            [['score'], 'string', 'max' => 4],
         ];
     }
 
