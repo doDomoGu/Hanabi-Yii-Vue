@@ -87,18 +87,30 @@ class HistoryLog extends \yii\db\ActiveRecord
             }*/
             $card = GameCard::find()->where(['room_id'=>$room_id,'ord'=>$card_ord])->one();
             if($card){
-                $param = [
+
+                $player = User::find()->where(['id'=>Yii::$app->user->id])->one();
+
+                $replace_param = [
                     'round_num'=>$round_num,
                     'card_color'=>$card->color,
                     'card_num'=>$card->num,
+                    'player_name'=>$player->nickname
                 ];
 
                 $template = '回合[round_num]:[player_name]丢弃了[card_color]-[card_num]';
 
-                $content = str_replace(array_keys($param),array_values($param),$template);
+                $param = array_merge(
+                    $replace_param,
+                    [
+                        'player_id'=>Yii::$app->user->id,
+                        'template'=>$template
+                    ]
+                );
 
-                $param['template'] = $template;
                 $content_param = json_encode($param);
+
+                $content = self::replaceContent($replace_param,$template);
+
                 $success = true;
             }
         }
@@ -107,7 +119,30 @@ class HistoryLog extends \yii\db\ActiveRecord
     }
 
 
-    /*private static function replaceContent($params,$template){
+    private static function replaceContent($param,$template){
+        $content = $template;
+        $search = [];
+        $replace = [];
+        foreach($param as $k=>$v){
+            if(in_array($k,['template'])){
+                continue;
+            }
 
-    }*/
+            $search[] = '['.$k.']';
+
+            if($k=='card_color'){
+                $replace[] = Card::$colors[$v];
+            }else if($k=='card_num'){
+                $replace[] = Card::$numbers[$v];
+            }else{
+                $replace[] = $v;
+            }
+        }
+
+        if(!empty($search)) {
+            $content = str_replace($search, $replace, $template);
+        }
+
+        return $content;
+    }
 }
