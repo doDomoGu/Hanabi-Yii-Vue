@@ -287,6 +287,9 @@ class Game extends ActiveRecord
                         $data['card'] = $cardInfo;
 
 
+                        list(,,$data['log']) = HistoryLog::getList($game->room_id);
+
+
                         $cache->set($cache_key,true);
                     }
 

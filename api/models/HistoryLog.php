@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use Symfony\Component\BrowserKit\History;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -144,5 +145,29 @@ class HistoryLog extends \yii\db\ActiveRecord
         }
 
         return $content;
+    }
+
+
+
+    public static function getList($room_id) {
+        $success = false;
+        $msg = '';
+        $data = [];
+        $game = Game::find()->where(['room_id' => $room_id, 'status' => Game::STATUS_PLAYING])->one();
+        if ($game) {
+            $history = History::find()->where(['room_id' => $room_id, 'status' => History::STATUS_PLAYING])->one();
+            if ($history) {
+                $logs = HistoryLog::find()->where(['history_id' => $history->id])->orderBy('created_at asc')->all();
+                foreach ($logs as $log) {
+                    $data[] = $log->content;
+                }
+                $success = true;
+            } else {
+                $msg = 'history不存在';
+            }
+        } else {
+            $msg = '游戏不存在';
+        }
+        return [$success,$msg,$data];
     }
 }

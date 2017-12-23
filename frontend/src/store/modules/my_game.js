@@ -2,6 +2,7 @@ import axios from '../../axios'
 
 const state = {
   is_playing:false,
+  log_list:[],
   host_hands:[],
   guest_hands:[],
   round_num:-1,
@@ -69,6 +70,7 @@ const actions = {
           if(!res.data.data.no_update){
             commit('SetGameInfo',res.data.data.game);
             commit('SetCardInfo',res.data.data.card);
+            commit('SetLogInfo',res.data.data.log);
           }
 
         }else{
@@ -175,6 +177,7 @@ const actions = {
 
 const getters = {
   is_playing : state=>state.is_playing,
+  log_list : state=>state.log_list,
   host_hands : state=>state.host_hands,
   guest_hands : state=>state.guest_hands,
   round_num : state=>state.round_num,
@@ -189,6 +192,9 @@ const getters = {
 const mutations = {
   SetGameIsPlaying(state){
     state.is_playing = true;
+  },
+  SetLogInfo(state,data){
+    state.log_list = data;
   },
   SetCardInfo(state,data){
     state.host_hands = data.host_hands;
@@ -205,6 +211,7 @@ const mutations = {
   },
   ClearInfo(state){
     state.is_playing = false;
+    state.log_list = [];
     state.host_hands = [];
     state.guest_hands = [];
     state.round_num = -1;

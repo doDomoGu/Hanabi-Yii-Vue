@@ -30,7 +30,7 @@
         <section class="log-block">
             游戏记录：
             <div class="log-list">
-                1
+                <li v-for="log in log_list">{{log}}</li>
             </div>
         </section>
 

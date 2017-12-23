@@ -85,6 +85,9 @@ export default {
     },
     round_player_is_host:function(){
       return this.$store.getters['my_game/round_player_is_host'];
+    },
+    log_list:function(){
+      return this.$store.getters['my_game/log_list'];
     }
   },
   methods: {
