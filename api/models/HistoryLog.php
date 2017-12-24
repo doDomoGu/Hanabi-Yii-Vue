@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-use Symfony\Component\BrowserKit\History;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
