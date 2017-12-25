@@ -79,12 +79,6 @@ class HistoryLog extends \yii\db\ActiveRecord
         $game = Game::find()->where(['room_id'=>$room_id,'status'=>Game::STATUS_PLAYING])->one();
         if($game){
             $round_num = $game->round_num;
-            //$round_player_is_host =  $game->
-            /*$host_player = RoomPlayer::find()->where(['room_id'=>$room_id,'is_host'=>1])->one();
-            $guest_player = RoomPlayer::find()->where(['room_id'=>$room_id,'is_host'=>0])->one();
-            if($host_player && $guest_player){
-                if()
-            }*/
             $card = GameCard::find()->where(['room_id'=>$room_id,'ord'=>$card_ord])->one();
             if($card){
 
@@ -102,6 +96,63 @@ class HistoryLog extends \yii\db\ActiveRecord
                 $param = array_merge(
                     $replace_param,
                     [
+                        'player_id'=>Yii::$app->user->id,
+                        'template'=>$template
+                    ]
+                );
+
+                $content_param = json_encode($param);
+
+                $content = self::replaceContent($replace_param,$template);
+
+                $success = true;
+            }
+        }
+
+        return [$success,$content_param,$content];
+    }
+
+    public static function getContentByCue($room_id,$card_ord,$cue_type,$cards_ord){
+        $success = false;
+        $content_param = '';
+        $content = '';
+        $game = Game::find()->where(['room_id'=>$room_id,'status'=>Game::STATUS_PLAYING])->one();
+        if($game){
+            $player_is_host = $game->round_player_is_host;
+            $round_num = $game->round_num;
+            $card = GameCard::find()->where(['room_id'=>$room_id,'ord'=>$card_ord])->one();
+            if($card){
+
+                $player = User::find()->where(['id'=>Yii::$app->user->id])->one();
+                $cards_ord2 = [];
+                foreach($cards_ord as $c){
+                    $cards_ord2[] = $player_is_host?$c+1:$c-5+1;
+                }
+
+                $cards_ord_str = implode(', ',$cards_ord2);
+                $replace_param = [
+                    'round_num'=>$round_num,
+                    'card_color'=>$card->color,
+                    'card_num'=>$card->num,
+                    'player_name'=>$player->nickname,
+                    'cards_ord_str'=>$cards_ord_str
+
+                ];
+
+                $template = '';
+
+                if($cue_type=='color'){
+                    $template = '回合[round_num]:[player_name]提示了第[cards_ord_str]张是[card_color]色';
+                }elseif($cue_type == 'num'){
+                    $template = '回合[round_num]:[player_name]提示了第[cards_ord_str]张是[card_num]';
+                }
+
+
+                $param = array_merge(
+                    $replace_param,
+                    [
+                        'cards_ord'=>$cards_ord,
+                        'cue_type'=>$cue_type,
                         'player_id'=>Yii::$app->user->id,
                         'template'=>$template
                     ]

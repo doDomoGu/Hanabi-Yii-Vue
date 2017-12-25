@@ -25,6 +25,8 @@ class GameCard extends ActiveRecord
     const TYPE_SUCCESSED = 3;
     const TYPE_DISCARDED = 4;
 
+    public static $host_hands_type_ord = [0,1,2,3,4];
+    public static $guest_hands_type_ord = [5,6,7,8,9];
     /**
      * @inheritdoc
      */
@@ -134,10 +136,10 @@ class GameCard extends ActiveRecord
                 //根据player_is_host 限制type_ord 范围
                 if($player_is_host==1){
                     //房主 序号 0~4
-                    $type_orders = [0,1,2,3,4];
+                    $type_orders = self::$host_hands_type_ord;
                 }else{
                     //来宾 序号5~9
-                    $type_orders = [5,6,7,8,9];
+                    $type_orders = self::$guest_hands_type_ord;
                 }
                 //最多5张手牌
                 $player_card_count = self::find()->where(['room_id'=>$room_id,'type'=>self::TYPE_IN_HAND,'type_ord'=>$type_orders])->count();
@@ -247,7 +249,7 @@ class GameCard extends ActiveRecord
 
     public static function cue($room_id,$ord,$type){
         $success = false;
-        $result = false;
+        $cards_ord = [];
         //统计牌的总数 应该为50张
         $count = self::find()->where(['room_id'=>$room_id])->count();
         if($count==Card::CARD_NUM_ALL){
@@ -256,27 +258,30 @@ class GameCard extends ActiveRecord
             if($cardSelected){
                 $game = Game::find()->where(['room_id'=>$room_id])->one();
                 if($game){
+                    $hands_ord = $game->round_player_is_host?self::$guest_hands_type_ord:self::$host_hands_type_ord;
 
 
+                    if($type=='color'){
+                        $cardCueList = self::find()->where(['room_id'=>$room_id,'type'=>self::TYPE_IN_HAND,'color'=>$cardSelected->color])->andWhere(['in','type_ord',$hands_ord])->orderby('type_ord asc')->all();
 
-
-                    $cardsSuccessTop = self::getCardsSuccessTop($room_id);
-
-                    $colorTopNum = $cardsSuccessTop[$cardSelected->color]; //对应花色的目前成功的最大数值
-                    $num = Card::$numbers[$cardSelected->num];              //选中牌的数值
-                    if($colorTopNum + 1 == $num){
-                        $cardSelected->type = GameCard::TYPE_SUCCESSED;
-                        $cardSelected->type_ord = 0;
-                        $cardSelected->save();
-                        $result = true;
+                    }elseif($type=='num'){
+                        $cardCueList = self::find()->where(['room_id'=>$room_id,'type'=>self::TYPE_IN_HAND])->andWhere(['in','num',Card::$numbers2[Card::$numbers[$cardSelected->num]]])->andWhere(['in','type_ord',$hands_ord])->orderby('type_ord asc')->all();
                     }else{
-                        $cardSelected->type = self::TYPE_DISCARDED;
-                        $cardSelected->type_ord = self::getInsertDiscardOrd($room_id);
-                        $cardSelected->save();
-                        $result = false;
+                        $msg = '提示类型不正确';
                     }
-                    self::moveHandCardsByLackOfCard($room_id,$ord);
-                    $success = true;
+
+                    if(isset($cardCueList) && !empty($cardCueList)){
+                        foreach($cardCueList as $c){
+                            $cards_ord[] = $c->type_ord;
+                        }
+                        $success = true;
+                    }else{
+                        $msg = '提示列表为空';
+                    }
+
+
+
+
                 }else{
                     echo '游戏未开始';
                 }
@@ -286,7 +291,7 @@ class GameCard extends ActiveRecord
         }else{
             echo 'game card num wrong';
         }
-        return [$success,$result];
+        return [$success,$cards_ord];
     }
 
     //交换手牌顺序
@@ -361,13 +366,12 @@ class GameCard extends ActiveRecord
     private static function moveHandCardsByLackOfCard($room_id,$ord){
         //根据type_ord 判断是否is_host
         $type_ords = [];
-        $host_type_ords = [0,1,2,3,4];
-        $guest_type_ords = [5,6,7,8,9];
-        if(in_array($ord,$host_type_ords)){
-            $type_ords = $host_type_ords;
-        }else if(in_array($ord,$guest_type_ords)){
-            $type_ords = $guest_type_ords;
+        if(in_array($ord,self::$host_hands_type_ord)){
+            $type_ords = self::$host_hands_type_ord;
+        }else if(in_array($ord,self::$guest_hands_type_ord)){
+            $type_ords = self::$guest_hands_type_ord;
         }
+
 
         if(!empty($type_ords)){
             //将排序靠后的手牌都往前移动

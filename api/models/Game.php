@@ -537,28 +537,45 @@ class Game extends ActiveRecord
                 if($game->round_player_is_host==$room_player->is_host){
                     $gameCardCount = GameCard::find()->where(['room_id'=>$game->room_id])->count();
                     if($gameCardCount==Card::CARD_NUM_ALL){
-                        //打出一张牌
-                        $success = GameCard::cue($game->room_id,$ord,$type);
+                        //提示一张牌
+                        list($success,$cards_ord) = GameCard::cue($game->room_id,$ord,$type);
 
                         if($success){
                             //消耗一个提示数
                             self::useCue($game->room_id);
+
                             //交换(下一个)回合
                             self::changeRoundPlayer($game->room_id);
+
+                            //插入日志 record
+                            //TODO
+                            $history = History::find()->where(['room_id'=>$game->room_id,'status'=>History::STATUS_PLAYING])->one();
+                            if($history){
+                                list($get_content_success,$content_param,$content) = HistoryLog::getContentByCue($game->room_id,$ord,$type,$cards_ord);
+                                if($get_content_success){
+                                    $historyLog = new HistoryLog();
+                                    $historyLog->history_id = $history->id;
+                                    $historyLog->type = HistoryLog::TYPE_DISCARD_CARD;
+                                    $historyLog->content_param = $content_param;
+                                    $historyLog->content = $content;
+                                    $historyLog->save();
+                                    //var_dump($historyLog->errors);exit;
+                                }
+                            }
+
+
+                            $cache = Yii::$app->cache;
+                            $cache_key = 'game_info_'.$game->room_id.'_1_no_update';
+                            $cache_key2 = 'game_info_'.$game->room_id.'_0_no_update';
+                            $cache->set($cache_key,false);
+                            $cache->set($cache_key2,false);
+
                         }else{
                             $msg = '提示失败';
                         }
 
 
 
-                        //插入日志 record
-                        //TODO
-
-                        /*$cache = Yii::$app->cache;
-                        $cache_key = 'game_info_'.$game->room_id.'_1_no_update';
-                        $cache_key2 = 'game_info_'.$game->room_id.'_0_no_update';
-                        $cache->set($cache_key,false);
-                        $cache->set($cache_key2,false);*/
 
                     }else{
                         $msg = '总卡牌数错误';
