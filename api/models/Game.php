@@ -541,12 +541,6 @@ class Game extends ActiveRecord
                         list($success,$cards_ord) = GameCard::cue($game->room_id,$ord,$type);
 
                         if($success){
-                            //消耗一个提示数
-                            self::useCue($game->room_id);
-
-                            //交换(下一个)回合
-                            self::changeRoundPlayer($game->room_id);
-
                             //插入日志 record
                             //TODO
                             $history = History::find()->where(['room_id'=>$game->room_id,'status'=>History::STATUS_PLAYING])->one();
@@ -562,6 +556,12 @@ class Game extends ActiveRecord
                                     //var_dump($historyLog->errors);exit;
                                 }
                             }
+
+                            //消耗一个提示数
+                            self::useCue($game->room_id);
+
+                            //交换(下一个)回合
+                            self::changeRoundPlayer($game->room_id);
 
 
                             $cache = Yii::$app->cache;

@@ -120,13 +120,13 @@ class HistoryLog extends \yii\db\ActiveRecord
         if($game){
             $player_is_host = $game->round_player_is_host;
             $round_num = $game->round_num;
-            $card = GameCard::find()->where(['room_id'=>$room_id,'ord'=>$card_ord])->one();
+            $card = GameCard::find()->where(['room_id'=>$room_id,'type_ord'=>$card_ord])->one();
             if($card){
 
                 $player = User::find()->where(['id'=>Yii::$app->user->id])->one();
                 $cards_ord2 = [];
                 foreach($cards_ord as $c){
-                    $cards_ord2[] = $player_is_host?$c+1:$c-5+1;
+                    $cards_ord2[] = $player_is_host?$c-5+1:$c+1;
                 }
 
                 $cards_ord_str = implode(', ',$cards_ord2);
@@ -136,7 +136,6 @@ class HistoryLog extends \yii\db\ActiveRecord
                     'card_num'=>$card->num,
                     'player_name'=>$player->nickname,
                     'cards_ord_str'=>$cards_ord_str
-
                 ];
 
                 $template = '';
