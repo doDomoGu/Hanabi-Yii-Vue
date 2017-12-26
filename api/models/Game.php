@@ -386,6 +386,7 @@ class Game extends ActiveRecord
 
                 $data['cue_num'] = $game->cue_num;
                 $data['chance_num'] = $game->chance_num;
+                $data['score'] = $game->score;
             }else{
                 //TODO
             }

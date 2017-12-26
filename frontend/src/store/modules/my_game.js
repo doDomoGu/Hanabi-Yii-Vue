@@ -11,6 +11,7 @@ const state = {
   discard_cards_num:-1,
   cue_num:-1,
   chance_num:-1,
+  score:-1,
   success_cards:[]
 };
 
@@ -186,6 +187,7 @@ const getters = {
   discard_cards_num : state=>state.discard_cards_num,
   cue_num : state=>state.cue_num,
   chance_num : state=>state.chance_num,
+  score : state=>state.score,
   success_cards : state=>state.success_cards
 };
 
@@ -203,6 +205,7 @@ const mutations = {
     state.discard_cards_num = data.discard_cards_num;
     state.cue_num = data.cue_num;
     state.chance_num = data.chance_num;
+    state.score = data.score;
     state.success_cards = data.success_cards;
   },
   SetGameInfo(state, data){
@@ -220,6 +223,7 @@ const mutations = {
     state.discard_cards_num = -1;
     state.cue_num = -1;
     state.chance_num = -1;
+    state.score = -1;
     state.success_cards = [];
   },
 };

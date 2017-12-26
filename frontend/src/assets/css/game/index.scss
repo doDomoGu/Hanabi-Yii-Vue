@@ -88,6 +88,7 @@
 .middle-block > .box-block {
     float:left;
     margin-right:10px;
+    font-size:12px;
 }
 
 
@@ -253,5 +254,12 @@
     > .log-list {
         border:1px solid #2c3e50;
         background: #fefefe;
+        height:100px;
+        overflow: scroll;
+        > li {
+            list-style: none;
+            padding-left:2px;
+            font-size:12px;
+        }
     }
 }

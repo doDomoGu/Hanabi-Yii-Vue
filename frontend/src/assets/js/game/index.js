@@ -77,6 +77,9 @@ export default {
     chance_num:function(){
       return this.$store.getters['my_game/chance_num'];
     },
+    score:function(){
+      return this.$store.getters['my_game/score'];
+    },
     discard_cards_num:function(){
       return this.$store.getters['my_game/discard_cards_num'];
     },

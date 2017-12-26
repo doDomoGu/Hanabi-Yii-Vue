@@ -17,8 +17,11 @@
                 牌库<br/>{{library_cards_num}}张
             </div>
             <div class="box-block">
-                提示数: {{cue_num}}
-                <br/>机会数: {{chance_num}}
+                提示: {{cue_num}}
+                <br/>
+                机会: {{chance_num}}
+                <br/>
+                得分: {{score}}
             </div>
             <div class="table-block">
                 <li v-for="(color,c_key) in colors" :class="colors[c_key]+'-color'">{{success_cards[c_key]}}</li>

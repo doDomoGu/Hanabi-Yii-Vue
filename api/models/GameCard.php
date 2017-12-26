@@ -225,6 +225,10 @@ class GameCard extends ActiveRecord
                         $cardSelected->type = GameCard::TYPE_SUCCESSED;
                         $cardSelected->type_ord = 0;
                         $cardSelected->save();
+
+                        $game->score +=1;
+                        $game->save();
+
                         $result = true;
                     }else{
                         $cardSelected->type = self::TYPE_DISCARDED;
