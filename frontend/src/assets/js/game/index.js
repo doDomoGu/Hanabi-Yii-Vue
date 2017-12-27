@@ -1,4 +1,4 @@
-import { MessageBox } from 'mint-ui'
+import { MessageBox,Toast } from 'mint-ui'
 import  XDialog from 'vux/src/components/x-dialog'
 export default {
   name: 'game',
@@ -135,7 +135,8 @@ export default {
         if(res.success){
           this.cardOperationShow = false;
         }else{
-          alert(res.msg);
+          this.cardOperationShow = false;
+          Toast(res.msg);
         }
       })
     },
@@ -144,7 +145,8 @@ export default {
         if(res.success){
           this.cardOperationShow = false;
         }else{
-          alert(res.msg);
+          this.cardOperationShow = false;
+          Toast(res.msg);
         }
       })
     },
@@ -153,7 +155,8 @@ export default {
         if(res.success){
           this.cardOperationShow = false;
         }else{
-          alert(res.msg);
+          this.cardOperationShow = false;
+          Toast(res.msg);
         }
       })
     },
