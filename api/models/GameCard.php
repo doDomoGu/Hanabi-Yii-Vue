@@ -209,6 +209,7 @@ class GameCard extends ActiveRecord
     public static function playCard($room_id,$ord){
         $success = false;
         $result = false;
+        $card_ord = -1;
         //统计牌的总数 应该为50张
         $count = self::find()->where(['room_id'=>$room_id])->count();
         if($count==Card::CARD_NUM_ALL){
@@ -236,6 +237,7 @@ class GameCard extends ActiveRecord
                         $cardSelected->save();
                         $result = false;
                     }
+                    $card_ord = $cardSelected->ord;
                     self::moveHandCardsByLackOfCard($room_id,$ord);
                     $success = true;
                 }else{
@@ -247,7 +249,7 @@ class GameCard extends ActiveRecord
         }else{
             echo 'game card num wrong';
         }
-        return [$success,$result];
+        return [$success,$result,$card_ord];
     }
 
 

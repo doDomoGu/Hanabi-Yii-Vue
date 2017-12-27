@@ -482,7 +482,7 @@ class Game extends ActiveRecord
                     $gameCardCount = GameCard::find()->where(['room_id'=>$game->room_id])->count();
                     if($gameCardCount==Card::CARD_NUM_ALL){
                         //打出一张牌
-                        list($success,$data['play_result']) = GameCard::playCard($game->room_id,$ord);
+                        list($success,$data['play_result'],$card_ord) = GameCard::playCard($game->room_id,$ord);
 
                         //给这个玩家摸一张牌
                         GameCard::drawCard($game->room_id,$room_player->is_host);
@@ -496,11 +496,27 @@ class Game extends ActiveRecord
                         }
 
 
+                        //插入日志 record
+                        $history = History::find()->where(['room_id'=>$game->room_id,'status'=>History::STATUS_PLAYING])->one();
+                        if($history){
+                            list($get_content_success,$content_param,$content) = HistoryLog::getContentByPlay($game->room_id,$card_ord,$data['play_result']);
+                            if($get_content_success){
+                                $historyLog = new HistoryLog();
+                                $historyLog->history_id = $history->id;
+                                $historyLog->type = HistoryLog::TYPE_PLAY_CARD;
+                                $historyLog->content_param = $content_param;
+                                $historyLog->content = $content;
+                                $historyLog->save();
+                                //var_dump($historyLog->errors);exit;
+                            }
+                        }
+
+
                         //交换(下一个)回合
                         self::changeRoundPlayer($game->room_id);
 
-                        //插入日志 record
-                        //TODO
+
+
 
                         $cache = Yii::$app->cache;
                         $cache_key = 'game_info_'.$game->room_id.'_1_no_update';
@@ -550,7 +566,7 @@ class Game extends ActiveRecord
                                 if($get_content_success){
                                     $historyLog = new HistoryLog();
                                     $historyLog->history_id = $history->id;
-                                    $historyLog->type = HistoryLog::TYPE_DISCARD_CARD;
+                                    $historyLog->type = HistoryLog::TYPE_CUE_CARD;
                                     $historyLog->content_param = $content_param;
                                     $historyLog->content = $content;
                                     $historyLog->save();

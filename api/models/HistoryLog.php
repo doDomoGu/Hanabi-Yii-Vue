@@ -88,10 +88,58 @@ class HistoryLog extends \yii\db\ActiveRecord
                     'round_num'=>$round_num,
                     'card_color'=>$card->color,
                     'card_num'=>$card->num,
-                    'player_name'=>$player->nickname
+                    'player_name'=>$player->nickname,
+                    'cue_num'=>$game->cue_num,
+                    'chance_num'=>$game->chance_num
                 ];
 
-                $template = '回合[round_num]:[player_name]丢弃了[card_color]-[card_num]';
+                $template = '回合[round_num]:[player_name]丢弃了[card_color]-[card_num],恢复一个提示次数[剩余提示次数:[cue_num]次]';
+
+                $param = array_merge(
+                    $replace_param,
+                    [
+                        'player_id'=>Yii::$app->user->id,
+                        'template'=>$template
+                    ]
+                );
+
+                $content_param = json_encode($param);
+
+                $content = self::replaceContent($replace_param,$template);
+
+                $success = true;
+            }
+        }
+
+        return [$success,$content_param,$content];
+    }
+
+    public static function getContentByPlay($room_id,$card_ord,$result){
+        $success = false;
+        $content_param = '';
+        $content = '';
+        $game = Game::find()->where(['room_id'=>$room_id,'status'=>Game::STATUS_PLAYING])->one();
+        if($game){
+            $round_num = $game->round_num;
+            $card = GameCard::find()->where(['room_id'=>$room_id,'ord'=>$card_ord])->one();
+            if($card){
+
+                $player = User::find()->where(['id'=>Yii::$app->user->id])->one();
+
+                $replace_param = [
+                    'round_num'=>$round_num,
+                    'play_result'=>$result,
+                    'card_color'=>$card->color,
+                    'card_num'=>$card->num,
+                    'player_name'=>$player->nickname,
+                    'cue_num'=>$game->cue_num,
+                    'chance_num'=>$game->chance_num
+                ];
+                if($result) {
+                    $template = '回合[round_num]:[player_name]成功地打出了[card_color]-[card_num],恢复一次提示此处[剩余提示次数:[cue_num]次]';
+                }else{
+                    $template = '回合[round_num]:[player_name]错误地打出了[card_color]-[card_num],失去一次机会[剩余机会次数:[chance_num]次]';
+                }
 
                 $param = array_merge(
                     $replace_param,
@@ -137,8 +185,8 @@ class HistoryLog extends \yii\db\ActiveRecord
                     'player_name'=>$player->nickname,
                     'cards_ord_str'=>$cards_ord_str
                 ];
-
                 $template = '';
+
 
                 if($cue_type=='color'){
                     $template = '回合[round_num]:[player_name]提示了第[cards_ord_str]张是[card_color]色';
