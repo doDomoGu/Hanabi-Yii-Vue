@@ -179,6 +179,13 @@ const actions = {
 const getters = {
   is_playing : state=>state.is_playing,
   log_list : state=>state.log_list,
+  log_list2 : state=>{
+    let list_tmp=[]
+    for(let i in state.log_list){
+      list_tmp.unshift(state.log_list[i]);
+    }
+    return list_tmp;
+  },
   host_hands : state=>state.host_hands,
   guest_hands : state=>state.guest_hands,
   round_num : state=>state.round_num,

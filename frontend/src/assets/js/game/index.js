@@ -90,9 +90,14 @@ export default {
       return this.$store.getters['my_game/round_player_is_host'];
     },
     log_list:function(){
-      return this.$store.getters['my_game/log_list'];
+      return this.$store.getters['my_game/log_list2'];
     }
   },
+  /*watch:{
+    log_list(){
+      document.getElementById('log-list').scrollTop(document.getElementById('log-list').clientHeight)
+    }
+  },*/
   methods: {
     getGameInfo(){
       this.$store.dispatch('my_game/GetGameInfo');
