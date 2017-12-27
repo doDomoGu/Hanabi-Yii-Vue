@@ -1,7 +1,7 @@
 <template>
     <div id="game">
         <section :class="'player-block' + (is_host?' is_you':'')">
-            <div class="player-name">房主： {{'('+host_player.id+')'+host_player.name}} {{round_player_is_host?'++':''}}</div>
+            <div class="player-name">房主： {{'('+host_player.id+')'+host_player.name}} {{round_player_is_host?'出牌中':''}}</div>
 
             <div class="hand-card">
                 <li v-if="!is_host" v-for="card in host_hands" :class="colors[card.color]+'-color'"
@@ -38,7 +38,7 @@
         </section>
 
         <section :class="'player-block' + (!is_host?' is_you':'')">
-            <div class="player-name">玩家：{{'('+guest_player.id+')'+guest_player.name}} {{round_player_is_host?'':'++'}}</div>
+            <div class="player-name">玩家：{{'('+guest_player.id+')'+guest_player.name}} {{round_player_is_host?'':'出牌中'}}</div>
 
             <div class="hand-card">
                 <li v-if="is_host"  v-for="card in guest_hands" :class="colors[card.color]+'-color'"

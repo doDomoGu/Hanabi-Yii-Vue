@@ -196,8 +196,8 @@ class Game extends ActiveRecord
         $user_id = Yii::$app->user->id;
         $room_player = RoomPlayer::find()->where(['user_id'=>$user_id])->one();
         if($room_player){
-            //TODO 暂时只有玩家1可以进行"结束游戏操作"
-            if($room_player->is_host == 1){
+            /*//TODO 暂时只有玩家1可以进行"结束游戏操作"
+            if($room_player->is_host == 1){*/
                 $room = Room::find()->where(['id'=>$room_player->room_id])->one();
                 if($room){
                     $game = Game::find()->where(['room_id'=>$room->id,'status'=>Game::STATUS_PLAYING])->all();
@@ -226,9 +226,9 @@ class Game extends ActiveRecord
                 }else{
                     $msg = '房间不存在！';
                 }
-            }else{
+            /*}else{
                 $msg = '玩家角色错误';
-            }
+            }*/
         }else{
             $msg = '你不在房间中/不止在一个房间中，错误';
         }
@@ -492,7 +492,12 @@ class Game extends ActiveRecord
                             self::recoverCue($game->room_id);
                         }else{
                             //消耗一次机会
-                            self::useChance($game->room_id);
+                            $chance_num = self::useChance($game->room_id);
+
+                            $result = self::checkGame();
+                            if(!$result){
+                                self::end();
+                            }
                         }
 
 
@@ -641,7 +646,7 @@ class Game extends ActiveRecord
             if($game->chance_num > 0){
                 $game->chance_num = $game->chance_num - 1;
                 if($game->save())
-                    return true;
+                    return [true,$game->chance_num];
             }
         }
         return false;
@@ -656,5 +661,38 @@ class Game extends ActiveRecord
                 return true;
         }
         return false;
+    }
+
+    private static function checkGame(){
+        $result = false;
+        $msg = '';
+        $user_id = Yii::$app->user->id;
+        $room_player = RoomPlayer::find()->where(['user_id'=>$user_id])->one();
+        if($room_player) {
+            $room = Room::find()->where(['id' => $room_player->room_id])->one();
+            if ($room) {
+                $game = Game::find()->where(['room_id' => $room->id])->one();
+                if ($game) {
+                    if ($game->status == Game::STATUS_PLAYING) {
+                        if ($game->chance_num > 0) {
+                            //TODO 更多检测
+
+                            $result = true;
+                        } else {
+                            $msg = '游戏剩余机会次数为0';
+                        }
+                    } else {
+                        $msg = '游戏不是游玩状态';
+                    }
+                } else {
+                    $msg = '游戏不存在';
+                }
+            }else{
+                $msg = '房间不存在';
+            }
+        }else{
+            $msg = '不在房间中';
+        }
+        return $result;
     }
 }

@@ -93,7 +93,7 @@ class HistoryLog extends \yii\db\ActiveRecord
                     'chance_num'=>$game->chance_num
                 ];
 
-                $template = '回合[round_num]:[player_name]丢弃了[card_color]-[card_num],恢复一个提示次数[剩余提示次数:[cue_num]次]';
+                $template = '回合[round_num]:[player_name]丢弃了[card_color]-[card_num],恢复一次提示[剩余提示次数:[cue_num]次]';
 
                 $param = array_merge(
                     $replace_param,
@@ -136,7 +136,7 @@ class HistoryLog extends \yii\db\ActiveRecord
                     'chance_num'=>$game->chance_num
                 ];
                 if($result) {
-                    $template = '回合[round_num]:[player_name]成功地打出了[card_color]-[card_num],恢复一次提示此处[剩余提示次数:[cue_num]次]';
+                    $template = '回合[round_num]:[player_name]成功地打出了[card_color]-[card_num],恢复一次提示[剩余提示次数:[cue_num]次]';
                 }else{
                     $template = '回合[round_num]:[player_name]错误地打出了[card_color]-[card_num],失去一次机会[剩余机会次数:[chance_num]次]';
                 }
