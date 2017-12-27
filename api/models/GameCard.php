@@ -174,7 +174,7 @@ class GameCard extends ActiveRecord
     }
 
 
-    public static function discardCard($room_id,$ord){
+    public static function discardCard($room_id,$type_ord){
         $success = false;
         $card_ord = -1;
         $msg = '';
@@ -182,14 +182,20 @@ class GameCard extends ActiveRecord
         $count = self::find()->where(['room_id'=>$room_id])->count();
         if($count==Card::CARD_NUM_ALL){
             //所选择的牌
-            $cardSelected = self::find()->where(['room_id'=>$room_id,'type'=>self::TYPE_IN_HAND,'type_ord'=>$ord])->one();
+            $cardSelected = self::find()->where(['room_id'=>$room_id,'type'=>self::TYPE_IN_HAND,'type_ord'=>$type_ord])->one();
             if($cardSelected){
                 $card_ord = $cardSelected->ord;
                 //将牌丢进弃牌堆
                 $cardSelected->type = self::TYPE_DISCARDED;
                 $cardSelected->type_ord = self::getInsertDiscardOrd($room_id);
                 if($cardSelected->save()){
-                    if(self::moveHandCardsByLackOfCard($room_id,$ord)){
+                    if(self::moveHandCardsByLackOfCard($room_id,$type_ord)){
+                        //给这个玩家摸一张牌
+                        if(in_array($type_ord,self::$host_hands_type_ord)){
+                            GameCard::drawCard($room_id,true);
+                        }else if(in_array($type_ord,self::$guest_hands_type_ord)){
+                            GameCard::drawCard($room_id,false);
+                        }
                         $success = true;
                     }else{
                         $msg = '补牌失败';
@@ -206,7 +212,7 @@ class GameCard extends ActiveRecord
         return [$success,$card_ord,$msg];
     }
 
-    public static function playCard($room_id,$ord){
+    public static function playCard($room_id,$type_ord){
         $success = false;
         $result = false;
         $card_ord = -1;
@@ -214,7 +220,7 @@ class GameCard extends ActiveRecord
         $count = self::find()->where(['room_id'=>$room_id])->count();
         if($count==Card::CARD_NUM_ALL){
             //所选择的牌
-            $cardSelected = self::find()->where(['room_id'=>$room_id,'type'=>self::TYPE_IN_HAND,'type_ord'=>$ord])->one();
+            $cardSelected = self::find()->where(['room_id'=>$room_id,'type'=>self::TYPE_IN_HAND,'type_ord'=>$type_ord])->one();
             if($cardSelected){
                 $game = Game::find()->where(['room_id'=>$room_id])->one();
                 if($game){
@@ -253,14 +259,14 @@ class GameCard extends ActiveRecord
     }
 
 
-    public static function cue($room_id,$ord,$type){
+    public static function cue($room_id,$type_ord,$type){
         $success = false;
         $cards_ord = [];
         //统计牌的总数 应该为50张
         $count = self::find()->where(['room_id'=>$room_id])->count();
         if($count==Card::CARD_NUM_ALL){
             //所选择的牌
-            $cardSelected = self::find()->where(['room_id'=>$room_id,'type'=>self::TYPE_IN_HAND,'type_ord'=>$ord])->one();
+            $cardSelected = self::find()->where(['room_id'=>$room_id,'type'=>self::TYPE_IN_HAND,'type_ord'=>$type_ord])->one();
             if($cardSelected){
                 $game = Game::find()->where(['room_id'=>$room_id])->one();
                 if($game){

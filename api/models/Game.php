@@ -414,13 +414,8 @@ class Game extends ActiveRecord
                         //丢弃一张牌
                         list($discard_success,$card_ord) =GameCard::discardCard($room_id,$ord);
                         if($discard_success){
-                            //给这个玩家摸一张牌
-                            GameCard::drawCard($room_id,$room_player->is_host);
-
                             //恢复一个提示数
                             self::recoverCue($room_id);
-
-
 
                             //插入日志 record
                             //TODO
