@@ -1,5 +1,5 @@
 'use strict'
 module.exports = {
   NODE_ENV: '"production"',
-  AXIOS_BASEURL: '"http://apitest.hanabi8.com/v1"'
+  AXIOS_BASEURL: '"http://api.hanabi8.com/v1"'
 }
