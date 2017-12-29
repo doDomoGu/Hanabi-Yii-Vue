@@ -10,7 +10,7 @@ export default {
     /*console.log(window);
     console.log(canvas);*/
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.height = window.innerHeight - 40;
     ctx.fillStyle = "#cececa";
     ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
     /*ctx.lineWidth = .3;
