@@ -1,6 +1,6 @@
 import { MessageBox } from 'mint-ui'
 export default {
-  name: 'room',
+  name: 'room2',
   data () {
     return {
     }
